@@ -6,7 +6,7 @@ from typing import Dict, List, Tuple
 
 
 DOMAIN_KEYWORDS: Dict[str, List[str]] = {
-    "mechanics": ["mass", "acceleration", "force", "speed", "velocity", "kinetic energy", "momentum", "block", "car"],
+    "mechanics": ["mass", "acceleration", "force", "speed", "velocity", "kinetic energy", "momentum", "block", "car", "falls", "fall", "free fall", "falling", "brake", "brakes", "braking", "decelerat", "stops", "drop", "dropped", "object", "motorbike", "motorcycle", "train", "vehicle", "wagon", "truck"],
     "electricity": [
         "capacitor", "capacitance", "charge", "voltage", "battery", "resistor", "resistance", "current", "circuit",
         "ac circuit", "alternating current", "rms", "impedance", "reactance", "power factor", "phase angle",
@@ -26,7 +26,7 @@ SUBDOMAIN_KEYWORDS: Dict[str, List[str]] = {
     "ohms_law": ["resistor", "resistance", "current", "voltage"],
     "capacitors": ["capacitor", "capacitance", "energy stored"],
     "coulombs_law": ["point charges", "coulomb force", "electric force"],
-    "kinematics": ["from rest", "accelerates", "velocity", "speed", "distance"],
+    "kinematics": ["from rest", "accelerates", "velocity", "speed", "distance", "falls", "fall", "free fall", "falling", "brake", "brakes", "braking", "decelerat", "stops", "drop", "dropped", "uniformly accelerated", "uniformly decelerated"],
     "wave_relation": ["frequency", "wavelength", "wave speed"],
     "ac_circuit": ["ac circuit", "alternating current", "rms", "impedance", "reactance", "power factor", "phase angle"],
     "rlc_circuit": ["rlc", "series rlc"],

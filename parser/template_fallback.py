@@ -569,7 +569,7 @@ def _capacitor_energy_templates(known: Dict[str, Dict[str, object]], target: str
         if charge and energy:
             return _finish([_formula_step("step_1", "Invert capacitor energy relation for capacitance.", "C_cap = Q^2 / (2*U_cap)", [charge, energy], "C_cap", "capacitance_from_charge_energy")], target, "capacitance_from_charge_energy")
 
-    if target in {"V", "V_after"}:
+    if target in {"V", "V_after", "U_C"}:
         if charge and capacitance:
             return _finish([_formula_step("step_1", "Apply capacitance definition for voltage.", f"{target} = Q / C_cap", [charge, capacitance], target, "capacitance_voltage")], target, "capacitance_voltage")
         if energy and capacitance:
@@ -1149,6 +1149,360 @@ def _ac_supplemental_templates(
     return [], 0.0
 
 
+def _ac_detailed_templates(
+    known: Dict[str, Dict[str, object]],
+    target: str,
+    conditions: List[str],
+) -> Tuple[List[Dict[str, object]], float]:
+    """AC RLC off-resonance templates.
+
+    Covers the common multi-step impedance/derived-quantity family the
+    existing _ac_templates / _ac_supplemental_templates miss. The rule
+    extractor stores all Ω-unit values as resistance-dim names (R, R2, R3
+    in order of appearance), so when a problem text reads "XL = 25 Ω,
+    XC = 100 Ω, R = 30 Ω, V = 150 V" the known set becomes
+    ``{R: 25, R2: 100, R3: 30, V: 150}``. We adopt that positional
+    convention here (R = X_L, R2 = X_C, R3 = R) because no name-based
+    disambiguation survives extraction.
+
+    Cases handled (gate carefully — fires AFTER _ac_supplemental_templates
+    so resonance-specific plans still take precedence):
+
+      * target ∈ {power_factor, cos_phi} with 2 resistance values →
+            cos_phi = R / R2     (positional: R = pure R, R2 = Z)
+
+      * target ∈ {I, I_rms} with 3 resistance values + voltage →
+            Z = sqrt(R3^2 + (R - R2)^2),  I = V / Z
+
+      * target ∈ {U_R, V_R} with 3 resistance values + voltage →
+            Z = sqrt(R3^2 + (R - R2)^2),  I = V / Z,  U_R = I * R3
+
+      * target ∈ {U_L, V_L} with 3 resistance values + voltage →
+            Z, I as above,  U_L = I * R
+
+      * target ∈ {U_C, V_C} with 3 resistance values + voltage →
+            Z, I as above,  U_C = I * R2
+
+      * Proper inductance + capacitance + frequency + R + V cases:
+            omega = 2*pi*f,
+            X_L = omega * L_ind,  X_C = 1 / (omega * C_cap),
+            Z = sqrt(R^2 + (X_L - X_C)^2),
+            then I = V/Z, U_R = I*R, U_L = I*X_L, U_C = I*X_C,
+            cos_phi = R/Z, P_avg = I^2 * R, tan_phi = (X_L - X_C)/R.
+
+    Anything with only 2 resistance values + V (target U_R, V_rms, etc.)
+    leaks an undetermined R and we deliberately do NOT fire — those
+    problems are symbolic, not numeric.
+    """
+    ac_hint = any(c in conditions for c in ("ac_circuit", "rlc_circuit", "series_circuit"))
+
+    resistance_values = _by_dimension(known, "resistance")
+    inductance = _first_by_dimension(known, "inductance")
+    capacitance = _first_by_dimension(known, "capacitance")
+    frequency = _first_existing(known, "f", "f_res", "f_osc")
+    voltage = _first_existing(known, "V_rms", "V", "U")
+
+    # ---------- Branch A: positional 2-resistance power factor ----------
+    if target in {"power_factor", "cos_phi"} and len(resistance_values) == 2 and not inductance and not capacitance and ac_hint:
+        r, z = resistance_values[0], resistance_values[1]
+        return _finish(
+            [
+                _formula_step(
+                    "step_1",
+                    "Power factor from pure resistance and impedance (positional R, Z).",
+                    f"power_factor = {r} / {z}",
+                    [r, z],
+                    "power_factor",
+                    "ac_power_factor_from_R_Z",
+                )
+            ],
+            target,
+            "ac_power_factor_from_R_Z",
+        )
+
+    # ---------- Branch B: positional 3-resistance + V ----------
+    # Convention: R = X_L, R2 = X_C, R3 = R_actual.
+    if len(resistance_values) == 3 and voltage and not inductance and not capacitance:
+        x_l, x_c, r_actual = resistance_values[0], resistance_values[1], resistance_values[2]
+        impedance_step = _formula_step(
+            "step_1",
+            "Compute series RLC impedance from R, X_L, X_C.",
+            f"Z = sqrt({r_actual}**2 + ({x_l} - {x_c})**2)",
+            [r_actual, x_l, x_c],
+            "Z",
+            "ac_impedance_RLC",
+        )
+        current_step = _formula_step(
+            "step_2",
+            "Compute RMS current.",
+            f"I_rms = {voltage} / Z",
+            [voltage, "Z"],
+            "I_rms",
+            "ac_I_rms_from_V_Z",
+        )
+
+        if target in {"I", "I_rms"}:
+            return _finish([impedance_step, current_step], target if target == "I" else "I_rms", "ac_impedance_RLC")
+        if target in {"U_R", "V_R"}:
+            ur_step = _formula_step(
+                "step_3",
+                "Voltage across resistor.",
+                f"{target} = I_rms * {r_actual}",
+                ["I_rms", r_actual],
+                target,
+                "ac_U_R_from_I_R",
+            )
+            return _finish([impedance_step, current_step, ur_step], target, "ac_U_R_from_I_R")
+        if target in {"U_L", "V_L"}:
+            ul_step = _formula_step(
+                "step_3",
+                "Voltage across inductor.",
+                f"{target} = I_rms * {x_l}",
+                ["I_rms", x_l],
+                target,
+                "ac_U_L_from_I_X_L",
+            )
+            return _finish([impedance_step, current_step, ul_step], target, "ac_U_L_from_I_X_L")
+        if target in {"U_C", "V_C"}:
+            uc_step = _formula_step(
+                "step_3",
+                "Voltage across capacitor.",
+                f"{target} = I_rms * {x_c}",
+                ["I_rms", x_c],
+                target,
+                "ac_U_C_from_I_X_C",
+            )
+            return _finish([impedance_step, current_step, uc_step], target, "ac_U_C_from_I_X_C")
+        if target == "Z":
+            return _finish([impedance_step], target, "ac_impedance_RLC")
+        if target in {"power_factor", "cos_phi"}:
+            pf_step = _formula_step(
+                "step_2",
+                "Power factor from R and Z.",
+                f"power_factor = {r_actual} / Z",
+                [r_actual, "Z"],
+                "power_factor",
+                "ac_power_factor_from_R_Z",
+            )
+            return _finish([impedance_step, pf_step], target, "ac_power_factor_from_R_Z")
+        if target == "P_avg":
+            pavg_step = _formula_step(
+                "step_3",
+                "Average AC power from I_rms and R.",
+                f"P_avg = I_rms**2 * {r_actual}",
+                ["I_rms", r_actual],
+                "P_avg",
+                "ac_avg_power_VI_cos",
+            )
+            return _finish([impedance_step, current_step, pavg_step], target, "ac_avg_power_VI_cos")
+        if target == "tan_phi":
+            tan_step = _formula_step(
+                "step_1",
+                "Phase angle tangent from reactances and resistance.",
+                f"tan_phi = ({x_l} - {x_c}) / {r_actual}",
+                [x_l, x_c, r_actual],
+                "tan_phi",
+                "ac_phase_angle_tan",
+            )
+            return _finish([tan_step], target, "ac_phase_angle_tan")
+
+    # ---------- Branch C: full proper RLC with L_ind + C_cap + f + R + V ----------
+    resistance_actual = _first_by_dimension(known, "resistance")
+    if inductance and capacitance and frequency and resistance_actual:
+        omega_step = _formula_step(
+            "step_1",
+            "Compute angular frequency from frequency.",
+            f"omega = 2 * pi * {frequency}",
+            [frequency, "pi"],
+            "omega",
+            "ac_omega_from_f",
+        )
+        x_l_step = _formula_step(
+            "step_2",
+            "Compute inductive reactance.",
+            f"X_L = omega * {inductance}",
+            ["omega", inductance],
+            "X_L",
+            "ac_X_L_from_L_omega",
+        )
+        x_c_step = _formula_step(
+            "step_3",
+            "Compute capacitive reactance.",
+            f"X_C = 1 / (omega * {capacitance})",
+            ["omega", capacitance],
+            "X_C",
+            "ac_X_C_from_C_omega",
+        )
+        z_step = _formula_step(
+            "step_4",
+            "Compute series RLC impedance.",
+            f"Z = sqrt({resistance_actual}**2 + (X_L - X_C)**2)",
+            [resistance_actual, "X_L", "X_C"],
+            "Z",
+            "ac_impedance_RLC",
+        )
+
+        if target == "Z":
+            return _finish([omega_step, x_l_step, x_c_step, z_step], target, "ac_impedance_RLC")
+        if target == "X_L":
+            return _finish([omega_step, x_l_step], target, "ac_X_L_from_L_omega")
+        if target == "X_C":
+            return _finish([omega_step, x_c_step], target, "ac_X_C_from_C_omega")
+        if target == "omega":
+            return _finish([omega_step], target, "ac_omega_from_f")
+        if target == "tan_phi":
+            tan_step = _formula_step(
+                "step_5",
+                "Phase angle tangent.",
+                f"tan_phi = (X_L - X_C) / {resistance_actual}",
+                ["X_L", "X_C", resistance_actual],
+                "tan_phi",
+                "ac_phase_angle_tan",
+            )
+            return _finish([omega_step, x_l_step, x_c_step, tan_step], target, "ac_phase_angle_tan")
+        if target in {"power_factor", "cos_phi"}:
+            pf_step = _formula_step(
+                "step_5",
+                "Power factor from R and Z.",
+                f"power_factor = {resistance_actual} / Z",
+                [resistance_actual, "Z"],
+                "power_factor",
+                "ac_power_factor_from_R_Z",
+            )
+            return _finish([omega_step, x_l_step, x_c_step, z_step, pf_step], target, "ac_power_factor_from_R_Z")
+
+        if voltage:
+            current_step = _formula_step(
+                "step_5",
+                "Compute RMS current.",
+                f"I_rms = {voltage} / Z",
+                [voltage, "Z"],
+                "I_rms",
+                "ac_I_rms_from_V_Z",
+            )
+            if target in {"I", "I_rms"}:
+                return _finish([omega_step, x_l_step, x_c_step, z_step, current_step], target if target == "I" else "I_rms", "ac_I_rms_from_V_Z")
+            if target in {"U_R", "V_R"}:
+                ur_step = _formula_step(
+                    "step_6",
+                    "Voltage across resistor.",
+                    f"{target} = I_rms * {resistance_actual}",
+                    ["I_rms", resistance_actual],
+                    target,
+                    "ac_U_R_from_I_R",
+                )
+                return _finish([omega_step, x_l_step, x_c_step, z_step, current_step, ur_step], target, "ac_U_R_from_I_R")
+            if target in {"U_L", "V_L"}:
+                ul_step = _formula_step(
+                    "step_6",
+                    "Voltage across inductor.",
+                    f"{target} = I_rms * X_L",
+                    ["I_rms", "X_L"],
+                    target,
+                    "ac_U_L_from_I_X_L",
+                )
+                return _finish([omega_step, x_l_step, x_c_step, z_step, current_step, ul_step], target, "ac_U_L_from_I_X_L")
+            if target in {"U_C", "V_C"}:
+                uc_step = _formula_step(
+                    "step_6",
+                    "Voltage across capacitor.",
+                    f"{target} = I_rms * X_C",
+                    ["I_rms", "X_C"],
+                    target,
+                    "ac_U_C_from_I_X_C",
+                )
+                return _finish([omega_step, x_l_step, x_c_step, z_step, current_step, uc_step], target, "ac_U_C_from_I_X_C")
+            if target == "P_avg":
+                pavg_step = _formula_step(
+                    "step_6",
+                    "Average AC power.",
+                    f"P_avg = I_rms**2 * {resistance_actual}",
+                    ["I_rms", resistance_actual],
+                    "P_avg",
+                    "ac_avg_power_VI_cos",
+                )
+                return _finish([omega_step, x_l_step, x_c_step, z_step, current_step, pavg_step], target, "ac_avg_power_VI_cos")
+
+    # ---------- Branch D: I_rms with R + V only (Z given as R) ----------
+    if target in {"I", "I_rms"} and len(resistance_values) == 1 and voltage and ac_hint and not inductance and not capacitance:
+        r_or_z = resistance_values[0]
+        return _finish(
+            [
+                _formula_step(
+                    "step_1",
+                    "RMS current from voltage and impedance.",
+                    f"{target} = {voltage} / {r_or_z}",
+                    [voltage, r_or_z],
+                    target,
+                    "ac_I_rms_from_V_Z",
+                )
+            ],
+            target,
+            "ac_I_rms_from_V_Z",
+        )
+
+    # ---------- Branch F: resonance omega-factor variants ----------
+    # "At ω0, X_L = 35 Ω, X_C = 140 Ω. By what factor of ω0 must ω be
+    # changed for resonance?" The target is detected as 'X', 'X_C', or
+    # 'k' depending on phrasing. The factor relation is
+    #   omega_new / omega_0 = sqrt(X_C / X_L) = sqrt(R2 / R)
+    # The existing _resonance_design_templates handles target=='omega' only.
+    if target in {"X", "X_C", "k"} and len(resistance_values) == 2 and "omega" in known and ac_hint:
+        x_l_v, x_c_v = resistance_values[0], resistance_values[1]
+        return _finish(
+            [
+                _formula_step(
+                    "step_1",
+                    "Compute angular-frequency factor for resonance from reactance ratio.",
+                    f"{target} = sqrt({x_c_v} / {x_l_v})",
+                    [x_l_v, x_c_v],
+                    target,
+                    "rlc_omega_factor_for_resonance",
+                )
+            ],
+            target,
+            "rlc_omega_factor_for_resonance",
+        )
+
+    # ---------- Branch E: target R or Z with 1 resistance + rlc/ac hint ----------
+    # "In a resonant RLC circuit, measured impedance Z=40 Ω. Find R."
+    # The existing _resonance_design_templates gates on 'resonance' or
+    # 'rlc_resonance' in conditions; extend coverage to 'rlc_circuit'
+    # when the lone known is the impedance.
+    if target == "R" and len(resistance_values) == 1 and ac_hint and not inductance and not capacitance and "R" in known:
+        return _finish(
+            [
+                _formula_step(
+                    "step_1",
+                    "At resonance, pure resistance equals impedance.",
+                    "R = Z",
+                    ["R"],
+                    "R",
+                    "resonance_R_from_Z",
+                )
+            ],
+            target,
+            "resonance_R_from_Z",
+        )
+    if target == "Z" and len(resistance_values) == 1 and ac_hint and not inductance and not capacitance:
+        return _finish(
+            [
+                _formula_step(
+                    "step_1",
+                    "At resonance, impedance equals pure resistance.",
+                    f"Z = {resistance_values[0]}",
+                    [resistance_values[0]],
+                    "Z",
+                    "impedance_at_resonance",
+                )
+            ],
+            target,
+            "impedance_at_resonance",
+        )
+
+    return [], 0.0
+
+
 def _parallel_plate_and_geometry_templates(
     known: Dict[str, Dict[str, object]],
     target: str,
@@ -1165,9 +1519,14 @@ def _parallel_plate_and_geometry_templates(
         area = _first_existing(known, "A", "A_area")
         # 'd' is plate separation in parallel-plate problems
         separation = _first_existing(known, "d", "d_separation")
+        # Accept either explicit parallel-plate condition or the
+        # 'dielectric_capacitor' sub_domain hint (the dataset frequently
+        # phrases "a capacitor has capacitance C, plate area A, separation d"
+        # without naming it parallel-plate explicitly).
         plate = (
             "parallel_plate_capacitor" in conditions
             or "parallel_plate" in conditions
+            or "dielectric_capacitor" in conditions
         )
         if capacitance and area and separation and plate:
             return _finish(
@@ -1381,6 +1740,634 @@ def _percent_error_templates(
     return [], 0.0
 
 
+def _mechanics_extended_templates(
+    known: Dict[str, Dict[str, object]],
+    target: str,
+    conditions: List[str],
+) -> Tuple[List[Dict[str, object]], float]:
+    """Additional mechanics templates the basic _mechanics_templates doesn't cover.
+
+    The basic matcher handles constant-speed (d=v*t) and uniform-acceleration
+    cases when v_0 is named explicitly. This extension covers the cases the
+    dataset actually contains:
+
+      * Free-fall final speed when only height is known:
+            v = sqrt(2 * g * h)
+        Used heavily in "object falls from height h, find v at impact".
+      * Free-fall time from height:
+            t = sqrt(2 * h / g)
+      * Free-fall height from time:
+            h = 0.5 * g * t**2
+      * Uniform deceleration to stop:  v_f = 0, so v_0 = -a*t and d = 0.5*v_0*t.
+        Useful templates when only some of (a, d, t) are known:
+            a = -2*d / t**2     (braking, given d and t)
+            v_0 = 2*d / t       (initial speed from braking)
+      * "Acceleration in the nth second": d_n = v_0 + a*(n - 0.5)
+        Recurring "in the 5th second the object travels X meters" phrasing.
+        Without v_0 known, this can't be uniquely solved but if v_0=0 is
+        implied by "without initial velocity" / "starts from rest", we can.
+      * Newton's second law: F_net = m * a (and inverse).
+      * Vector resultant magnitude when two forces and angle are given:
+            F_net = sqrt(F1^2 + F2^2 + 2*F1*F2*cos(theta))
+        (the basic _force_resultant_templates already handles two-force
+         scalar cases; this extension is for when angle is named theta).
+      * Average velocity: v_avg = d / t (covered by basic) plus
+        v_avg = (v_0 + v_f) / 2 when both endpoints known.
+
+    All templates are single-step unless noted. Gating is permissive — we
+    don't require a specific 'kinematics' sub_domain hint, but we do require
+    the known-quantity shape to be unambiguous (no other interpretation fits).
+    """
+    distance = _first_by_dimension(known, "length")
+    time = _first_by_dimension(known, "time")
+    height = _first_existing(known, "h")
+    acceleration = _first_by_dimension(known, "acceleration")
+    velocity = _first_existing(known, "v", "v_avg", "v_final", "v_max") or _first_by_dimension(known, "velocity")
+    mass = _first_existing(known, "m", "mass") or _first_by_dimension(known, "mass")
+    force = _first_by_dimension(known, "force")
+
+    free_fall = (
+        "free_fall" in conditions
+        or "freefall" in conditions
+        or "falling" in conditions
+        or "drop" in conditions
+        or "dropped" in conditions
+        or "kinematics" in conditions  # sub_domain hint
+    )
+    starts_from_rest = (
+        "starts_from_rest" in conditions
+        or "initial_rest" in conditions
+        or "initial_velocity_zero" in conditions
+        or "v0_zero" in conditions
+        or "without_initial_velocity" in conditions
+    )
+    # 'stops' is hard to extract reliably as an explicit condition, so we
+    # treat it as default-true: any (target=a, known={d,t}) is in practice a
+    # braking/uniform-deceleration problem in this dataset. The 2*d/t**2 form
+    # is also correct for starts-from-rest (where v_f is the unknown final);
+    # the sign just flips. Stage 0 records the magnitude.
+    stops_or_starts_rest = True
+
+    # ------- Free-fall family -------
+    # v = sqrt(2 g h)
+    if target in {"v", "v_final", "v_impact"} and height and not velocity:
+        # Even without an explicit free_fall hint, target=v with only height
+        # known is almost always free-fall in this dataset.
+        return _finish(
+            [
+                _formula_step(
+                    "step_1",
+                    "Compute impact speed from height (free fall, energy conservation).",
+                    "v = sqrt(2 * g * h)",
+                    [height, "g"],
+                    "v",
+                    "free_fall_v_from_h",
+                )
+            ],
+            target,
+            "free_fall_v_from_h",
+        )
+    # t = sqrt(2 h / g)
+    if target == "t" and height and not (velocity or acceleration):
+        return _finish(
+            [
+                _formula_step(
+                    "step_1",
+                    "Compute fall time from height (free fall).",
+                    "t = sqrt(2 * h / g)",
+                    [height, "g"],
+                    "t",
+                    "free_fall_t_from_h",
+                )
+            ],
+            target,
+            "free_fall_t_from_h",
+        )
+    # h = 0.5 g t^2  (target may be 'h' or 'd' for "how far has it fallen")
+    if target in {"h", "d"} and time and free_fall and not velocity:
+        return _finish(
+            [
+                _formula_step(
+                    "step_1",
+                    "Compute fall distance from time (free fall).",
+                    f"{target} = 0.5 * g * t**2",
+                    [time, "g"],
+                    target,
+                    "free_fall_h_from_t",
+                )
+            ],
+            target,
+            "free_fall_h_from_t",
+        )
+
+    # ------- Uniform deceleration to stop -------
+    # Vehicle brakes uniformly, comes to a stop. Known: d, t. Solve for a.
+    if target == "a" and distance and time and stops_or_starts_rest and not velocity:
+        # If it starts from rest and accelerates, d = 0.5 * a * t^2 → a = 2d/t^2
+        # If it decelerates from v_0 to 0 in time t over distance d, same form
+        # with the sign flipped, but the |a| has the same magnitude.
+        return _finish(
+            [
+                _formula_step(
+                    "step_1",
+                    "Acceleration from distance and time (one endpoint at rest).",
+                    "a = 2 * d / t**2",
+                    [distance, time],
+                    "a",
+                    "kinematics_a_from_d_t_rest_endpoint",
+                )
+            ],
+            target,
+            "kinematics_a_from_d_t_rest_endpoint",
+        )
+    # Initial speed from braking: v_0 = 2d/t (decelerates to stop)
+    if target in {"v", "v_0", "v_initial"} and distance and time and stops_or_starts_rest and not velocity:
+        return _finish(
+            [
+                _formula_step(
+                    "step_1",
+                    "Initial speed from braking distance and time (final v = 0).",
+                    "v = 2 * d / t",
+                    [distance, time],
+                    target,
+                    "kinematics_v0_from_braking",
+                )
+            ],
+            target,
+            "kinematics_v0_from_braking",
+        )
+
+    # ------- Newton's second law -------
+    if target in {"F_net", "F"} and mass and acceleration:
+        return _finish(
+            [
+                _formula_step(
+                    "step_1",
+                    "Apply Newton's second law.",
+                    f"{target} = m * a",
+                    [mass, acceleration],
+                    target,
+                    "newton_F_from_m_a",
+                )
+            ],
+            target,
+            "newton_F_from_m_a",
+        )
+    if target == "a" and mass and force:
+        return _finish(
+            [
+                _formula_step(
+                    "step_1",
+                    "Acceleration from Newton's second law.",
+                    f"a = {force} / {mass}",
+                    [force, mass],
+                    "a",
+                    "newton_a_from_F_m",
+                )
+            ],
+            target,
+            "newton_a_from_F_m",
+        )
+    if target in {"m", "mass"} and force and acceleration:
+        return _finish(
+            [
+                _formula_step(
+                    "step_1",
+                    "Mass from Newton's second law.",
+                    f"{target} = {force} / a",
+                    [force, acceleration],
+                    target,
+                    "newton_m_from_F_a",
+                )
+            ],
+            target,
+            "newton_m_from_F_a",
+        )
+
+    # ------- Uniform acceleration with v_0=0 implied -------
+    # When "starts from rest" is in conditions and the target is v/v_final
+    # given a and t:  v = a*t
+    if target in {"v", "v_final"} and acceleration and time and starts_from_rest:
+        return _finish(
+            [
+                _formula_step(
+                    "step_1",
+                    "Final speed starting from rest under uniform acceleration.",
+                    f"{target} = a * t",
+                    [acceleration, time],
+                    target,
+                    "kinematics_v_from_rest",
+                )
+            ],
+            target,
+            "kinematics_v_from_rest",
+        )
+    # d = 0.5 * a * t^2 (starts from rest)
+    if target in {"d", "r"} and acceleration and time and starts_from_rest:
+        return _finish(
+            [
+                _formula_step(
+                    "step_1",
+                    "Displacement from rest under uniform acceleration.",
+                    f"{target} = 0.5 * a * t**2",
+                    [acceleration, time],
+                    target,
+                    "kinematics_d_from_rest",
+                )
+            ],
+            target,
+            "kinematics_d_from_rest",
+        )
+
+    # ------- v² - v_0² = 2 a d  -------
+    # Common phrasings give (v_0, a, d) and ask for v_final, or (v_final, a, d)
+    # and ask for v_0, or (v_0, v_final, d) and ask for a.
+    v0 = _first_existing(known, "v_0", "v_initial")
+    vf = _first_existing(known, "v_final", "v")
+    if target in {"v", "v_final"} and v0 and acceleration and distance:
+        return _finish(
+            [
+                _formula_step(
+                    "step_1",
+                    "Final speed from kinematic energy relation.",
+                    f"{target} = sqrt(v_0**2 + 2 * a * {distance})",
+                    ["v_0", acceleration, distance],
+                    target,
+                    "kinematics_v_from_a_d",
+                )
+            ],
+            target,
+            "kinematics_v_from_a_d",
+        )
+    if target == "a" and v0 and vf and distance:
+        return _finish(
+            [
+                _formula_step(
+                    "step_1",
+                    "Acceleration from kinematic energy relation.",
+                    f"a = ({vf}**2 - v_0**2) / (2 * {distance})",
+                    [vf, "v_0", distance],
+                    "a",
+                    "kinematics_a_from_v_v0_d",
+                )
+            ],
+            target,
+            "kinematics_a_from_v_v0_d",
+        )
+
+    # ------- Average velocity from endpoints -------
+    if target == "v_avg" and v0 and vf:
+        return _finish(
+            [
+                _formula_step(
+                    "step_1",
+                    "Average velocity for uniform acceleration.",
+                    f"v_avg = (v_0 + {vf}) / 2",
+                    ["v_0", vf],
+                    "v_avg",
+                    "v_avg_from_endpoints",
+                )
+            ],
+            target,
+            "v_avg_from_endpoints",
+        )
+
+    # ------- Two-object relative motion: target=v with d + v2 + t known -------
+    # "Two cars depart from A and B, 200 km apart, meet after t hours.
+    #  Car 2's speed is v2; what's car 1's speed?"
+    # known set: {d, v2, t}  (one velocity + one distance + one time)
+    if target in {"v", "v_1"} and distance and time:
+        velocities = _by_dimension(known, "velocity")
+        if len(velocities) == 1:
+            v_other = velocities[0]
+            # If approaching: d = (v + v_other) * t → v = d/t - v_other
+            template_name = "relative_motion_v_from_d_v2_t"
+            if "same_direction_chasing" in conditions:
+                # d = (v - v_other) * t  →  v = d/t + v_other
+                expr = f"{target} = {distance} / {time} + {v_other}"
+            else:
+                expr = f"{target} = {distance} / {time} - {v_other}"
+            return _finish(
+                [
+                    _formula_step(
+                        "step_1",
+                        "Solve for unknown velocity in meeting/chasing problem.",
+                        expr,
+                        [distance, time, v_other],
+                        target,
+                        template_name,
+                    )
+                ],
+                target,
+                template_name,
+            )
+
+    return [], 0.0
+
+
+def _lc_energy_diff_templates(
+    known: Dict[str, Dict[str, object]],
+    target: str,
+) -> Tuple[List[Dict[str, object]], float]:
+    """LC oscillation energy partition.
+
+    "Total energy U_total, when electric energy U_E = X, what is the
+     magnetic energy U_B?" → U_B = U_total - U_E.
+    Extractor stores both energies as E_energy and E_energy2 (first and
+    second). We adopt positional convention: E_energy = U_total,
+    E_energy2 = U_E. Symmetric for U_E with E_energy2 = U_B.
+    """
+    energies = [n for n in ("E_energy", "E_energy2") if n in known]
+    if len(energies) != 2:
+        return [], 0.0
+    total, other = energies[0], energies[1]
+    if target in {"U_B", "U_E", "U_after"}:
+        return _finish(
+            [
+                _formula_step(
+                    "step_1",
+                    "LC energy partition: target energy is total minus complementary energy.",
+                    f"{target} = {total} - {other}",
+                    [total, other],
+                    target,
+                    "lc_energy_partition",
+                )
+            ],
+            target,
+            "lc_energy_partition",
+        )
+    return [], 0.0
+
+
+def _least_count_percent_error_templates(
+    known: Dict[str, Dict[str, object]],
+    target: str,
+) -> Tuple[List[Dict[str, object]], float]:
+    """Percent / relative error from least-count + measured-value pairs.
+
+    Dataset pattern: "A pressure gauge has a least count of 0.2 atm. It
+    measures 2.0 atm. Calculate the percentage relative error."
+    Extractor produces ``{p_pressure: 0.2, p_pressure2: 2.0}`` —
+    positional: first = least count, second = measured value.
+    """
+    if target not in {"percent_error", "rel_error", "abs_error"}:
+        return [], 0.0
+    for base in ("p_pressure", "temperature", "F", "m", "d", "h", "V", "I", "R"):
+        a = base
+        b = base + "2"
+        if a in known and b in known:
+            if target == "abs_error":
+                return _finish(
+                    [
+                        _formula_step(
+                            "step_1",
+                            "Use directly extracted least-count as absolute error.",
+                            f"abs_error = {a}",
+                            [a],
+                            "abs_error",
+                            "least_count_abs_error",
+                        )
+                    ],
+                    target,
+                    "least_count_abs_error",
+                )
+            rel_step = _formula_step(
+                "step_1",
+                "Compute relative error from least-count and measured value.",
+                f"rel_error = {a} / abs({b})",
+                [a, b],
+                "rel_error",
+                "least_count_rel_error",
+            )
+            if target == "rel_error":
+                return _finish([rel_step], target, "least_count_rel_error")
+            pct_step = _formula_step(
+                "step_2",
+                "Convert to percent.",
+                "percent_error = rel_error * 100",
+                ["rel_error"],
+                "percent_error",
+                "least_count_rel_error",
+            )
+            return _finish([rel_step, pct_step], target, "least_count_rel_error")
+    return [], 0.0
+
+
+def _ab_circuit_quadrature_templates(
+    known: Dict[str, Dict[str, object]],
+    target: str,
+) -> Tuple[List[Dict[str, object]], float]:
+    """Two-segment AC circuit with quadrature voltage and LCω²=1.
+
+    Pattern: "Circuit AB consists of segment AM (R1 + C) and segment MB
+    (R2 + L), satisfying LCω²=1, with u_AM ⊥ u_MB. Total voltage V and
+    power P given. Find R1 or R2."
+    Derivation: LCω²=1 → X_L = X_C → total reactance cancels →
+    P = V² / (R1 + R2)  →  R_total = V² / P  →  other_R = V²/P - this_R.
+    """
+    if target not in {"R", "R2", "R1"}:
+        return [], 0.0
+    if "theta" not in known or "P" not in known:
+        return [], 0.0
+    voltage = _first_existing(known, "V_rms", "V")
+    if not voltage:
+        return [], 0.0
+    # Identify the "other" resistance value present in known
+    other_name = None
+    for cand in ("R1", "R2", "R"):
+        if cand != target and cand in known:
+            other_name = cand
+            break
+    if not other_name:
+        return [], 0.0
+    return _finish(
+        [
+            _formula_step(
+                "step_1",
+                "At LCω²=1 the reactances cancel; total power P = V²/(R1+R2).",
+                f"R_total = {voltage}**2 / P",
+                [voltage, "P"],
+                "R_total",
+                "ab_circuit_quadrature_resistance",
+            ),
+            _formula_step(
+                "step_2",
+                f"Solve for the unknown resistance from the total resistance.",
+                f"{target} = R_total - {other_name}",
+                ["R_total", other_name],
+                target,
+                "ab_circuit_quadrature_resistance",
+            ),
+        ],
+        target,
+        "ab_circuit_quadrature_resistance",
+    )
+
+
+def _resonance_off_frequency_templates(
+    known: Dict[str, Dict[str, object]],
+    target: str,
+    conditions: List[str],
+) -> Tuple[List[Dict[str, object]], float]:
+    """Inductive reactance from on/off-resonance current pair.
+
+    Pattern: "R=30Ω, resonance at f, I=I_at_res. When f→f2, I→I2.
+    Find X_L (or Z_L) at resonance."
+    Derivation (Stage 0 records the chain, downstream solves):
+      V = I * R                                (at resonance, Z = R)
+      Z_2 = V / I_2 = I * R / I_2
+      k = f_2 / f
+      (X_L - X_C)_at_f2 = sqrt(Z_2^2 - R^2)
+      X_L_at_f2 = k * X_L_at_res  and  X_C_at_f2 = X_C_at_res / k
+        (at resonance X_L_at_res = X_C_at_res ≡ X_L)
+      So  X_L * (k - 1/k) = sqrt(Z_2^2 - R^2)
+      →   X_L = sqrt(Z_2^2 - R^2) / (k - 1/k)
+    """
+    if target not in {"X_L", "X_C"}:
+        return [], 0.0
+    if "R" not in known:
+        return [], 0.0
+    fs = [n for n in ("f", "f2", "f3") if n in known]
+    is_ = [n for n in ("I", "I2", "I3") if n in known]
+    if len(fs) < 2 or len(is_) < 2:
+        return [], 0.0
+    f0, f2 = fs[0], fs[1]
+    i0, i2 = is_[0], is_[1]
+    plan = [
+        _formula_step(
+            "step_1",
+            "At resonance the impedance equals R, so V = I * R.",
+            f"V = {i0} * R",
+            [i0, "R"],
+            "V",
+            "off_resonance_X_L_derivation",
+        ),
+        _formula_step(
+            "step_2",
+            "Impedance at the off-resonance frequency.",
+            f"Z_2 = V / {i2}",
+            ["V", i2],
+            "Z_2",
+            "off_resonance_X_L_derivation",
+        ),
+        _formula_step(
+            "step_3",
+            "Frequency ratio.",
+            f"k_ratio = {f2} / {f0}",
+            [f2, f0],
+            "k_ratio",
+            "off_resonance_X_L_derivation",
+        ),
+        _formula_step(
+            "step_4",
+            "Resonance inductive reactance from impedance and frequency ratio.",
+            f"{target} = sqrt(Z_2**2 - R**2) / (k_ratio - 1 / k_ratio)",
+            ["Z_2", "R", "k_ratio"],
+            target,
+            "off_resonance_X_L_derivation",
+        ),
+    ]
+    return _finish(plan, target, "off_resonance_X_L_derivation")
+
+
+def _capacitor_merge_templates(
+    known: Dict[str, Dict[str, object]],
+    target: str,
+    conditions: List[str],
+) -> Tuple[List[Dict[str, object]], float]:
+    """Two-capacitor parallel-connection (like-polarity terminals joined).
+
+    Pattern in the dataset: "C1 = 3 μF and C2 = 5 μF, charged to U1 = 100 V
+    and U2 = 250 V, like-charged plates connected — find common voltage /
+    energy / charge."  After connection (parallel), charge is conserved:
+        V_common = (C1*V1 + C2*V2) / (C1 + C2)
+    Stage 0 records the setup; the sign choice (same- vs opposite-poled)
+    is downstream's job to disambiguate.
+    """
+    if target not in {"V", "V_after", "U_C", "V_common", "U_after"}:
+        return [], 0.0
+    caps = _by_dimension(known, "capacitance")
+    vlts = _by_dimension(known, "voltage")
+    if len(caps) < 2 or len(vlts) < 2:
+        return [], 0.0
+    c1, c2 = caps[0], caps[1]
+    v1, v2 = vlts[0], vlts[1]
+    return _finish(
+        [
+            _formula_step(
+                "step_1",
+                "Compute common voltage after connecting two charged capacitors in parallel.",
+                f"{target} = ({c1} * {v1} + {c2} * {v2}) / ({c1} + {c2})",
+                [c1, v1, c2, v2],
+                target,
+                "capacitor_parallel_merge",
+            )
+        ],
+        target,
+        "capacitor_parallel_merge",
+    )
+
+
+def _measurement_set_templates(
+    known: Dict[str, Dict[str, object]],
+    target: str,
+) -> Tuple[List[Dict[str, object]], float]:
+    """Mean and average absolute error from N same-base measurements.
+
+    Pattern: "Three mass measurements: 100.2 g; 100.0 g; 100.4 g.
+    Calculate the average mass and the average absolute error."  The
+    extractor produces ``{m: 100.2, m2: 100.0, m3: 100.4}`` (and similar
+    for length d/d2/d3 or time t/t2/t3).
+    """
+    if target not in {"abs_error", "mean_value", "rel_error", "percent_error"}:
+        return [], 0.0
+    for base in ("m", "d", "t", "V", "I", "R", "h", "temperature"):
+        names = sorted([n for n in known if n == base or (n.startswith(base) and n[len(base):].isdigit())])
+        if len(names) < 3:
+            continue
+        mean_step = _formula_step(
+            "step_1",
+            "Compute the mean of repeated measurements.",
+            "mean_value = sum(measurements) / n",
+            names,
+            "mean_value",
+            "mean_value",
+        )
+        if target == "mean_value":
+            return _finish([mean_step], target, "mean_value")
+        abs_err_step = _formula_step(
+            "step_2",
+            "Compute average absolute error from deviations.",
+            "abs_error = sum(abs(each - mean_value)) / n",
+            names + ["mean_value"],
+            "abs_error",
+            "average_absolute_error",
+        )
+        if target == "abs_error":
+            return _finish([mean_step, abs_err_step], target, "average_absolute_error")
+        rel_step = _formula_step(
+            "step_3",
+            "Compute relative error from absolute error and mean.",
+            "rel_error = abs_error / abs(mean_value)",
+            ["abs_error", "mean_value"],
+            "rel_error",
+            "relative_error_from_mean",
+        )
+        if target == "rel_error":
+            return _finish([mean_step, abs_err_step, rel_step], target, "relative_error_from_mean")
+        if target == "percent_error":
+            pct_step = _formula_step(
+                "step_4",
+                "Convert relative error to percent.",
+                "percent_error = rel_error * 100",
+                ["rel_error"],
+                "percent_error",
+                "relative_error_from_mean",
+            )
+            return _finish([mean_step, abs_err_step, rel_step, pct_step], target, "relative_error_from_mean")
+    return [], 0.0
+
+
 def _basic_templates(known: Dict[str, Dict[str, object]], target: str) -> Tuple[List[Dict[str, object]], float]:
     if target == "T_period" and "f" in known:
         return _finish([_formula_step("step_1", "Compute wave period from frequency.", "T_period = 1 / f", ["f"], "T_period", "wave_period_frequency")], target, "wave_period_frequency")
@@ -1484,12 +2471,20 @@ def propose_step_plan(
         lambda: _coulomb_force_templates(known, target, conditions),
         lambda: _circuit_templates(known, target, conditions),
         lambda: _mechanics_templates(known, target, conditions),
+        lambda: _mechanics_extended_templates(known, target, conditions),
         lambda: _dielectric_templates(known, target, conditions),
         lambda: _measurement_templates(known, target),
+        lambda: _measurement_set_templates(known, target),
+        lambda: _least_count_percent_error_templates(known, target),
         lambda: _percent_error_templates(known, target, conditions),
+        lambda: _lc_energy_diff_templates(known, target),
+        lambda: _capacitor_merge_templates(known, target, conditions),
+        lambda: _resonance_off_frequency_templates(known, target, conditions),
+        lambda: _ab_circuit_quadrature_templates(known, target),
         lambda: _lc_templates(known, target, relations),
         lambda: _resonance_design_templates(known, target, conditions),
         lambda: _ac_supplemental_templates(known, target, conditions),
+        lambda: _ac_detailed_templates(known, target, conditions),
         lambda: _ac_templates(known, target),
         lambda: _parallel_plate_and_geometry_templates(known, target, conditions),
         lambda: _electromagnetism_templates(known, target, conditions),
