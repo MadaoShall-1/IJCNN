@@ -1,0 +1,10 @@
+group,run,path,total,correct,accuracy,parse_errors,numeric_matches,unit_matches
+active,qwen3_8b_td5,outputs/qwen3_8b_td5,5,2,0.4,0,2,4
+active,qwen3_8b_td3_diagnostics,outputs/qwen3_8b_td3_diagnostics,3,1,0.3333333333333333,0,1,3
+archive,qwen3_8b_td3_fallback,outputs/archive/20260515_000136/qwen3_8b_td3_fallback,3,1,0.3333333333333333,0,1,3
+archive,qwen3_8b_td3_prefix_prompt,outputs/archive/20260515_000136/qwen3_8b_td3_prefix_prompt,3,1,0.3333333333333333,0,1,3
+archive,qwen3_8b_td3_selfcheck,outputs/archive/20260515_000136/qwen3_8b_td3_selfcheck,3,1,0.3333333333333333,0,1,3
+archive,qwen3_8b_td3_think,outputs/archive/20260515_000136/qwen3_8b_td3_think,3,1,0.3333333333333333,1,1,2
+archive,qwen3_8b_td5_nothink,outputs/archive/20260515_000136/qwen3_8b_td5_nothink,5,1,0.2,0,1,5
+archive,llama31_8b_td3,outputs/archive/20260515_000136/llama31_8b_td3,3,0,0.0,0,0,3
+archive,old_root_outputs,outputs/archive/20260515_000136/old_root_outputs,1,0,0.0,1,0,0

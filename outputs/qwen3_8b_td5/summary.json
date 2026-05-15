@@ -1,0 +1,11 @@
+{
+  "total_evaluated": 5,
+  "correct": 2,
+  "accuracy": 0.4,
+  "parse_errors": 0,
+  "numeric_matches": 2,
+  "unit_matches": 4,
+  "accuracy_by_prefix": {
+    "TD": 0.4
+  }
+}

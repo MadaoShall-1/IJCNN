@@ -1,0 +1,15 @@
+{
+  "total_evaluated": 3,
+  "correct": 1,
+  "accuracy": 0.3333333333333333,
+  "parse_errors": 0,
+  "numeric_matches": 1,
+  "unit_matches": 3,
+  "accuracy_by_prefix": {
+    "TD": 0.3333333333333333
+  },
+  "error_breakdown": {
+    "correct": 1,
+    "numeric_mismatch": 2
+  }
+}
