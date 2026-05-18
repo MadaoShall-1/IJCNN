@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd /c/Users/cwh50/GitProjects/IJCNN/IJCNN && find . -type f -name \"*.md\" -o -name \"*.txt\" -o -name \"*.toml\" -o -name \"*.cfg\" -o -name \"*.ini\" -o -name \"*.json\" -o -name \"*.py\" | head -50)",
+      "Bash(python -m pytest test_type1.py -v)",
+      "Bash(python test_type1.py -v)"
+    ]
+  }
+}
