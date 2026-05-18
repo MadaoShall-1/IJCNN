@@ -3,7 +3,16 @@
     "allow": [
       "Bash(cd /c/Users/cwh50/GitProjects/IJCNN/IJCNN && find . -type f -name \"*.md\" -o -name \"*.txt\" -o -name \"*.toml\" -o -name \"*.cfg\" -o -name \"*.ini\" -o -name \"*.json\" -o -name \"*.py\" | head -50)",
       "Bash(python -m pytest test_type1.py -v)",
-      "Bash(python test_type1.py -v)"
+      "Bash(python test_type1.py -v)",
+      "Bash(python -m unittest discover -p \"test_*.py\")",
+      "Bash(python -m unittest test_type2_stage4 -v)",
+      "Bash(python -m unittest test_type2_stage5 -v)",
+      "Bash(python -c \"from parser.main import parse_problem; import inspect; print\\(inspect.signature\\(parse_problem\\)\\)\")",
+      "Bash(python -c \"from parser.schemas import ProblemParseObject; import inspect; print\\(inspect.signature\\(ProblemParseObject.__init__\\)\\)\")",
+      "Bash(python -c \"from parser.main import parse_problem; r = parse_problem\\('A 10 ohm resistor has 5V.'\\); print\\(type\\(r\\)\\); print\\(list\\(r.keys\\(\\)\\)[:8]\\)\")",
+      "Bash(python -c ' *)",
+      "Bash(python -m unittest test_api -v)",
+      "Bash(python -m unittest test_type2_stage1 test_type2_stage2 test_type2_stage4 test_type2_stage5 test_type2_stage6 test_api test_type1)"
     ]
   }
 }
