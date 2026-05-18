@@ -1,0 +1,20 @@
+# Core LLM framework (Type 1 DSPy modules)
+dspy-ai>=2.5.0
+
+# Physics / unit handling (Type 2 parser — existing dependency)
+quantulum3>=0.9.1
+Pint>=0.23
+
+# Symbolic math (Type 2 Stage 3 verifier)
+sympy>=1.12
+
+# Formal logic solvers (Type 1 Phase 1)
+z3-solver>=4.12.0
+# Prover9 is a system binary — install separately (Phase 2)
+
+# Scientific constants
+scipy>=1.11
+
+# API serving
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
