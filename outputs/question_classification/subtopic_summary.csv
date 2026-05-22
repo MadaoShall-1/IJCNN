@@ -1,0 +1,45 @@
+﻿domain,topic,subtopic,rows,share
+Electricity and magnetism,Electrostatics,Electric force vector composition,240,0.1368
+Electricity and magnetism,Electrostatics,Electric field from point charges,204,0.1162
+Electricity and magnetism,Capacitors,Capacitor energy,159,0.0906
+Electricity and magnetism,AC circuits and resonance,RLC impedance/resistance,150,0.0855
+Electricity and magnetism,Capacitors,Parallel-plate capacitor and dielectric,143,0.0815
+Electricity and magnetism,AC circuits and resonance,RLC capacitance,111,0.0632
+Mechanics,Motion,Kinematics,108,0.0615
+Mechanics,Motion,Meeting-point motion,86,0.049
+Electricity and magnetism,Magnetism and inductors,Inductor energy,63,0.0359
+Electricity and magnetism,Electrostatics,Coulomb force,51,0.0291
+Electricity and magnetism,AC circuits and resonance,RLC frequency,44,0.0251
+Electricity and magnetism,Basic circuits,Ohm's law,43,0.0245
+Measurement,Measurement and uncertainty,Absolute error and bounds,42,0.0239
+Electricity and magnetism,Magnetism and inductors,Solenoid magnetic field,41,0.0234
+Electricity and magnetism,AC circuits and resonance,Resonance yes/no judgment,36,0.0205
+Optics,Geometric optics,Lens/image calculation,26,0.0148
+Electricity and magnetism,Electromagnetic induction,Induced EMF,22,0.0125
+Electricity and magnetism,Capacitors,Capacitor charge,21,0.012
+Waves and oscillations,Oscillations and waves,Simple harmonic motion,20,0.0114
+Electricity and magnetism,Basic circuits,Electrical power,16,0.0091
+Electricity and magnetism,Basic circuits,Circuit qualitative behavior,13,0.0074
+Measurement,Measurement and uncertainty,Measurement uncertainty,12,0.0068
+Mechanics,Energy,Mechanical energy,11,0.0063
+Electricity and magnetism,Magnetism and inductors,Inductance,11,0.0063
+Measurement,Measurement and uncertainty,Relative error,11,0.0063
+Electricity and magnetism,AC circuits and resonance,RLC inductance,9,0.0051
+Waves and oscillations,Oscillations and waves,LC oscillation,8,0.0046
+Electricity and magnetism,AC circuits and resonance,RLC resonance calculation,7,0.004
+Thermodynamics,Heat and temperature,Thermal calculation,6,0.0034
+Electricity and magnetism,Magnetism and inductors,Solenoid turn density,6,0.0034
+Electricity and magnetism,Capacitors,Capacitor voltage,5,0.0028
+Electricity and magnetism,Magnetism and inductors,Magnetic flux,4,0.0023
+Optics,Wave optics,Interference,4,0.0023
+Mechanics,Motion,Relative motion in current,4,0.0023
+Electricity and magnetism,Capacitors,Capacitance calculation,3,0.0017
+Waves and oscillations,Oscillations and waves,Oscillation calculation,3,0.0017
+Electricity and magnetism,Electrostatics,Point-charge electrostatics,3,0.0017
+Electricity and magnetism,Magnetism and inductors,Magnetism calculation,3,0.0017
+Electricity and magnetism,Basic circuits,Electrical energy efficiency,1,0.0006
+Data quality,Missing question,Missing question text,1,0.0006
+Electricity and magnetism,Electrostatics,Electric potential,1,0.0006
+Electricity and magnetism,Capacitors,Capacitor calculation,1,0.0006
+Optics,Wave optics,Refraction,1,0.0006
+Waves and oscillations,Oscillations and waves,Sound frequency,1,0.0006

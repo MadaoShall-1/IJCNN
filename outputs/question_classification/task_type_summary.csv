@@ -1,0 +1,11 @@
+﻿task_type,answer_mode,rows,share
+single_numeric_calculation,numeric,894,0.5094
+unlabeled_question,unlabeled,414,0.2359
+single_numeric_calculation,scientific_notation,220,0.1254
+qualitative_explanation,text,101,0.0575
+ratio_or_percent_calculation,numeric,71,0.0405
+multi_part_calculation,multi_value,25,0.0142
+yes_no_judgment,boolean,21,0.012
+single_numeric_calculation,symbolic,6,0.0034
+ratio_or_percent_calculation,scientific_notation,2,0.0011
+missing_question,unlabeled,1,0.0006
