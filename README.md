@@ -235,12 +235,30 @@ Analyze a run:
 python analyze_results.py --results outputs/qwen3_8b_td3/results.csv
 ```
 
+## Dataset Analysis
+
+Profile the raw Excel dataset:
+
+```powershell
+python analyze_dataset.py --data Physics_Problems_Text_Only.xlsx
+```
+
+Outputs are written to `outputs/data_analysis/`.
+
+Classify questions by physics topic and task type:
+
+```powershell
+python classify_questions.py --data Physics_Problems_Text_Only.xlsx
+```
+
+Outputs are written to `outputs/question_classification/`. The classification rules are documented in `outputs/question_classification/README.md`.
+
 ## Verification
 
 Basic local checks:
 
 ```powershell
-python -m py_compile run_benchmark.py llm_client.py evaluator.py analyze_results.py
+python -m py_compile run_benchmark.py llm_client.py evaluator.py analyze_results.py analyze_dataset.py classify_questions.py
 ```
 
 The benchmark runner requires a running local model server for real evaluation. Without one, it fails fast instead of silently producing parse errors.
