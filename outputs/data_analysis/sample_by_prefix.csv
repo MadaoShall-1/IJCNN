@@ -1,0 +1,32 @@
+﻿id,prefix,question_text,answer_text,unit_text,answer_format
+CH001,CH,"In a resonant RLC circuit, the measured impedance is Z=40 Ω. Determine the pure resistance R.",40,Ω,plain_number
+CH002,CH,"An RLC series circuit is in resonance. The inductor has L = 0.5 H, the capacitor has C = 20 μF, and the total impedance is Z = 80 Ω. Calculate the resistance R.",80,Ω,plain_number
+CH003,CH,"At resonance, an RLC circuit has a total impedance of 120 Ω. What is the value of the pure resistance R?",120,Ω,plain_number
+CHLT001,CHLT,"An RLC series circuit consists of R=50 Ω, L=0.5 H, and C=20 μF. When an AC voltage with a frequency of 40 Hz is supplied, does the circuit experience electrical resonance?",No,-,boolean
+CHLT002,CHLT,"Given a series AC circuit with R = 10 Ω, L = 0.4 H, and C = 50 μF, determine if resonance occurs at an operating frequency of 35.6 Hz.",Yes,-,boolean
+CHLT003,CHLT,A pure inductor with an inductance of 0.2 H is connected in series with a resistor R=25 Ω and a capacitor C=10 μF. Determine if resonance occurs at a frequency of f=112 Hz?,Yes,-,boolean
+DDT131,DDT,"A solenoid is 0.5 m long, has 1000 turns, and a current of 2 A flows through it. Calculate the magnitude of the magnetic field inside the solenoid.",0.005,T,plain_number
+DDT132,DDT,"A solenoid is 1 m long, has 2000 turns of wire, and a current of 3 A flows through it. Calculate the magnetic field inside the solenoid.",0.00754,T,plain_number
+DDT133,DDT,A 0.6 m long solenoid has 1200 turns and a cross-sectional area of 5 cm². Calculate the inductance of the solenoid.,1.508,mH,plain_number
+DT001,DT,"Two point charges, q1 and q2, are placed at points A and B, separated by 10 cm in air. Both charges have a magnitude of q1 = q2 = 16 x 10^-8 C. Determine the electric field strength produced by these two point charges at point M, where MA = MB = 5 cm.",0,V/m,plain_number
+DT002,DT,"Two point charges, q1 = q2 = 16 x 10^-8 C, are placed at points A and B, which are 10 cm apart in air. Determine the electric field strength due to these two point charges at point N, given that NA = 5 cm and NB = 15 cm.",640000,V/m,plain_number
+DT003,DT,"Two point charges, q1 = q2 = 16 x 10^-8 C, are placed at points A and B, which are 10 cm apart in the air. Determine the electric field strength caused by these two point charges at point C, given that AC = BC = 8 cm.",351000,V/m,plain_number
+LD001,LD,"Two charges, q1 = 6 × 10^-8 C and q2 = -6 × 10^-8 C, are placed at points A and B in air, 8 cm apart. A third charge, q3 = 6 × 10^-8 C, is placed at point C, with CA = 5 cm and CB = 3 cm. Determine the force acting on q3.",0.05,N,plain_number
+LD002,LD,"Three electric charges are placed at three fixed points, forming a right-angled triangle ABC, where AB = 4 m and BC = 5 m. The charges are qA = 5.0 μC, qB = -5.0 μC, and qC = 4.0 μC, respectively. Find the net electric force acting on the charge at A.",24.45 × 10^-3,N,scientific_notation
+LD003,LD,"Points A and B are separated by 20 cm in air. Charges q1 = -3 × 10^-6 C and q2 = 8 × 10^-6 C are placed at A and B, respectively. A test charge q3 = 2 × 10^-6 C is placed at point C such that AC = 12 cm and BC = 16 cm. Calculate the magnitude of the electric force acting on q3.",6.76,N,plain_number
+NL001,NL,A capacitor with a capacitance of C = 20 μF is charged to 100 V. Calculate the energy (mJ) stored in the capacitor.,100,mJ,plain_number
+NL002,NL,"A capacitor has a capacitance C = 50 μF, and the voltage across its plates is 60 V. Calculate the energy (mJ) stored in the electric field.",90,mJ,plain_number
+NL003,NL,"An inductor has an inductance L = 0.2 H, and the current flowing through it is 3 A. Calculate the magnetic field energy (mJ) stored in the inductor.",900,mJ,plain_number
+QA1000,QA,"At 6:00 AM, a car travels uniformly in a straight line with a velocity of 40 km/h from point A to point B, where the distance AB = 100 km.
+Choose the origin of the coordinate system at a point 20 km from A in the direction of B.
+Choose the positive direction for the coordinate axis from A to B.
+Choose the origin of time as 6:00 AM.
+Write the equation of motion for the car.",,,missing
+QA1103,QA,,,,missing
+QA1119,QA,"A car moves in a straight line without changing direction. For the first half of the total time, its speed is 12 km/h. For the second half of the total time, its speed is 18 km/h. Calculate the average speed for the entire motion.",,,missing
+TD001,TD,An air-filled parallel-plate capacitor has a capacitance C = 500 pF and is charged to a potential difference U = 300 V. It is then disconnected from the source and immersed in a liquid dielectric with dielectric constant ε = 2. What is the potential difference between the plates of the capacitor?,150,V,plain_number
+TD002,TD,"An air-filled parallel plate capacitor has a capacitance C = 500 pF and is charged to a voltage U = 300 V. While still connected to the source, it is immersed in a liquid dielectric with a dielectric constant ε = 2. What will be the potential difference between the capacitor plates?",300,V,plain_number
+TD003,TD,An air-filled parallel plate capacitor with capacitance C = 500 pF is charged to a voltage U = 300 V. The capacitor is then disconnected from the source and immersed in a liquid dielectric with a relative permittivity (dielectric constant) of ε_r = 2. What is the electric field energy stored between the plates of the capacitor?,11.25,μJ,plain_number
+THCB001,THCB,"An ammeter has a measuring range of 2 A and a least count of 0.1 A. When measuring the current through a light bulb, the reading is 1.2 A. What is the absolute error?",0.1,A,plain_number
+THCB002,THCB,A voltmeter with a least count of 0.2 V reads 5.6 V. What is the relative error of the measurement?,3.57,%,plain_number
+THCB003,THCB,"Resistance R is calculated using the formula R = U/I, where U = 6.0 ± 0.1 V and I = 0.3 ± 0.01 A. What is the absolute error of R?",1,Ω,plain_number
