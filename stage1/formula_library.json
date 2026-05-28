@@ -1,0 +1,498 @@
+[
+  {
+    "id": "CKT-001",
+    "topic": "circuits",
+    "subtopic": "ohms_law",
+    "target_quantities": ["V", "I", "R"],
+    "canonical_quantity_names": ["electric_potential", "electric_current", "resistance"],
+    "text": "Ohm's Law: voltage equals current multiplied by resistance.",
+    "formula": "V = I * R",
+    "sympy_expr": "Eq(V, I * R)",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "V": {"symbol": "V", "name": "voltage", "unit_symbol": "V", "unit_name": "volts"},
+      "I": {"symbol": "I", "name": "electric current", "unit_symbol": "A", "unit_name": "amperes"},
+      "R": {"symbol": "R", "name": "resistance", "unit_symbol": "Ω", "unit_name": "ohms"}
+    },
+    "conditions": [
+      "Valid for ohmic (linear) resistors at constant temperature.",
+      "Current direction follows conventional current flow (positive to negative externally)."
+    ],
+    "fol_axiom": "∀V ∀I ∀R (HasVoltage(V) ∧ HasCurrent(I) ∧ HasResistance(R) → OhmsLaw(V = I * R))",
+    "premise_text": "Ohm's Law: V = IR"
+  },
+  {
+    "id": "CKT-002",
+    "topic": "circuits",
+    "subtopic": "series_resistance",
+    "target_quantities": ["R_s", "R1", "R2"],
+    "canonical_quantity_names": ["resistance"],
+    "text": "Series resistance: total resistance equals the sum of individual resistances.",
+    "formula": "R_s = R1 + R2",
+    "sympy_expr": "Eq(R_s, R1 + R2)",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "R_s": {"symbol": "R_s", "name": "total series resistance", "unit_symbol": "Ω", "unit_name": "ohms"},
+      "R1": {"symbol": "R1", "name": "first resistance", "unit_symbol": "Ω", "unit_name": "ohms"},
+      "R2": {"symbol": "R2", "name": "second resistance", "unit_symbol": "Ω", "unit_name": "ohms"}
+    },
+    "conditions": [
+      "Resistors are connected end-to-end (same current flows through all).",
+      "Generalizes to N resistors: R_s = R1 + R2 + ... + RN."
+    ],
+    "fol_axiom": "∀R1 ∀R2 ∀Rs (SeriesConnected(R1, R2) → TotalResistance(Rs = R1 + R2))",
+    "premise_text": "Series resistance: R_total = R₁ + R₂ + ..."
+  },
+  {
+    "id": "CKT-003",
+    "topic": "circuits",
+    "subtopic": "parallel_resistance",
+    "target_quantities": ["R_p", "R1", "R2"],
+    "canonical_quantity_names": ["resistance"],
+    "text": "Parallel resistance: reciprocal of total resistance equals sum of reciprocals of individual resistances.",
+    "formula": "R_p = R1*R2 / (R1 + R2)",
+    "sympy_expr": "Eq(R_p, R1*R2 / (R1 + R2))",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "R_p": {"symbol": "R_p", "name": "total parallel resistance", "unit_symbol": "Ω", "unit_name": "ohms"},
+      "R1": {"symbol": "R1", "name": "first resistance", "unit_symbol": "Ω", "unit_name": "ohms"},
+      "R2": {"symbol": "R2", "name": "second resistance", "unit_symbol": "Ω", "unit_name": "ohms"}
+    },
+    "conditions": [
+      "Resistors share the same two nodes (same voltage across all).",
+      "For N resistors: 1/R_p = 1/R1 + 1/R2 + ... + 1/RN."
+    ],
+    "fol_axiom": "∀R1 ∀R2 ∀Rp (ParallelConnected(R1, R2) → TotalResistance(Rp = R1*R2/(R1+R2)))",
+    "premise_text": "Parallel resistance (2 elements): R_p = R₁R₂/(R₁+R₂)"
+  },
+  {
+    "id": "CKT-004",
+    "topic": "circuits",
+    "subtopic": "power_vi",
+    "target_quantities": ["P", "V", "I"],
+    "canonical_quantity_names": ["power", "electric_potential", "electric_current"],
+    "text": "Electric power equals voltage multiplied by current.",
+    "formula": "P = V * I",
+    "sympy_expr": "Eq(P, V * I)",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "P": {"symbol": "P", "name": "power", "unit_symbol": "W", "unit_name": "watts"},
+      "V": {"symbol": "V", "name": "voltage", "unit_symbol": "V", "unit_name": "volts"},
+      "I": {"symbol": "I", "name": "electric current", "unit_symbol": "A", "unit_name": "amperes"}
+    },
+    "conditions": ["Valid for DC circuits and instantaneous values in AC circuits."],
+    "fol_axiom": "∀P ∀V ∀I (HasPower(P) ∧ HasVoltage(V) ∧ HasCurrent(I) → PowerLaw(P = V * I))",
+    "premise_text": "Electric power: P = VI"
+  },
+  {
+    "id": "CKT-005",
+    "topic": "circuits",
+    "subtopic": "power_ir",
+    "target_quantities": ["P", "I", "R"],
+    "canonical_quantity_names": ["power", "electric_current", "resistance"],
+    "text": "Electric power in terms of current and resistance: P equals I squared times R.",
+    "formula": "P = I**2 * R",
+    "sympy_expr": "Eq(P, I**2 * R)",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "P": {"symbol": "P", "name": "power", "unit_symbol": "W", "unit_name": "watts"},
+      "I": {"symbol": "I", "name": "electric current", "unit_symbol": "A", "unit_name": "amperes"},
+      "R": {"symbol": "R", "name": "resistance", "unit_symbol": "Ω", "unit_name": "ohms"}
+    },
+    "conditions": ["Derived from Ohm's Law (V = IR) combined with P = VI."],
+    "fol_axiom": "∀P ∀I ∀R (HasCurrent(I) ∧ HasResistance(R) → PowerLaw(P = I**2 * R))",
+    "premise_text": "Electric power: P = I²R"
+  },
+  {
+    "id": "CKT-006",
+    "topic": "circuits",
+    "subtopic": "power_vr",
+    "target_quantities": ["P", "V", "R"],
+    "canonical_quantity_names": ["power", "electric_potential", "resistance"],
+    "text": "Electric power in terms of voltage and resistance: P equals V squared divided by R.",
+    "formula": "P = V**2 / R",
+    "sympy_expr": "Eq(P, V**2 / R)",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "P": {"symbol": "P", "name": "power", "unit_symbol": "W", "unit_name": "watts"},
+      "V": {"symbol": "V", "name": "voltage", "unit_symbol": "V", "unit_name": "volts"},
+      "R": {"symbol": "R", "name": "resistance", "unit_symbol": "Ω", "unit_name": "ohms"}
+    },
+    "conditions": ["Derived from Ohm's Law (I = V/R) combined with P = VI."],
+    "fol_axiom": "∀P ∀V ∀R (HasVoltage(V) ∧ HasResistance(R) → PowerLaw(P = V**2 / R))",
+    "premise_text": "Electric power: P = V²/R"
+  },
+  {
+    "id": "CKT-007",
+    "topic": "circuits",
+    "subtopic": "capacitance_charge",
+    "target_quantities": ["Q", "C", "V"],
+    "canonical_quantity_names": ["electric_charge", "capacitance", "electric_potential"],
+    "text": "Charge stored on a capacitor equals capacitance multiplied by voltage.",
+    "formula": "Q = C * V",
+    "sympy_expr": "Eq(Q, C * V)",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "Q": {"symbol": "Q", "name": "electric charge", "unit_symbol": "C", "unit_name": "coulombs"},
+      "C": {"symbol": "C", "name": "capacitance", "unit_symbol": "F", "unit_name": "farads"},
+      "V": {"symbol": "V", "name": "voltage", "unit_symbol": "V", "unit_name": "volts"}
+    },
+    "conditions": ["Applies to a fully charged capacitor under DC steady-state conditions."],
+    "fol_axiom": "∀Q ∀C ∀V (HasCharge(Q) ∧ HasCapacitance(C) ∧ HasVoltage(V) → CapacitorLaw(Q = C * V))",
+    "premise_text": "Capacitor charge: Q = CV"
+  },
+  {
+    "id": "CKT-008",
+    "topic": "circuits",
+    "subtopic": "series_capacitance",
+    "target_quantities": ["C_s", "C1", "C2"],
+    "canonical_quantity_names": ["capacitance"],
+    "text": "Series capacitance: reciprocal of equivalent capacitance equals sum of reciprocals.",
+    "formula": "C_s = C1*C2 / (C1 + C2)",
+    "sympy_expr": "Eq(C_s, C1*C2 / (C1 + C2))",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "C_s": {"symbol": "C_s", "name": "total series capacitance", "unit_symbol": "F", "unit_name": "farads"},
+      "C1": {"symbol": "C1", "name": "first capacitance", "unit_symbol": "F", "unit_name": "farads"},
+      "C2": {"symbol": "C2", "name": "second capacitance", "unit_symbol": "F", "unit_name": "farads"}
+    },
+    "conditions": [
+      "Capacitors in series share the same charge Q.",
+      "For N capacitors: 1/C_s = 1/C1 + 1/C2 + ... + 1/CN."
+    ],
+    "fol_axiom": "∀C1 ∀C2 ∀Cs (SeriesCapacitors(C1,C2) → EquivalentCapacitance(Cs = C1*C2/(C1+C2)))",
+    "premise_text": "Series capacitance (2 elements): 1/C_s = 1/C₁ + 1/C₂"
+  },
+  {
+    "id": "CKT-009",
+    "topic": "circuits",
+    "subtopic": "parallel_capacitance",
+    "target_quantities": ["C_p", "C1", "C2"],
+    "canonical_quantity_names": ["capacitance"],
+    "text": "Parallel capacitance: equivalent capacitance equals sum of individual capacitances.",
+    "formula": "C_p = C1 + C2",
+    "sympy_expr": "Eq(C_p, C1 + C2)",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "C_p": {"symbol": "C_p", "name": "total parallel capacitance", "unit_symbol": "F", "unit_name": "farads"},
+      "C1": {"symbol": "C1", "name": "first capacitance", "unit_symbol": "F", "unit_name": "farads"},
+      "C2": {"symbol": "C2", "name": "second capacitance", "unit_symbol": "F", "unit_name": "farads"}
+    },
+    "conditions": [
+      "Capacitors in parallel share the same voltage.",
+      "Generalizes to N capacitors: C_p = C1 + C2 + ... + CN."
+    ],
+    "fol_axiom": "∀C1 ∀C2 ∀Cp (ParallelCapacitors(C1,C2) → EquivalentCapacitance(Cp = C1 + C2))",
+    "premise_text": "Parallel capacitance: C_p = C₁ + C₂ + ..."
+  },
+  {
+    "id": "CKT-010",
+    "topic": "circuits",
+    "subtopic": "rc_time_constant",
+    "target_quantities": ["tau", "R", "C"],
+    "canonical_quantity_names": ["time_constant", "resistance", "capacitance"],
+    "text": "RC time constant: tau equals resistance times capacitance.",
+    "formula": "tau = R * C",
+    "sympy_expr": "Eq(tau, R * C)",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "tau": {"symbol": "τ", "name": "time constant", "unit_symbol": "s", "unit_name": "seconds"},
+      "R": {"symbol": "R", "name": "resistance", "unit_symbol": "Ω", "unit_name": "ohms"},
+      "C": {"symbol": "C", "name": "capacitance", "unit_symbol": "F", "unit_name": "farads"}
+    },
+    "conditions": ["Characterizes the exponential charge/discharge of a capacitor through a resistor."],
+    "fol_axiom": "∀τ ∀R ∀C (HasResistance(R) ∧ HasCapacitance(C) → TimeConstant(τ = R * C))",
+    "premise_text": "RC time constant: τ = RC"
+  },
+  {
+    "id": "CKT-011",
+    "topic": "circuits",
+    "subtopic": "capacitor_energy_voltage",
+    "target_quantities": ["U", "C", "V"],
+    "canonical_quantity_names": ["energy", "capacitance", "electric_potential"],
+    "text": "Energy stored in a capacitor equals one-half times capacitance times voltage squared.",
+    "formula": "U = 0.5 * C * V**2",
+    "sympy_expr": "Eq(U, C * V**2 / 2)",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "U": {"symbol": "U", "name": "stored energy", "unit_symbol": "J", "unit_name": "joules"},
+      "C": {"symbol": "C", "name": "capacitance", "unit_symbol": "F", "unit_name": "farads"},
+      "V": {"symbol": "V", "name": "voltage", "unit_symbol": "V", "unit_name": "volts"}
+    },
+    "conditions": ["Energy is stored in the electric field between the capacitor plates."],
+    "fol_axiom": "∀U ∀C ∀V (HasCapacitance(C) ∧ HasVoltage(V) → StoredEnergy(U = C*V**2/2))",
+    "premise_text": "Capacitor energy: U = ½CV²"
+  },
+  {
+    "id": "CKT-012",
+    "topic": "circuits",
+    "subtopic": "capacitor_energy_charge",
+    "target_quantities": ["U", "Q", "C"],
+    "canonical_quantity_names": ["energy", "electric_charge", "capacitance"],
+    "text": "Energy stored in a capacitor in terms of charge: U equals Q squared divided by 2C.",
+    "formula": "U = Q**2 / (2 * C)",
+    "sympy_expr": "Eq(U, Q**2 / (2 * C))",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "U": {"symbol": "U", "name": "stored energy", "unit_symbol": "J", "unit_name": "joules"},
+      "Q": {"symbol": "Q", "name": "electric charge", "unit_symbol": "C", "unit_name": "coulombs"},
+      "C": {"symbol": "C", "name": "capacitance", "unit_symbol": "F", "unit_name": "farads"}
+    },
+    "conditions": ["Equivalent to U = ½CV² and U = ½QV."],
+    "fol_axiom": "∀U ∀Q ∀C (HasCharge(Q) ∧ HasCapacitance(C) → StoredEnergy(U = Q**2/(2*C)))",
+    "premise_text": "Capacitor energy: U = Q²/(2C)"
+  },
+  {
+    "id": "CKT-013",
+    "topic": "circuits",
+    "subtopic": "kirchhoff_voltage",
+    "target_quantities": ["V1", "V2", "V_source"],
+    "canonical_quantity_names": ["electric_potential"],
+    "text": "Kirchhoff's Voltage Law: the algebraic sum of all voltages around any closed loop is zero.",
+    "formula": "sum(V_loop) = 0",
+    "sympy_expr": "Eq(V1 + V2, V_source)",
+    "tool_dispatch": "llm",
+    "variables": {
+      "V1": {"symbol": "V1", "name": "voltage across element 1", "unit_symbol": "V", "unit_name": "volts"},
+      "V2": {"symbol": "V2", "name": "voltage across element 2", "unit_symbol": "V", "unit_name": "volts"},
+      "V_source": {"symbol": "V_s", "name": "source voltage", "unit_symbol": "V", "unit_name": "volts"}
+    },
+    "conditions": [
+      "Apply sign convention consistently: rises positive, drops negative.",
+      "Must traverse a complete closed loop."
+    ],
+    "fol_axiom": "∀loop (ClosedLoop(loop) → SumOfVoltages(loop) = 0)",
+    "premise_text": "Kirchhoff's Voltage Law (KVL): ΣV_loop = 0"
+  },
+  {
+    "id": "CKT-014",
+    "topic": "circuits",
+    "subtopic": "kirchhoff_current",
+    "target_quantities": ["I_in", "I_out"],
+    "canonical_quantity_names": ["electric_current"],
+    "text": "Kirchhoff's Current Law: the algebraic sum of all currents at a node is zero.",
+    "formula": "sum(I_node) = 0",
+    "sympy_expr": "Eq(I_in, I_out)",
+    "tool_dispatch": "llm",
+    "variables": {
+      "I_in": {"symbol": "I_in", "name": "current flowing into node", "unit_symbol": "A", "unit_name": "amperes"},
+      "I_out": {"symbol": "I_out", "name": "current flowing out of node", "unit_symbol": "A", "unit_name": "amperes"}
+    },
+    "conditions": [
+      "Conservation of charge at every circuit node.",
+      "Currents entering are positive; currents leaving are negative (or vice versa consistently)."
+    ],
+    "fol_axiom": "∀node (CircuitNode(node) → SumOfCurrents(node) = 0)",
+    "premise_text": "Kirchhoff's Current Law (KCL): ΣI_node = 0"
+  },
+  {
+    "id": "CKT-015",
+    "topic": "circuits",
+    "subtopic": "voltage_divider",
+    "target_quantities": ["V_out", "V_in", "R1", "R2"],
+    "canonical_quantity_names": ["electric_potential", "resistance"],
+    "text": "Voltage divider: output voltage equals input voltage times R2 divided by (R1 + R2).",
+    "formula": "V_out = V_in * R2 / (R1 + R2)",
+    "sympy_expr": "Eq(V_out, V_in * R2 / (R1 + R2))",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "V_out": {"symbol": "V_out", "name": "output voltage", "unit_symbol": "V", "unit_name": "volts"},
+      "V_in":  {"symbol": "V_in",  "name": "input voltage",  "unit_symbol": "V", "unit_name": "volts"},
+      "R1":    {"symbol": "R1",    "name": "first resistance (series, top)",    "unit_symbol": "Ω", "unit_name": "ohms"},
+      "R2":    {"symbol": "R2",    "name": "second resistance (shunt, bottom)", "unit_symbol": "Ω", "unit_name": "ohms"}
+    },
+    "conditions": [
+      "R1 and R2 are in series; output is measured across R2.",
+      "Assumes no load current (open-circuit output)."
+    ],
+    "fol_axiom": "∀Vout ∀Vin ∀R1 ∀R2 (VoltageDivider(Vin,R1,R2) → OutputVoltage(Vout = Vin*R2/(R1+R2)))",
+    "premise_text": "Voltage divider: V_out = V_in × R₂/(R₁+R₂)"
+  },
+  {
+    "id": "ELS-001",
+    "topic": "electrostatics",
+    "subtopic": "coulombs_law",
+    "target_quantities": ["F", "k_e", "q1", "q2", "r"],
+    "canonical_quantity_names": ["force", "electric_charge", "distance"],
+    "text": "Coulomb's Law: electrostatic force between two point charges is proportional to their charges and inversely proportional to the square of their separation.",
+    "formula": "F = k_e * q1 * q2 / r**2",
+    "sympy_expr": "Eq(F, k_e * q1 * q2 / r**2)",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "F":   {"symbol": "F",   "name": "electrostatic force",    "unit_symbol": "N",       "unit_name": "newtons"},
+      "k_e": {"symbol": "k_e", "name": "Coulomb constant",       "unit_symbol": "N·m²/C²", "unit_name": "newton metre squared per coulomb squared"},
+      "q1":  {"symbol": "q1",  "name": "first charge",           "unit_symbol": "C",       "unit_name": "coulombs"},
+      "q2":  {"symbol": "q2",  "name": "second charge",          "unit_symbol": "C",       "unit_name": "coulombs"},
+      "r":   {"symbol": "r",   "name": "separation distance",    "unit_symbol": "m",       "unit_name": "metres"}
+    },
+    "conditions": [
+      "Point charges only (or spherically symmetric charge distributions).",
+      "k_e = 8.9875 × 10⁹ N·m²/C² (= 1/(4πε₀))."
+    ],
+    "fol_axiom": "∀F ∀q1 ∀q2 ∀r (PointCharges(q1,q2,r) → CoulombForce(F = k_e*q1*q2/r**2))",
+    "premise_text": "Coulomb's Law: F = k_e·q₁q₂/r²"
+  },
+  {
+    "id": "ELS-002",
+    "topic": "electrostatics",
+    "subtopic": "electric_field_point_charge",
+    "target_quantities": ["E", "k_e", "q", "r"],
+    "canonical_quantity_names": ["electric_field", "electric_charge", "distance"],
+    "text": "Electric field due to a point charge: E equals k_e times charge divided by distance squared.",
+    "formula": "E = k_e * q / r**2",
+    "sympy_expr": "Eq(E, k_e * q / r**2)",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "E":   {"symbol": "E",   "name": "electric field strength", "unit_symbol": "N/C",     "unit_name": "newtons per coulomb"},
+      "k_e": {"symbol": "k_e", "name": "Coulomb constant",        "unit_symbol": "N·m²/C²", "unit_name": "newton metre squared per coulomb squared"},
+      "q":   {"symbol": "q",   "name": "source charge",           "unit_symbol": "C",       "unit_name": "coulombs"},
+      "r":   {"symbol": "r",   "name": "distance from charge",    "unit_symbol": "m",       "unit_name": "metres"}
+    },
+    "conditions": [
+      "Field points radially outward from positive charges, inward toward negative charges.",
+      "k_e = 8.9875 × 10⁹ N·m²/C²."
+    ],
+    "fol_axiom": "∀E ∀q ∀r (PointCharge(q,r) → ElectricField(E = k_e*q/r**2))",
+    "premise_text": "Electric field (point charge): E = k_e·q/r²"
+  },
+  {
+    "id": "ELS-003",
+    "topic": "electrostatics",
+    "subtopic": "electric_potential_point_charge",
+    "target_quantities": ["V", "k_e", "q", "r"],
+    "canonical_quantity_names": ["electric_potential", "electric_charge", "distance"],
+    "text": "Electric potential due to a point charge: V equals k_e times charge divided by distance.",
+    "formula": "V = k_e * q / r",
+    "sympy_expr": "Eq(V, k_e * q / r)",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "V":   {"symbol": "V",   "name": "electric potential",   "unit_symbol": "V",       "unit_name": "volts"},
+      "k_e": {"symbol": "k_e", "name": "Coulomb constant",     "unit_symbol": "N·m²/C²", "unit_name": "newton metre squared per coulomb squared"},
+      "q":   {"symbol": "q",   "name": "source charge",        "unit_symbol": "C",       "unit_name": "coulombs"},
+      "r":   {"symbol": "r",   "name": "distance from charge", "unit_symbol": "m",       "unit_name": "metres"}
+    },
+    "conditions": [
+      "Potential is zero at infinite distance.",
+      "k_e = 8.9875 × 10⁹ N·m²/C².",
+      "Positive for positive charges; negative for negative charges."
+    ],
+    "fol_axiom": "∀V ∀q ∀r (PointCharge(q,r) → ElectricPotential(V = k_e*q/r))",
+    "premise_text": "Electric potential (point charge): V = k_e·q/r"
+  },
+  {
+    "id": "ELS-004",
+    "topic": "electrostatics",
+    "subtopic": "uniform_electric_field",
+    "target_quantities": ["E", "V", "d"],
+    "canonical_quantity_names": ["electric_field", "electric_potential", "distance"],
+    "text": "Uniform electric field between parallel plates: field strength equals voltage divided by plate separation.",
+    "formula": "E = V / d",
+    "sympy_expr": "Eq(E, V / d)",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "E": {"symbol": "E", "name": "electric field strength", "unit_symbol": "V/m", "unit_name": "volts per metre"},
+      "V": {"symbol": "V", "name": "voltage between plates",  "unit_symbol": "V",   "unit_name": "volts"},
+      "d": {"symbol": "d", "name": "plate separation",        "unit_symbol": "m",   "unit_name": "metres"}
+    },
+    "conditions": [
+      "Applies between parallel plate capacitors with uniform field.",
+      "Fringe effects neglected (plate dimensions >> separation)."
+    ],
+    "fol_axiom": "∀E ∀V ∀d (UniformField(V,d) → FieldStrength(E = V/d))",
+    "premise_text": "Uniform electric field: E = V/d"
+  },
+  {
+    "id": "ELS-005",
+    "topic": "electrostatics",
+    "subtopic": "parallel_plate_capacitance",
+    "target_quantities": ["C", "epsilon_0", "A", "d"],
+    "canonical_quantity_names": ["capacitance", "area", "distance", "permittivity"],
+    "text": "Capacitance of a parallel plate capacitor: C equals permittivity of free space times plate area divided by separation.",
+    "formula": "C = epsilon_0 * A / d",
+    "sympy_expr": "Eq(C, epsilon_0 * A / d)",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "C":         {"symbol": "C",   "name": "capacitance",              "unit_symbol": "F",   "unit_name": "farads"},
+      "epsilon_0": {"symbol": "ε₀",  "name": "permittivity of free space","unit_symbol": "F/m", "unit_name": "farads per metre"},
+      "A":         {"symbol": "A",   "name": "plate area",               "unit_symbol": "m²",  "unit_name": "square metres"},
+      "d":         {"symbol": "d",   "name": "plate separation",         "unit_symbol": "m",   "unit_name": "metres"}
+    },
+    "conditions": [
+      "Vacuum or air dielectric (relative permittivity ε_r = 1).",
+      "For dielectric material: C = ε_r * ε₀ * A / d.",
+      "ε₀ = 8.854 × 10⁻¹² F/m."
+    ],
+    "fol_axiom": "∀C ∀A ∀d (ParallelPlate(A,d) → Capacitance(C = epsilon_0*A/d))",
+    "premise_text": "Parallel plate capacitor: C = ε₀A/d"
+  },
+  {
+    "id": "ELS-006",
+    "topic": "electrostatics",
+    "subtopic": "electric_potential_energy",
+    "target_quantities": ["U", "k_e", "q1", "q2", "r"],
+    "canonical_quantity_names": ["energy", "electric_charge", "distance"],
+    "text": "Electric potential energy of two point charges: U equals k_e times the product of charges divided by separation.",
+    "formula": "U = k_e * q1 * q2 / r",
+    "sympy_expr": "Eq(U, k_e * q1 * q2 / r)",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "U":   {"symbol": "U",   "name": "electric potential energy", "unit_symbol": "J",       "unit_name": "joules"},
+      "k_e": {"symbol": "k_e", "name": "Coulomb constant",          "unit_symbol": "N·m²/C²", "unit_name": "newton metre squared per coulomb squared"},
+      "q1":  {"symbol": "q1",  "name": "first charge",              "unit_symbol": "C",       "unit_name": "coulombs"},
+      "q2":  {"symbol": "q2",  "name": "second charge",             "unit_symbol": "C",       "unit_name": "coulombs"},
+      "r":   {"symbol": "r",   "name": "separation distance",       "unit_symbol": "m",       "unit_name": "metres"}
+    },
+    "conditions": [
+      "Potential energy is zero at infinite separation.",
+      "k_e = 8.9875 × 10⁹ N·m²/C².",
+      "Equivalent form: U = q₂ × V₁ where V₁ = k_e·q₁/r."
+    ],
+    "fol_axiom": "∀U ∀q1 ∀q2 ∀r (PointCharges(q1,q2,r) → PotentialEnergy(U = k_e*q1*q2/r))",
+    "premise_text": "Electric potential energy: U = k_e·q₁q₂/r"
+  },
+  {
+    "id": "ELS-007",
+    "topic": "electrostatics",
+    "subtopic": "force_on_charge",
+    "target_quantities": ["F", "q", "E"],
+    "canonical_quantity_names": ["force", "electric_charge", "electric_field"],
+    "text": "Force on a charge in an electric field equals the charge times the field strength.",
+    "formula": "F = q * E",
+    "sympy_expr": "Eq(F, q * E)",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "F": {"symbol": "F", "name": "electrostatic force",    "unit_symbol": "N",   "unit_name": "newtons"},
+      "q": {"symbol": "q", "name": "charge",                 "unit_symbol": "C",   "unit_name": "coulombs"},
+      "E": {"symbol": "E", "name": "electric field strength","unit_symbol": "N/C", "unit_name": "newtons per coulomb"}
+    },
+    "conditions": [
+      "Force is along E for positive charges; opposite E for negative charges.",
+      "This relation defines the electric field: E = F/q."
+    ],
+    "fol_axiom": "∀F ∀q ∀E (HasCharge(q) ∧ HasElectricField(E) → ChargeForce(F = q * E))",
+    "premise_text": "Force on charge in field: F = qE"
+  },
+  {
+    "id": "ELS-008",
+    "topic": "electrostatics",
+    "subtopic": "gauss_law",
+    "target_quantities": ["Phi_E", "Q_enc", "epsilon_0"],
+    "canonical_quantity_names": ["electric_flux", "electric_charge", "permittivity"],
+    "text": "Gauss's Law: total electric flux through a closed surface equals the enclosed charge divided by permittivity of free space.",
+    "formula": "Phi_E = Q_enc / epsilon_0",
+    "sympy_expr": "Eq(Phi_E, Q_enc / epsilon_0)",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "Phi_E":     {"symbol": "Φ_E",  "name": "electric flux",             "unit_symbol": "N·m²/C", "unit_name": "newton metre squared per coulomb"},
+      "Q_enc":     {"symbol": "Q_enc","name": "total enclosed charge",     "unit_symbol": "C",      "unit_name": "coulombs"},
+      "epsilon_0": {"symbol": "ε₀",   "name": "permittivity of free space","unit_symbol": "F/m",    "unit_name": "farads per metre"}
+    },
+    "conditions": [
+      "Applies to any closed Gaussian surface.",
+      "ε₀ = 8.854 × 10⁻¹² F/m.",
+      "Integral form: Φ_E = ∮ E · dA."
+    ],
+    "fol_axiom": "∀Phi ∀Q_enc (ClosedSurface → GaussFlux(Phi = Q_enc/epsilon_0))",
+    "premise_text": "Gauss's Law: Φ_E = Q_enc/ε₀"
+  }
+]

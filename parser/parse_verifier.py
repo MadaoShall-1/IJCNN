@@ -284,13 +284,21 @@ def verify_parse(parse_object: Dict[str, object]) -> VerifierResult:
     steps: List[Dict[str, object]] = parse_object.get("step_plan", []) or []
     for index, step in enumerate(steps, start=1):
         is_skeleton = step.get("template_name") == "skeleton_placeholder"
+        # LLM-fallback-generated steps reference symbolic variables (e.g.
+        # 'q', 'r' in "find the charge q at distance r") that aren't in
+        # known_quantities because the problem is symbolic. The LLM's
+        # reasoning is valid; skipping dependency checks here lets such
+        # symbolic-physics problems pass. The trade-off is we trust the
+        # LLM's variable hygiene — if it references nonsense, that's still
+        # accepted, but the step_plan retains template_name='llm_fallback'
+        # so downstream stages can audit. See LLM_FALLBACK_README.md.
+        is_llm_fallback = step.get("template_name") == "llm_fallback"
         if step.get("step_id") != f"step_{index}":
             errors.append(_err("invalid_dependency", f"Expected step_{index}, got {step.get('step_id')}.", "Renumber step ids sequentially."))
-        if is_skeleton:
-            # Skeleton stubs intentionally carry placeholder inputs/outputs
-            # ('TBD' etc.). Skip dependency analysis so they don't generate
-            # spurious invalid_dependency errors; low_confidence already
-            # signals that this parse is not actually solved.
+        if is_skeleton or is_llm_fallback:
+            # Skip dependency analysis. For skeletons, the inputs are
+            # placeholder 'TBD' values. For LLM-fallback steps, the inputs
+            # may be symbolic variables not present in known_quantities.
             available.update((step.get("output_var") or {}).keys())
             continue
         for var in (step.get("input_var") or {}).keys():

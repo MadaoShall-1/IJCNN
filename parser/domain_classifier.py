@@ -10,15 +10,16 @@ DOMAIN_KEYWORDS: Dict[str, List[str]] = {
     "electricity": [
         "capacitor", "capacitance", "charge", "voltage", "battery", "resistor", "resistance", "current", "circuit",
         "ac circuit", "alternating current", "rms", "impedance", "reactance", "power factor", "phase angle",
-        "rlc", "series rlc", "resonance", "lc circuit", "oscillation", "dielectric", "relative permittivity",
+        "rlc", "series rlc", "resonance", "resonate", "resonating", "lc circuit", "oscillation", "dielectric", "relative permittivity",
         "move toward each other", "moving towards each other", "meet after",
+        "inductor", "inductance", "coil", "solenoid",
     ],
-    "electromagnetism": ["electric field", "coulomb force", "electric force", "magnetic field", "magnetic flux", "emf", "induced"],
+    "electromagnetism": ["electric field", "coulomb force", "electric force", "magnetic field", "magnetic flux", "emf", "induced", "solenoid"],
     "thermodynamics": ["ideal gas", "pressure", "volume", "temperature", "heat", "thermal"],
     "waves": ["frequency", "wavelength", "wave speed", "period", "wave"],
     "optics": ["lens", "mirror", "focal length", "image height", "refraction", "reflection"],
     "fluids": ["fluid", "buoyancy", "density", "viscosity", "flow", "pressure"],
-    "measurement_error": ["relative error", "absolute error", "percentage error", "random error", "measured value", "true value", "accepted value", "uncertainty"],
+    "measurement_error": ["relative error", "absolute error", "percentage error", "random error", "measured value", "true value", "accepted value", "uncertainty", "least count"],
 }
 
 
@@ -30,7 +31,7 @@ SUBDOMAIN_KEYWORDS: Dict[str, List[str]] = {
     "wave_relation": ["frequency", "wavelength", "wave speed"],
     "ac_circuit": ["ac circuit", "alternating current", "rms", "impedance", "reactance", "power factor", "phase angle"],
     "rlc_circuit": ["rlc", "series rlc"],
-    "resonance": ["resonance", "resonant frequency", "resonance frequency"],
+    "resonance": ["resonance", "resonant", "resonant frequency", "resonance frequency"],
     "lc_oscillation": ["lc circuit", "oscillation", "oscillating circuit", "maximum charge", "maximum current", "energy oscillates"],
     "measurement_error": ["absolute error", "relative error", "percentage error", "random error", "measured value", "true value", "accepted value", "uncertainty"],
     "dielectric_capacitor": ["dielectric", "dielectric constant", "relative permittivity", "inserted dielectric", "battery disconnected", "battery connected"],

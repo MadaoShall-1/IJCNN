@@ -1,8 +1,8 @@
 """Split Stage 0 results into eval cohort (non-QA) vs QA-only and report counts.
 
 Usage:
-  python scripts/eval_cohort_summary.py --results outputs/stage0_baseline/stage0_results.jsonl
-  python scripts/eval_cohort_summary.py --results outputs/stage0_baseline/stage0_results.jsonl --json-out outputs/stage0_baseline/eval_summary.json
+  python scripts/eval_cohort_summary.py --results outputs/stage0_with_llm_v2/stage0_results.jsonl
+  python scripts/eval_cohort_summary.py --results outputs/stage0_with_llm_v2/stage0_results.jsonl --json-out outputs/stage0_with_llm_v2/eval_summary.json
 """
 
 from __future__ import annotations

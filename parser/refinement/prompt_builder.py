@@ -45,7 +45,7 @@ def build_codex_prompt(suggestions: List[Dict[str, Any]]) -> str:
             "",
             "Validation:",
             "pytest",
-            "python scripts/run_stage0_on_dataset.py --output-dir outputs/stage0_next",
+            "python scripts/run_stage0_on_dataset.py --use-llm-fallback --output-dir outputs/stage0_with_llm_v2",
             "",
             "Design constraints:",
             "- Do not weaken verifier globally.",

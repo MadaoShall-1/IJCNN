@@ -273,7 +273,13 @@ def parse_problem(
     if use_llm_fallback:
         fallback = LLMFallbackParser()
         parse_object = fallback.complete_parse(problem_text, parse_object, verifier_result["errors"])
-        parse_object.setdefault("metadata", {})["used_llm_fallback"] = True
+        # Only mark used_llm_fallback=True when the LLM actually applied
+        # fields. Mock mode and error paths leave the parse unchanged, and
+        # in those cases the verifier should treat the parse exactly as it
+        # would have without the fallback (i.e. low_confidence still FAILs).
+        fb_mode = parse_object.get("metadata", {}).get("llm_fallback_mode")
+        if fb_mode == "applied":
+            parse_object.setdefault("metadata", {})["used_llm_fallback"] = True
         verifier_result = _apply_verifier(parse_object)
         if verifier_result["status"] == "FAIL" and log_failures:
             log_verifier_failure(problem_text, parse_object, verifier_result)

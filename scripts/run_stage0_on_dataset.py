@@ -12,11 +12,54 @@ from pathlib import Path
 from typing import Dict, Iterable, List
 
 
+import time
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from parser.main import parse_problem
+
+
+def _format_eta(seconds: float) -> str:
+    """Format seconds as Xh Ym Zs."""
+    if seconds < 60:
+        return f"{seconds:.0f}s"
+    minutes, secs = divmod(int(seconds), 60)
+    if minutes < 60:
+        return f"{minutes}m{secs:02d}s"
+    hours, minutes = divmod(minutes, 60)
+    return f"{hours}h{minutes:02d}m"
+
+
+def _print_progress(
+    current: int,
+    total: int,
+    start_time: float,
+    pass_count: int,
+    pnn_count: int,
+    fail_count: int,
+    llm_modes: "Counter[str]",
+) -> None:
+    """Print a one-line progress update — overwrites the previous line."""
+    elapsed = time.monotonic() - start_time
+    rate = current / elapsed if elapsed > 0 else 0.0
+    remaining = (total - current) / rate if rate > 0 else 0.0
+    pct = 100.0 * current / total
+    llm_summary = ""
+    if llm_modes:
+        applied = llm_modes.get("applied", 0)
+        mock = llm_modes.get("mock", 0)
+        total_llm = sum(llm_modes.values())
+        llm_summary = f" | LLM {applied}/{total_llm} applied" + (f" ({mock} mock)" if mock else "")
+    line = (
+        f"  [{current:>5}/{total}] {pct:5.1f}% | "
+        f"PASS={pass_count} PNN={pnn_count} FAIL={fail_count}"
+        f"{llm_summary} | "
+        f"elapsed {_format_eta(elapsed)} | ETA {_format_eta(remaining)} | "
+        f"{rate:.1f} probs/s"
+    )
+    # \r returns to start of line, padding spaces clear any leftover chars
+    print("\r" + line + " " * 6, end="", flush=True)
 
 
 def _load_csv(path: Path, text_field: str, id_field: str) -> List[Dict[str, str]]:
@@ -60,10 +103,19 @@ def run_dataset(
     fallback_counts: Counter[str] = Counter()
     template_name_counts: Counter[str] = Counter()
     relation_type_counts: Counter[str] = Counter()
+    llm_fallback_mode_counts: Counter[str] = Counter()
+    llm_fallback_applied_field_counts: Counter[str] = Counter()
     extracted_relation_total = 0
     extracted_uncertainty_total = 0
     results: List[Dict[str, object]] = []
     failures: List[Dict[str, object]] = []
+
+    total_rows = len(rows)
+    start_time = time.monotonic()
+    print(f"\nStarting Stage 0 run on {total_rows} problems...")
+    if use_llm_fallback:
+        print("LLM fallback enabled — FAIL problems will be sent to Qwen3.")
+    print()
 
     for index, row in enumerate(rows, start=1):
         problem_text = row.get(text_field, "")
@@ -104,6 +156,15 @@ def run_dataset(
             template_name_counts.update(str(name) for name in metadata.get("used_template_names", []))
         if metadata.get("used_llm_fallback"):
             fallback_counts["llm"] += 1
+        # Stage 0 LLM fallback diagnostics — count every attempted call,
+        # not just successful ones. This makes it obvious when the fallback
+        # silently mocked-out (model file missing / library not installed).
+        fb_mode = metadata.get("llm_fallback_mode")
+        if fb_mode:
+            llm_fallback_mode_counts[str(fb_mode)] += 1
+            if fb_mode == "applied":
+                for f in metadata.get("llm_fallback_applied_fields") or []:
+                    llm_fallback_applied_field_counts[str(f)] += 1
 
         errors = metadata.get("verifier_errors", [])
         for error in errors:
@@ -120,6 +181,23 @@ def run_dataset(
         results.append(record)
         if status != "PASS":
             failures.append(record)
+
+        # Progress update — every 10 rows for fast paths, every row when
+        # LLM fallback fires (since those are slow). Final row always reports.
+        is_slow = bool(metadata.get("used_llm_fallback")) or fb_mode == "applied"
+        if index % 10 == 0 or is_slow or index == total_rows:
+            _print_progress(
+                index,
+                total_rows,
+                start_time,
+                status_counts.get("PASS", 0),
+                status_counts.get("PASS_NON_NUMERIC", 0),
+                status_counts.get("FAIL", 0),
+                llm_fallback_mode_counts,
+            )
+    # End the progress line with a newline so subsequent output starts clean
+    print()
+    print(f"Run complete in {_format_eta(time.monotonic() - start_time)}.")
 
     total = len(rows)
     summary: Dict[str, object] = {
@@ -139,6 +217,8 @@ def run_dataset(
         "fallback_counts": dict(fallback_counts),
         "template_name_counts": dict(template_name_counts.most_common()),
         "relation_type_counts": dict(relation_type_counts.most_common()),
+        "llm_fallback_mode_counts": dict(llm_fallback_mode_counts.most_common()),
+        "llm_fallback_applied_field_counts": dict(llm_fallback_applied_field_counts.most_common()),
         "extracted_relation_total": extracted_relation_total,
         "extracted_uncertainty_total": extracted_uncertainty_total,
         "outputs": {

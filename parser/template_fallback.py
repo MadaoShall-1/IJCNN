@@ -508,7 +508,7 @@ def _coulomb_force_templates(known: Dict[str, Dict[str, object]], target: str, c
         combine = f"{output} = vector_sum(F_13, F_23)"
         inputs = ["F_13", "F_23"]
         plan[-1]["parser_warning"] = "Geometry is ambiguous; vector combination is conservative and left symbolic."
-    plan.append(_formula_step("step_1", "Combine pairwise electric forces using available geometry.", combine, inputs, output, template_name))
+    plan.append(_formula_step("step_1", "Combine pairwise electric forces using available geometry.", combine, inputs, output, "force_resultant_coulomb"))
     _renumber(plan)
     return _finish(plan, target, template_name)
 
@@ -534,6 +534,12 @@ def _circuit_templates(known: Dict[str, Dict[str, object]], target: str, conditi
             return _finish([_formula_step("step_1", "Compute equivalent parallel resistance.", formula, resistance_names, "R_eq", "parallel_resistance")], target, "parallel_resistance")
         if "series_circuit" in conditions:
             return _finish([_formula_step("step_1", "Compute equivalent series resistance.", "R_eq = sum(R_i)", resistance_names, "R_eq", "series_resistance")], target, "series_resistance")
+    if target in {"I", "I_total"} and len(current_names) >= 2 and not voltage and not resistance:
+        return _finish(
+            [_formula_step("step_1", "Apply Kirchhoff's current law (sum or difference of branch currents).",
+                           f"{target} = I1 +/- I2", current_names[:2], target, "current_arithmetic")],
+            target, "current_arithmetic",
+        )
     if target in {"P", "P_total"}:
         if power_names and target == "P_total":
             return _finish([_formula_step("step_1", "Sum individual powers.", "P_total = sum(P_i)", power_names, "P_total", "total_power_sum")], target, "total_power_sum")
@@ -604,6 +610,81 @@ def _inductor_energy_templates(known: Dict[str, Dict[str, object]], target: str)
         return _finish([_formula_step("step_1", "Invert inductor energy relation for inductance.", "L_ind = 2*U_B / I^2", [energy, current], "L_ind", "inductance_from_energy_current")], target, "inductance_from_energy_current")
     if target in {"I", "I_max"} and energy and inductance:
         return _finish([_formula_step("step_1", "Invert inductor energy relation for current.", f"{target} = sqrt(2*U_B / L)", [energy, inductance], target, "current_from_inductor_energy")], target, "current_from_inductor_energy")
+    return [], 0.0
+
+
+import re as _re
+
+_SINUSOIDAL_AMPLITUDE_RE = _re.compile(
+    r"^([\d.]+)\s*[×x\*]?\s*(?:sin|cos)",
+    _re.IGNORECASE,
+)
+
+
+def _extract_sinusoidal_amplitude(
+    relations: List[Dict[str, object]],
+    func_name: str,
+) -> Optional[float]:
+    for rel in relations:
+        if rel.get("type") == "function" and rel.get("function_name") == func_name:
+            expr = str(rel.get("expression", ""))
+            m = _SINUSOIDAL_AMPLITUDE_RE.match(expr)
+            if m:
+                try:
+                    return float(m.group(1))
+                except ValueError:
+                    pass
+        if rel.get("type") == "ratio" and rel.get("left") == func_name:
+            right = str(rel.get("right", ""))
+            if right in ("sin", "cos"):
+                factor = rel.get("factor")
+                if factor is not None:
+                    try:
+                        return float(factor)
+                    except (ValueError, TypeError):
+                        pass
+    return None
+
+
+def _sinusoidal_energy_templates(
+    known: Dict[str, Dict[str, object]],
+    target: str,
+    relations: List[Dict[str, object]],
+) -> Tuple[List[Dict[str, object]], float]:
+    inductance = _first_by_dimension(known, "inductance")
+    capacitance = _first_by_dimension(known, "capacitance")
+
+    if target in {"U_B", "U_B_max"} and inductance:
+        amp = _extract_sinusoidal_amplitude(relations, "I")
+        if amp is not None:
+            return _finish(
+                [
+                    _setup_step("step_1", f"Extract amplitude I_max = {amp} from sinusoidal I(t).",
+                                {"I_max": str(amp)}, "sinusoidal_inductor_energy"),
+                    _formula_step("step_2", "Compute magnetic energy from amplitude.",
+                                  "U_B = 0.5 * L * I_max^2",
+                                  [inductance, "I_max"], "U_B", "sinusoidal_inductor_energy"),
+                ],
+                target, "sinusoidal_inductor_energy",
+            )
+
+    if target in {"U_E", "U_E_max", "U_cap"} and capacitance:
+        amp = _extract_sinusoidal_amplitude(relations, "U")
+        if amp is None:
+            amp = _extract_sinusoidal_amplitude(relations, "u")
+        if amp is not None:
+            output = target
+            return _finish(
+                [
+                    _setup_step("step_1", f"Extract amplitude U_max = {amp} from sinusoidal U(t).",
+                                {"U_max": str(amp)}, "sinusoidal_capacitor_energy"),
+                    _formula_step("step_2", "Compute electric energy from amplitude.",
+                                  f"{output} = 0.5 * C * U_max^2",
+                                  [capacitance, "U_max"], output, "sinusoidal_capacitor_energy"),
+                ],
+                target, "sinusoidal_capacitor_energy",
+            )
+
     return [], 0.0
 
 
@@ -1112,6 +1193,22 @@ def _ac_supplemental_templates(
             ],
             target,
             "resonance_UL_calc",
+        )
+
+    if target == "power_factor" and resonance_hint and not known:
+        return _finish(
+            [
+                _formula_step(
+                    "step_1",
+                    "At resonance X_L = X_C, so Z = R and cos(phi) = R/Z = 1.",
+                    "power_factor = 1",
+                    [],
+                    "power_factor",
+                    "power_factor_at_resonance",
+                )
+            ],
+            target,
+            "power_factor_at_resonance",
         )
 
     if target == "U_C" and resonance_hint and voltage and resistance and inductance and capacitance:
@@ -2150,6 +2247,29 @@ def _least_count_percent_error_templates(
                 "least_count_rel_error",
             )
             return _finish([rel_step, pct_step], target, "least_count_rel_error")
+    lengths = _by_dimension(known, "length")
+    if len(lengths) >= 2 and target in {"percent_error", "rel_error"}:
+        smaller, larger = (lengths[0], lengths[1])
+        v0 = known[smaller].get("value", 0)
+        v1 = known[larger].get("value", 0)
+        if v0 and v1 and float(v0) > float(v1):
+            smaller, larger = larger, smaller
+        rel_step = _formula_step(
+            "step_1",
+            "Compute relative error: least-count / measured length.",
+            f"rel_error = {smaller} / {larger}",
+            [smaller, larger],
+            "rel_error",
+            "least_count_rel_error",
+        )
+        if target == "rel_error":
+            return _finish([rel_step], target, "least_count_rel_error")
+        pct_step = _formula_step(
+            "step_2", "Convert to percent.",
+            "percent_error = rel_error * 100",
+            ["rel_error"], "percent_error", "least_count_rel_error",
+        )
+        return _finish([rel_step, pct_step], target, "least_count_rel_error")
     return [], 0.0
 
 
@@ -2465,6 +2585,7 @@ def propose_step_plan(
         lambda: _relation_driven_templates(target, relations),
         lambda: _capacitor_energy_templates(known, target, conditions),
         lambda: _inductor_energy_templates(known, target),
+        lambda: _sinusoidal_energy_templates(known, target, relations),
         lambda: _force_resultant_templates(known, target, conditions),
         lambda: _field_geometry_templates(known, target, conditions),
         lambda: _capacitance_templates(known, target, conditions),

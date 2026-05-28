@@ -124,6 +124,11 @@ SYMBOLIC_PATTERNS: List[Tuple[re.Pattern, str]] = [
     # current in an ideal LC circuit when ...?", "what are the characteristics
     # of the magnetic field inside an ideal solenoid?")
     (re.compile(r"\bwhat\s+(?:are|is)\s+the\s+(?:characteristics?|properties|nature)\s+of\b", re.IGNORECASE), "characteristics_of_X"),
+    # "at resonance" / "in (the case of) resonance" — conceptual resonance questions
+    # without numeric data (e.g., "What is cos_phi at resonance?")
+    (re.compile(r"\b(?:at|in(?:\s+the\s+case\s+of)?|during)\s+resonance\b", re.IGNORECASE), "at_resonance_conceptual"),
+    # "when Z = R" / "when X_L = X_C" — definitional resonance condition
+    (re.compile(r"\bwhen\s+[ZX]_?\w*\s*=\s*[RX]_?\w*\b", re.IGNORECASE), "when_Z_equals_R"),
     # "How to calculate X" / "How do I calculate X" — asks for a method, not a value
     (re.compile(r"\bhow\s+(?:to|do\s+(?:i|we|you))\s+(?:calculate|compute|find|determine|measure|solve)\b", re.IGNORECASE), "how_to_calculate"),
     # "is there a formula" / "what is the formula" — variant of formula_for

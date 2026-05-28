@@ -696,8 +696,8 @@ def analyze_failures(input_path: Path, output_dir: Path, top_k: int) -> Dict[str
 def main() -> None:
     """CLI entrypoint."""
     parser = argparse.ArgumentParser(description="Analyze Stage 0 parser failure logs.")
-    parser.add_argument("--input", default="outputs/stage0/stage0_failures.jsonl")
-    parser.add_argument("--output-dir", default="outputs/stage0/analysis")
+    parser.add_argument("--input", default="outputs/stage0_with_llm_v2/stage0_failures.jsonl")
+    parser.add_argument("--output-dir", default="outputs/stage0_with_llm_v2/analysis")
     parser.add_argument("--top-k", type=int, default=50)
     args = parser.parse_args()
 
