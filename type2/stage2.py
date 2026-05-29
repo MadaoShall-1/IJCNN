@@ -384,13 +384,27 @@ def _try_sympy_solve_step(
     if solved is None:
         return False
 
-    unit_sym, _ = _infer_output_unit(target_var, formula_entry, vso)
+    output_names = list(plan_output_var.keys()) or [target_var]
+    primary_output = target_var
+    for output_name in output_names:
+        if output_name == target_var:
+            primary_output = output_name
+            break
+        out_canon = canonicalize_variable(output_name)
+        target_canon = canonicalize_variable(target_var)
+        if out_canon and target_canon and out_canon == target_canon:
+            primary_output = output_name
+            break
+
+    unit_sym, _ = _infer_output_unit(primary_output, formula_entry, vso)
     step.step_input = (
         f"Solved {formula_entry.formula} for {target_var} using "
         f"{json.dumps(formula_var_values, ensure_ascii=False)}"
     )
     step.intermediate_answer = f"{solved:g} {unit_sym}".strip()
-    step.output_var = {target_var: solved}
+    step.output_var = {primary_output: solved}
+    if primary_output != target_var:
+        step.output_var[target_var] = solved
     step.confidence = 1.0
     step.status = "OK"
     step.verifier_notes = "Solved deterministically with SymPy fallback."
@@ -414,22 +428,27 @@ def map_formula_vars_to_vso(
 
     # Build canonical → vso_var_name mapping once
     canonical_to_vso: Dict[str, str] = {}
-    for vso_var in vso:
+    for vso_var, entry in vso.items():
+        if entry.defined_at == "constants_table":
+            continue
         canon = canonicalize_variable(vso_var)
         if canon and canon not in canonical_to_vso:
             canonical_to_vso[canon] = vso_var
 
+    used_vso_vars: set[str] = set()
     for formula_var in formula_entry.variables:
         # Strategy 1: direct name
         if formula_var in vso:
             result[formula_var] = vso[formula_var].value
+            used_vso_vars.add(formula_var)
             continue
         # Strategy 2: canonical
         formula_canon = canonicalize_variable(formula_var)
         if formula_canon and formula_canon in canonical_to_vso:
             vso_var = canonical_to_vso[formula_canon]
-            if vso_var not in result.values():  # avoid double-mapping
+            if vso_var not in used_vso_vars:
                 result[formula_var] = vso[vso_var].value
+                used_vso_vars.add(vso_var)
 
     return result
 
@@ -656,6 +675,38 @@ if _DSPY_AVAILABLE:
                 )
 
                 # ── Generation + verification loop ────────────────────────
+                if step.checkable and _try_sympy_solve_step(
+                    step=step,
+                    formula_entry=formula_entry,
+                    plan_output_var=plan_item.get("output_var", {}),
+                    vso=vso,
+                ):
+                    for out_var, out_val in step.output_var.items():
+                        if isinstance(out_val, (int, float)) and out_val is not None:
+                            unit_sym, unit_nm = _infer_output_unit(out_var, formula_entry, vso)
+                            if out_var in vso:
+                                entry = VSOEntry(
+                                    value=float(out_val),
+                                    unit_symbol=unit_sym,
+                                    unit_name=unit_nm,
+                                    defined_at=vso[out_var].defined_at,
+                                    updated_at=step_id,
+                                )
+                            else:
+                                entry = VSOEntry(
+                                    value=float(out_val),
+                                    unit_symbol=unit_sym,
+                                    unit_name=unit_nm,
+                                    defined_at=step_id,
+                                    updated_at=step_id,
+                                )
+                            vso[out_var] = entry
+
+                    trace.vso = {k: asdict(v) for k, v in vso.items()}
+                    trace.vso_snapshots[step_id] = {k: asdict(v) for k, v in vso.items()}
+                    trace.steps.append(step)
+                    continue
+
                 repaired = False
                 verifier_feedback = ""
 
@@ -902,3 +953,135 @@ def _infer_output_unit(
     if var_name in vso:
         return vso[var_name].unit_symbol, vso[var_name].unit_name
     return "", ""
+
+
+def _lookup_vso_entry(
+    var_name: str,
+    vso: Dict[str, VSOEntry],
+) -> Optional[Tuple[str, VSOEntry]]:
+    """Find a VSO entry by exact name, then by canonical quantity name."""
+    if var_name in vso:
+        return var_name, vso[var_name]
+
+    target_canon = canonicalize_variable(var_name)
+    if not target_canon:
+        return None
+    for candidate_name, entry in vso.items():
+        if entry.defined_at == "constants_table":
+            continue
+        if canonicalize_variable(candidate_name) == target_canon:
+            return candidate_name, entry
+    return None
+
+
+class DeterministicSolveTrace:
+    """No-LLM Stage 2+3 solver using formula library SymPy expressions.
+
+    This is the production fallback when DSPy/vLLM is unavailable.  It executes
+    parser-provided formula_application steps, verifies them by construction,
+    updates the VSO, and copies the final value in conclusion steps.
+    """
+
+    def forward(
+        self,
+        parse_obj: ProblemParseObject,
+        formula_set: FormulaSet,
+        problem_id: str = "unknown",
+        step_retry_limit: int = 1,
+        trace_budget: int = 10,
+    ) -> TraceObject:
+        trace = TraceObject(
+            problem_id=problem_id,
+            formula_path_index=formula_set.path_index,
+        )
+        vso = init_vso(parse_obj)
+        trace.vso = {k: asdict(v) for k, v in vso.items()}
+
+        for step_index, plan_item in enumerate(parse_obj.step_plan):
+            if step_index >= trace_budget:
+                trace.trace_status = "FAIL"
+                break
+            if not isinstance(plan_item, dict):
+                continue
+
+            step_id = str(plan_item.get("step_id", f"step_{step_index + 1}"))
+            step_type = str(plan_item.get("type", "calculation"))
+            formula_entry = formula_set.formulas.get(step_id)
+            step = StepObject(
+                step_id=step_id,
+                goal=str(plan_item.get("goal", "")),
+                type=step_type,
+                formula_ids=[formula_entry.id] if formula_entry else [],
+                input_var={},
+                output_var={},
+            )
+
+            for var_name in plan_item.get("input_var", {}):
+                found = _lookup_vso_entry(var_name, vso)
+                step.input_var[var_name] = asdict(found[1]) if found else None
+
+            if step_type == "conclusion":
+                target_names = list(plan_item.get("input_var", {}).keys())
+                target_names.extend(plan_item.get("output_var", {}).keys())
+                copied = False
+                for target_name in target_names:
+                    found = _lookup_vso_entry(target_name, vso)
+                    if not found:
+                        continue
+                    actual_name, entry = found
+                    step.intermediate_answer = f"{entry.value:g} {entry.unit_symbol}".strip()
+                    step.output_var = {target_name: entry.value}
+                    if actual_name != target_name:
+                        step.output_var[actual_name] = entry.value
+                    step.status = "OK"
+                    step.confidence = 0.95
+                    step.verifier_notes = "Conclusion copied from VSO."
+                    copied = True
+                    break
+                if not copied:
+                    step.status = "WRONG"
+                    step.confidence = 0.0
+                    step.verifier_notes = "Conclusion target was not available in VSO."
+            elif step_type in _CHECKABLE_STEP_TYPES:
+                step.checkable = True
+                if not _try_sympy_solve_step(
+                    step=step,
+                    formula_entry=formula_entry,
+                    plan_output_var=plan_item.get("output_var", {}),
+                    vso=vso,
+                ):
+                    step.status = "WRONG"
+                    step.confidence = 0.0
+                    step.verifier_notes = (
+                        "Deterministic solver could not solve this step with the selected formula."
+                    )
+            else:
+                step.status = "UNCERTAIN"
+                step.confidence = 0.9
+                step.verifier_notes = "Non-checkable step accepted by deterministic solver."
+
+            if step.status != "WRONG":
+                for out_var, out_val in step.output_var.items():
+                    if not isinstance(out_val, (int, float)) or out_val is None:
+                        continue
+                    unit_sym, unit_nm = _infer_output_unit(out_var, formula_entry, vso)
+                    vso[out_var] = VSOEntry(
+                        value=float(out_val),
+                        unit_symbol=unit_sym,
+                        unit_name=unit_nm,
+                        defined_at=vso[out_var].defined_at if out_var in vso else step_id,
+                        updated_at=step_id,
+                    )
+
+            trace.vso = {k: asdict(v) for k, v in vso.items()}
+            trace.vso_snapshots[step_id] = {k: asdict(v) for k, v in vso.items()}
+            trace.steps.append(step)
+
+            if step.status == "WRONG":
+                trace.trace_status = "FAIL"
+                return trace
+
+        if trace.steps:
+            trace.final_answer = trace.steps[-1].intermediate_answer
+        trace.trace_status = "PASS" if trace.final_answer.strip() else "FAIL"
+        return trace

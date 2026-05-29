@@ -1,0 +1,24 @@
+services:
+  vllm:
+    build:
+      context: .
+      dockerfile: docker/vllm/Dockerfile
+    image: exact-vllm:local
+    container_name: exact-vllm
+    ports:
+      - "8000:8000"
+    volumes:
+      - ${USERPROFILE:-${HOME}}/.cache/huggingface:/root/.cache/huggingface
+    environment:
+      VLLM_MODEL: ${VLLM_MODEL:-Qwen/Qwen2.5-0.5B-Instruct}
+      VLLM_SERVED_MODEL_NAME: ${VLLM_SERVED_MODEL_NAME:-qwen2.5-0.5b}
+      VLLM_MAX_MODEL_LEN: ${VLLM_MAX_MODEL_LEN:-1024}
+      VLLM_GPU_MEMORY_UTILIZATION: ${VLLM_GPU_MEMORY_UTILIZATION:-0.65}
+      VLLM_EXTRA_ARGS: ${VLLM_EXTRA_ARGS:-}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

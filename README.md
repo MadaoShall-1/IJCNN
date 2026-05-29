@@ -55,21 +55,34 @@ The system uses [DSPy](https://github.com/stanfordnlp/dspy) for LLM calls. Set e
 
 ```bash
 # Windows PowerShell
-$env:DSPY_MODEL = "openai/qwen3-8b"
+$env:DSPY_MODEL = "openai/qwen2.5-0.5b"
 $env:DSPY_API_BASE = "http://localhost:8000/v1"
-$env:DSPY_API_KEY = "your-api-key"
+$env:DSPY_API_KEY = "EMPTY"
 
 # Linux / macOS
-export DSPY_MODEL="openai/qwen3-8b"
+export DSPY_MODEL="openai/qwen2.5-0.5b"
 export DSPY_API_BASE="http://localhost:8000/v1"
-export DSPY_API_KEY="your-api-key"
+export DSPY_API_KEY="EMPTY"
 ```
 
 Or edit `config.py` directly via `SolverConfig`.
 
 ### 3. (Optional) Local model
 
-If using a local model (e.g. Qwen3-8B with llama.cpp or vLLM), start the model server first, then point `DSPY_API_BASE` to it.
+If using a local model, start the model server first, then point `DSPY_API_BASE` to it.
+The included vLLM Docker setup serves `Qwen/Qwen2.5-0.5B-Instruct`:
+
+```bash
+docker compose -f docker-compose.vllm.yml up --build -d
+```
+
+Then verify:
+
+```bash
+python scripts/verify_vllm_smoke.py
+```
+
+See `docker/vllm/README.md` for model override examples.
 
 ## Run
 

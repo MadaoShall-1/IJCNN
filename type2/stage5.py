@@ -231,17 +231,21 @@ def repair_trace(
 
     # Restore VSO to the pre-FWS snapshot
     rolled_back_vso = rollback_vso(trace, fws_step_id)
+    if rolled_back_vso:
+        repair_known_quantities = {
+            var: {"value": entry.value, "unit_symbol": entry.unit_symbol,
+                  "unit_name": entry.unit_name}
+            for var, entry in rolled_back_vso.items()
+        }
+    else:
+        repair_known_quantities = copy.deepcopy(parse_obj.known_quantities)
 
     # Inject rolled-back VSO values into a minimal parse_obj for re-solving
     patched_parse_obj = ProblemParseObject(
         problem_text=parse_obj.problem_text,
         domains=parse_obj.domains,
         sub_domains=parse_obj.sub_domains,
-        known_quantities={
-            var: {"value": entry.value, "unit_symbol": entry.unit_symbol,
-                  "unit_name": entry.unit_name}
-            for var, entry in rolled_back_vso.items()
-        },
+        known_quantities=repair_known_quantities,
         step_plan=suffix_plan,
         vso={},
     )

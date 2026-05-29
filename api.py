@@ -55,6 +55,7 @@ import type1.pipeline as _type1_pipeline
 
 from parser.schemas import ProblemParseObject
 from type2.stage1 import FormulaRetriever
+from type2.stage2 import DeterministicSolveTrace
 from type2.stage4 import diagnose_trace
 from type2.stage5 import repair_trace, select_repair_formula
 from type2.stage6 import build_response
@@ -103,6 +104,7 @@ _config: SolverConfig = SolverConfig()
 _stage0_cache: Optional[Dict[str, Dict[str, Dict[str, Any]]]] = None
 _stage0_cache_path: Optional[str] = None
 _dspy_lm_configured = False
+_type2_solver_mode = "unloaded"
 
 
 def _normalize_problem_text(text: str) -> str:
@@ -214,10 +216,13 @@ def _get_stage0_parse(
 
 
 def _load_models(cfg: SolverConfig) -> None:
-    global _retriever, _solve_trace, _repair_module, _type1_solver, _dspy_lm_configured
+    global _retriever, _solve_trace, _repair_module, _type1_solver, _dspy_lm_configured, _type2_solver_mode
 
     logger.info("Loading FormulaRetriever...")
     _retriever = FormulaRetriever()
+    _solve_trace = DeterministicSolveTrace()
+    _repair_module = _solve_trace
+    _type2_solver_mode = "deterministic_sympy"
 
     if _DSPY_AVAILABLE:
         if cfg.dspy_model:
@@ -234,19 +239,20 @@ def _load_models(cfg: SolverConfig) -> None:
                 cfg.dspy_model,
                 cfg.dspy_api_base or "<provider-default>",
             )
+            from type2.stage2 import SolveTrace
+            from type2.stage5 import RepairSolveTrace
+            _solve_trace = SolveTrace()
+            _repair_module = RepairSolveTrace()
+            _type2_solver_mode = "dspy_llm"
+            logger.info("DSPy Type 2 modules loaded.")
         else:
             _dspy_lm_configured = False
             logger.warning(
                 "DSPy is installed but no LM is configured. Set DSPY_MODEL "
-                "before starting uvicorn."
+                "before starting uvicorn. Using deterministic SymPy Type 2 solver."
             )
-        from type2.stage2 import SolveTrace
-        from type2.stage5 import RepairSolveTrace
-        _solve_trace = SolveTrace()
-        _repair_module = RepairSolveTrace()
-        logger.info("DSPy modules loaded.")
     else:
-        logger.warning("DSPy not available; Type 2 solver will return stub responses.")
+        logger.warning("DSPy not available; using deterministic SymPy Type 2 solver.")
 
     # Type 1 solver
     try:
@@ -430,6 +436,7 @@ if _FASTAPI_AVAILABLE:
             "dspy_model": _config.dspy_model,
             "dspy_api_base": _config.dspy_api_base,
             "sympy": _SYMPY_AVAILABLE,
+            "type2_solver_mode": _type2_solver_mode,
             "retriever_loaded": _retriever is not None,
             "stage0_use_llm_fallback": _config.stage0_use_llm_fallback,
             "stage0_cache_enabled": _config.stage0_cache_enabled,
