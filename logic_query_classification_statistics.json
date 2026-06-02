@@ -1,0 +1,770 @@
+[
+  {
+    "coarse_cluster": 0,
+    "cluster_description": "Mixed logic reasoning; primary scenario: Student eligibility / learning condition scenario / Named-person eligibility scenario; top keywords: employees, people, registered, students, training, alex; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning; answers are relatively mixed; average premise count is about 13.4, and average question length is about 18.0 words.",
+    "knn_fine_class": "No",
+    "count": 18,
+    "percent_total": 0.022277,
+    "percent_in_cluster": 0.382979,
+    "knn_match_rate": 0.444444,
+    "mean_premise_count": 16.5,
+    "mean_question_word_count": 22.889,
+    "top_answer_class": "No",
+    "answer_class_distribution": {
+      "No": 8,
+      "Unknown": 5,
+      "Yes": 5
+    }
+  },
+  {
+    "coarse_cluster": 0,
+    "cluster_description": "Mixed logic reasoning; primary scenario: Student eligibility / learning condition scenario / Named-person eligibility scenario; top keywords: employees, people, registered, students, training, alex; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning; answers are relatively mixed; average premise count is about 13.4, and average question length is about 18.0 words.",
+    "knn_fine_class": "Option_A",
+    "count": 2,
+    "percent_total": 0.002475,
+    "percent_in_cluster": 0.042553,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 5.5,
+    "mean_question_word_count": 8.0,
+    "top_answer_class": "Yes",
+    "answer_class_distribution": {
+      "Yes": 2
+    }
+  },
+  {
+    "coarse_cluster": 0,
+    "cluster_description": "Mixed logic reasoning; primary scenario: Student eligibility / learning condition scenario / Named-person eligibility scenario; top keywords: employees, people, registered, students, training, alex; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning; answers are relatively mixed; average premise count is about 13.4, and average question length is about 18.0 words.",
+    "knn_fine_class": "Option_B",
+    "count": 2,
+    "percent_total": 0.002475,
+    "percent_in_cluster": 0.042553,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 5.5,
+    "mean_question_word_count": 29.0,
+    "top_answer_class": "Option_C",
+    "answer_class_distribution": {
+      "Option_C": 1,
+      "Yes": 1
+    }
+  },
+  {
+    "coarse_cluster": 0,
+    "cluster_description": "Mixed logic reasoning; primary scenario: Student eligibility / learning condition scenario / Named-person eligibility scenario; top keywords: employees, people, registered, students, training, alex; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning; answers are relatively mixed; average premise count is about 13.4, and average question length is about 18.0 words.",
+    "knn_fine_class": "Option_C",
+    "count": 2,
+    "percent_total": 0.002475,
+    "percent_in_cluster": 0.042553,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 5.5,
+    "mean_question_word_count": 24.5,
+    "top_answer_class": "No",
+    "answer_class_distribution": {
+      "No": 1,
+      "Option_B": 1
+    }
+  },
+  {
+    "coarse_cluster": 0,
+    "cluster_description": "Mixed logic reasoning; primary scenario: Student eligibility / learning condition scenario / Named-person eligibility scenario; top keywords: employees, people, registered, students, training, alex; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning; answers are relatively mixed; average premise count is about 13.4, and average question length is about 18.0 words.",
+    "knn_fine_class": "Unknown",
+    "count": 6,
+    "percent_total": 0.007426,
+    "percent_in_cluster": 0.12766,
+    "knn_match_rate": 0.166667,
+    "mean_premise_count": 5.5,
+    "mean_question_word_count": 26.5,
+    "top_answer_class": "No",
+    "answer_class_distribution": {
+      "No": 5,
+      "Unknown": 1
+    }
+  },
+  {
+    "coarse_cluster": 0,
+    "cluster_description": "Mixed logic reasoning; primary scenario: Student eligibility / learning condition scenario / Named-person eligibility scenario; top keywords: employees, people, registered, students, training, alex; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning; answers are relatively mixed; average premise count is about 13.4, and average question length is about 18.0 words.",
+    "knn_fine_class": "Yes",
+    "count": 17,
+    "percent_total": 0.02104,
+    "percent_in_cluster": 0.361702,
+    "knn_match_rate": 0.588235,
+    "mean_premise_count": 15.647,
+    "mean_question_word_count": 8.882,
+    "top_answer_class": "Yes",
+    "answer_class_distribution": {
+      "Yes": 10,
+      "No": 5,
+      "Option_A": 2
+    }
+  },
+  {
+    "coarse_cluster": 1,
+    "cluster_description": "Statement truth / entailment judgment; primary scenario: Student eligibility / learning condition scenario; top keywords: statement, student, premises statement, students, based premises, based; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains existential judgments, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 10.4, and average question length is about 42.3 words.",
+    "knn_fine_class": "No",
+    "count": 40,
+    "percent_total": 0.049505,
+    "percent_in_cluster": 0.363636,
+    "knn_match_rate": 0.1,
+    "mean_premise_count": 10.575,
+    "mean_question_word_count": 66.575,
+    "top_answer_class": "Unknown",
+    "answer_class_distribution": {
+      "Unknown": 33,
+      "No": 4,
+      "Option_C": 2,
+      "Yes": 1
+    }
+  },
+  {
+    "coarse_cluster": 1,
+    "cluster_description": "Statement truth / entailment judgment; primary scenario: Student eligibility / learning condition scenario; top keywords: statement, student, premises statement, students, based premises, based; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains existential judgments, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 10.4, and average question length is about 42.3 words.",
+    "knn_fine_class": "Option_A",
+    "count": 6,
+    "percent_total": 0.007426,
+    "percent_in_cluster": 0.054545,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 9.0,
+    "mean_question_word_count": 9.0,
+    "top_answer_class": "Yes",
+    "answer_class_distribution": {
+      "Yes": 6
+    }
+  },
+  {
+    "coarse_cluster": 1,
+    "cluster_description": "Statement truth / entailment judgment; primary scenario: Student eligibility / learning condition scenario; top keywords: statement, student, premises statement, students, based premises, based; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains existential judgments, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 10.4, and average question length is about 42.3 words.",
+    "knn_fine_class": "Option_B",
+    "count": 1,
+    "percent_total": 0.001238,
+    "percent_in_cluster": 0.009091,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 15.0,
+    "mean_question_word_count": 18.0,
+    "top_answer_class": "Yes",
+    "answer_class_distribution": {
+      "Yes": 1
+    }
+  },
+  {
+    "coarse_cluster": 1,
+    "cluster_description": "Statement truth / entailment judgment; primary scenario: Student eligibility / learning condition scenario; top keywords: statement, student, premises statement, students, based premises, based; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains existential judgments, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 10.4, and average question length is about 42.3 words.",
+    "knn_fine_class": "Option_C",
+    "count": 2,
+    "percent_total": 0.002475,
+    "percent_in_cluster": 0.018182,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 18.5,
+    "mean_question_word_count": 14.0,
+    "top_answer_class": "No",
+    "answer_class_distribution": {
+      "No": 2
+    }
+  },
+  {
+    "coarse_cluster": 1,
+    "cluster_description": "Statement truth / entailment judgment; primary scenario: Student eligibility / learning condition scenario; top keywords: statement, student, premises statement, students, based premises, based; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains existential judgments, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 10.4, and average question length is about 42.3 words.",
+    "knn_fine_class": "Unknown",
+    "count": 48,
+    "percent_total": 0.059406,
+    "percent_in_cluster": 0.436364,
+    "knn_match_rate": 0.166667,
+    "mean_premise_count": 9.771,
+    "mean_question_word_count": 26.708,
+    "top_answer_class": "No",
+    "answer_class_distribution": {
+      "No": 34,
+      "Unknown": 8,
+      "Yes": 5,
+      "Option_A": 1
+    }
+  },
+  {
+    "coarse_cluster": 1,
+    "cluster_description": "Statement truth / entailment judgment; primary scenario: Student eligibility / learning condition scenario; top keywords: statement, student, premises statement, students, based premises, based; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains existential judgments, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 10.4, and average question length is about 42.3 words.",
+    "knn_fine_class": "Yes",
+    "count": 13,
+    "percent_total": 0.016089,
+    "percent_in_cluster": 0.118182,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 11.077,
+    "mean_question_word_count": 47.154,
+    "top_answer_class": "Option_A",
+    "answer_class_distribution": {
+      "Option_A": 6,
+      "Unknown": 5,
+      "No": 1,
+      "Option_B": 1
+    }
+  },
+  {
+    "coarse_cluster": 2,
+    "cluster_description": "Multiple-choice conclusion selection; primary scenario: Student eligibility / learning condition scenario; top keywords: students, statement, student, true, based premises, premises; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains existential judgments, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 7.8, and average question length is about 42.6 words.",
+    "knn_fine_class": "No",
+    "count": 79,
+    "percent_total": 0.097772,
+    "percent_in_cluster": 0.33617,
+    "knn_match_rate": 0.126582,
+    "mean_premise_count": 8.646,
+    "mean_question_word_count": 66.582,
+    "top_answer_class": "Unknown",
+    "answer_class_distribution": {
+      "Unknown": 64,
+      "No": 10,
+      "Option_A": 3,
+      "Option_D": 1,
+      "Yes": 1
+    }
+  },
+  {
+    "coarse_cluster": 2,
+    "cluster_description": "Multiple-choice conclusion selection; primary scenario: Student eligibility / learning condition scenario; top keywords: students, statement, student, true, based premises, premises; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains existential judgments, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 7.8, and average question length is about 42.6 words.",
+    "knn_fine_class": "Option_A",
+    "count": 13,
+    "percent_total": 0.016089,
+    "percent_in_cluster": 0.055319,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 8.0,
+    "mean_question_word_count": 19.462,
+    "top_answer_class": "Yes",
+    "answer_class_distribution": {
+      "Yes": 9,
+      "No": 3,
+      "Unknown": 1
+    }
+  },
+  {
+    "coarse_cluster": 2,
+    "cluster_description": "Multiple-choice conclusion selection; primary scenario: Student eligibility / learning condition scenario; top keywords: students, statement, student, true, based premises, premises; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains existential judgments, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 7.8, and average question length is about 42.6 words.",
+    "knn_fine_class": "Option_B",
+    "count": 3,
+    "percent_total": 0.003713,
+    "percent_in_cluster": 0.012766,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 8.667,
+    "mean_question_word_count": 10.667,
+    "top_answer_class": "Yes",
+    "answer_class_distribution": {
+      "Yes": 3
+    }
+  },
+  {
+    "coarse_cluster": 2,
+    "cluster_description": "Multiple-choice conclusion selection; primary scenario: Student eligibility / learning condition scenario; top keywords: students, statement, student, true, based premises, premises; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains existential judgments, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 7.8, and average question length is about 42.6 words.",
+    "knn_fine_class": "Option_D",
+    "count": 2,
+    "percent_total": 0.002475,
+    "percent_in_cluster": 0.008511,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 6.0,
+    "mean_question_word_count": 14.5,
+    "top_answer_class": "No",
+    "answer_class_distribution": {
+      "No": 1,
+      "Yes": 1
+    }
+  },
+  {
+    "coarse_cluster": 2,
+    "cluster_description": "Multiple-choice conclusion selection; primary scenario: Student eligibility / learning condition scenario; top keywords: students, statement, student, true, based premises, premises; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains existential judgments, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 7.8, and average question length is about 42.6 words.",
+    "knn_fine_class": "Unknown",
+    "count": 111,
+    "percent_total": 0.137376,
+    "percent_in_cluster": 0.47234,
+    "knn_match_rate": 0.261261,
+    "mean_premise_count": 7.045,
+    "mean_question_word_count": 27.369,
+    "top_answer_class": "No",
+    "answer_class_distribution": {
+      "No": 72,
+      "Unknown": 29,
+      "Yes": 7,
+      "Option_A": 2,
+      "Option_B": 1
+    }
+  },
+  {
+    "coarse_cluster": 2,
+    "cluster_description": "Multiple-choice conclusion selection; primary scenario: Student eligibility / learning condition scenario; top keywords: students, statement, student, true, based premises, premises; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains existential judgments, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 7.8, and average question length is about 42.6 words.",
+    "knn_fine_class": "Yes",
+    "count": 27,
+    "percent_total": 0.033416,
+    "percent_in_cluster": 0.114894,
+    "knn_match_rate": 0.222222,
+    "mean_premise_count": 8.259,
+    "mean_question_word_count": 52.074,
+    "top_answer_class": "Option_A",
+    "answer_class_distribution": {
+      "Option_A": 8,
+      "Unknown": 8,
+      "Yes": 6,
+      "Option_B": 3,
+      "No": 1,
+      "Option_D": 1
+    }
+  },
+  {
+    "coarse_cluster": 3,
+    "cluster_description": "Statement truth / entailment judgment; primary scenario: Student eligibility / learning condition scenario; top keywords: statement, premises, students, property, based, based premises; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains existential judgments, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 8.0, and average question length is about 47.6 words.",
+    "knn_fine_class": "No",
+    "count": 50,
+    "percent_total": 0.061881,
+    "percent_in_cluster": 0.396825,
+    "knn_match_rate": 0.06,
+    "mean_premise_count": 8.26,
+    "mean_question_word_count": 70.98,
+    "top_answer_class": "Unknown",
+    "answer_class_distribution": {
+      "Unknown": 43,
+      "No": 3,
+      "Option_A": 1,
+      "Option_D": 1,
+      "Option_B": 1,
+      "Option_C": 1
+    }
+  },
+  {
+    "coarse_cluster": 3,
+    "cluster_description": "Statement truth / entailment judgment; primary scenario: Student eligibility / learning condition scenario; top keywords: statement, premises, students, property, based, based premises; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains existential judgments, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 8.0, and average question length is about 47.6 words.",
+    "knn_fine_class": "Option_A",
+    "count": 9,
+    "percent_total": 0.011139,
+    "percent_in_cluster": 0.071429,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 7.0,
+    "mean_question_word_count": 35.444,
+    "top_answer_class": "Yes",
+    "answer_class_distribution": {
+      "Yes": 8,
+      "Unknown": 1
+    }
+  },
+  {
+    "coarse_cluster": 3,
+    "cluster_description": "Statement truth / entailment judgment; primary scenario: Student eligibility / learning condition scenario; top keywords: statement, premises, students, property, based, based premises; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains existential judgments, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 8.0, and average question length is about 47.6 words.",
+    "knn_fine_class": "Option_B",
+    "count": 2,
+    "percent_total": 0.002475,
+    "percent_in_cluster": 0.015873,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 11.5,
+    "mean_question_word_count": 20.5,
+    "top_answer_class": "Yes",
+    "answer_class_distribution": {
+      "Yes": 1,
+      "No": 1
+    }
+  },
+  {
+    "coarse_cluster": 3,
+    "cluster_description": "Statement truth / entailment judgment; primary scenario: Student eligibility / learning condition scenario; top keywords: statement, premises, students, property, based, based premises; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains existential judgments, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 8.0, and average question length is about 47.6 words.",
+    "knn_fine_class": "Option_C",
+    "count": 2,
+    "percent_total": 0.002475,
+    "percent_in_cluster": 0.015873,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 9.0,
+    "mean_question_word_count": 18.0,
+    "top_answer_class": "Yes",
+    "answer_class_distribution": {
+      "Yes": 1,
+      "No": 1
+    }
+  },
+  {
+    "coarse_cluster": 3,
+    "cluster_description": "Statement truth / entailment judgment; primary scenario: Student eligibility / learning condition scenario; top keywords: statement, premises, students, property, based, based premises; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains existential judgments, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 8.0, and average question length is about 47.6 words.",
+    "knn_fine_class": "Option_D",
+    "count": 1,
+    "percent_total": 0.001238,
+    "percent_in_cluster": 0.007937,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 6.0,
+    "mean_question_word_count": 30.0,
+    "top_answer_class": "No",
+    "answer_class_distribution": {
+      "No": 1
+    }
+  },
+  {
+    "coarse_cluster": 3,
+    "cluster_description": "Statement truth / entailment judgment; primary scenario: Student eligibility / learning condition scenario; top keywords: statement, premises, students, property, based, based premises; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains existential judgments, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 8.0, and average question length is about 47.6 words.",
+    "knn_fine_class": "Unknown",
+    "count": 52,
+    "percent_total": 0.064356,
+    "percent_in_cluster": 0.412698,
+    "knn_match_rate": 0.115385,
+    "mean_premise_count": 7.962,
+    "mean_question_word_count": 23.038,
+    "top_answer_class": "No",
+    "answer_class_distribution": {
+      "No": 44,
+      "Unknown": 6,
+      "Yes": 1,
+      "Option_A": 1
+    }
+  },
+  {
+    "coarse_cluster": 3,
+    "cluster_description": "Statement truth / entailment judgment; primary scenario: Student eligibility / learning condition scenario; top keywords: statement, premises, students, property, based, based premises; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains existential judgments, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 8.0, and average question length is about 47.6 words.",
+    "knn_fine_class": "Yes",
+    "count": 10,
+    "percent_total": 0.012376,
+    "percent_in_cluster": 0.079365,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 7.6,
+    "mean_question_word_count": 83.0,
+    "top_answer_class": "Option_A",
+    "answer_class_distribution": {
+      "Option_A": 7,
+      "Option_C": 1,
+      "Option_B": 1,
+      "Unknown": 1
+    }
+  },
+  {
+    "coarse_cluster": 4,
+    "cluster_description": "Multiple-choice conclusion selection; primary scenario: Student eligibility / learning condition scenario; top keywords: research, thesis, quantum, housing, philosophy, policy; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains existential judgments; answers are relatively mixed; average premise count is about 15.4, and average question length is about 35.6 words.",
+    "knn_fine_class": "False",
+    "count": 1,
+    "percent_total": 0.001238,
+    "percent_in_cluster": 0.029412,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 14.0,
+    "mean_question_word_count": 55.0,
+    "top_answer_class": "Option_A",
+    "answer_class_distribution": {
+      "Option_A": 1
+    }
+  },
+  {
+    "coarse_cluster": 4,
+    "cluster_description": "Multiple-choice conclusion selection; primary scenario: Student eligibility / learning condition scenario; top keywords: research, thesis, quantum, housing, philosophy, policy; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains existential judgments; answers are relatively mixed; average premise count is about 15.4, and average question length is about 35.6 words.",
+    "knn_fine_class": "No",
+    "count": 10,
+    "percent_total": 0.012376,
+    "percent_in_cluster": 0.294118,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 15.6,
+    "mean_question_word_count": 44.2,
+    "top_answer_class": "Unknown",
+    "answer_class_distribution": {
+      "Unknown": 8,
+      "Option_A": 2
+    }
+  },
+  {
+    "coarse_cluster": 4,
+    "cluster_description": "Multiple-choice conclusion selection; primary scenario: Student eligibility / learning condition scenario; top keywords: research, thesis, quantum, housing, philosophy, policy; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains existential judgments; answers are relatively mixed; average premise count is about 15.4, and average question length is about 35.6 words.",
+    "knn_fine_class": "Option_A",
+    "count": 5,
+    "percent_total": 0.006188,
+    "percent_in_cluster": 0.147059,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 17.0,
+    "mean_question_word_count": 21.2,
+    "top_answer_class": "Yes",
+    "answer_class_distribution": {
+      "Yes": 2,
+      "No": 2,
+      "False": 1
+    }
+  },
+  {
+    "coarse_cluster": 4,
+    "cluster_description": "Multiple-choice conclusion selection; primary scenario: Student eligibility / learning condition scenario; top keywords: research, thesis, quantum, housing, philosophy, policy; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains existential judgments; answers are relatively mixed; average premise count is about 15.4, and average question length is about 35.6 words.",
+    "knn_fine_class": "Unknown",
+    "count": 10,
+    "percent_total": 0.012376,
+    "percent_in_cluster": 0.294118,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 16.2,
+    "mean_question_word_count": 18.1,
+    "top_answer_class": "No",
+    "answer_class_distribution": {
+      "No": 8,
+      "Yes": 2
+    }
+  },
+  {
+    "coarse_cluster": 4,
+    "cluster_description": "Multiple-choice conclusion selection; primary scenario: Student eligibility / learning condition scenario; top keywords: research, thesis, quantum, housing, philosophy, policy; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains existential judgments; answers are relatively mixed; average premise count is about 15.4, and average question length is about 35.6 words.",
+    "knn_fine_class": "Yes",
+    "count": 8,
+    "percent_total": 0.009901,
+    "percent_in_cluster": 0.235294,
+    "knn_match_rate": 0.25,
+    "mean_premise_count": 13.125,
+    "mean_question_word_count": 53.375,
+    "top_answer_class": "Option_A",
+    "answer_class_distribution": {
+      "Option_A": 4,
+      "Unknown": 2,
+      "Yes": 2
+    }
+  },
+  {
+    "coarse_cluster": 5,
+    "cluster_description": "Multiple-choice conclusion selection; primary scenario: Student eligibility / learning condition scenario; top keywords: students, learning, improve, premises, student, skills; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning; answers are relatively mixed; average premise count is about 11.3, and average question length is about 34.7 words.",
+    "knn_fine_class": "No",
+    "count": 33,
+    "percent_total": 0.040842,
+    "percent_in_cluster": 0.452055,
+    "knn_match_rate": 0.181818,
+    "mean_premise_count": 11.818,
+    "mean_question_word_count": 46.333,
+    "top_answer_class": "Unknown",
+    "answer_class_distribution": {
+      "Unknown": 27,
+      "No": 6
+    }
+  },
+  {
+    "coarse_cluster": 5,
+    "cluster_description": "Multiple-choice conclusion selection; primary scenario: Student eligibility / learning condition scenario; top keywords: students, learning, improve, premises, student, skills; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning; answers are relatively mixed; average premise count is about 11.3, and average question length is about 34.7 words.",
+    "knn_fine_class": "Option_B",
+    "count": 2,
+    "percent_total": 0.002475,
+    "percent_in_cluster": 0.027397,
+    "knn_match_rate": 1.0,
+    "mean_premise_count": 6.0,
+    "mean_question_word_count": 41.0,
+    "top_answer_class": "Option_B",
+    "answer_class_distribution": {
+      "Option_B": 2
+    }
+  },
+  {
+    "coarse_cluster": 5,
+    "cluster_description": "Multiple-choice conclusion selection; primary scenario: Student eligibility / learning condition scenario; top keywords: students, learning, improve, premises, student, skills; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning; answers are relatively mixed; average premise count is about 11.3, and average question length is about 34.7 words.",
+    "knn_fine_class": "Unknown",
+    "count": 35,
+    "percent_total": 0.043317,
+    "percent_in_cluster": 0.479452,
+    "knn_match_rate": 0.2,
+    "mean_premise_count": 11.371,
+    "mean_question_word_count": 23.686,
+    "top_answer_class": "No",
+    "answer_class_distribution": {
+      "No": 27,
+      "Unknown": 7,
+      "Yes": 1
+    }
+  },
+  {
+    "coarse_cluster": 5,
+    "cluster_description": "Multiple-choice conclusion selection; primary scenario: Student eligibility / learning condition scenario; top keywords: students, learning, improve, premises, student, skills; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning; answers are relatively mixed; average premise count is about 11.3, and average question length is about 34.7 words.",
+    "knn_fine_class": "Yes",
+    "count": 3,
+    "percent_total": 0.003713,
+    "percent_in_cluster": 0.041096,
+    "knn_match_rate": 0.666667,
+    "mean_premise_count": 9.0,
+    "mean_question_word_count": 31.667,
+    "top_answer_class": "Yes",
+    "answer_class_distribution": {
+      "Yes": 2,
+      "Unknown": 1
+    }
+  },
+  {
+    "coarse_cluster": 6,
+    "cluster_description": "Multiple-choice conclusion selection; primary scenario: Student eligibility / learning condition scenario; top keywords: statement, premises, premises statement, based, based premises, student; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 13.8, and average question length is about 45.1 words.",
+    "knn_fine_class": "No",
+    "count": 40,
+    "percent_total": 0.049505,
+    "percent_in_cluster": 0.421053,
+    "knn_match_rate": 0.125,
+    "mean_premise_count": 14.525,
+    "mean_question_word_count": 65.975,
+    "top_answer_class": "Unknown",
+    "answer_class_distribution": {
+      "Unknown": 27,
+      "No": 5,
+      "Option_A": 3,
+      "Option_B": 2,
+      "Option_D": 2,
+      "Yes": 1
+    }
+  },
+  {
+    "coarse_cluster": 6,
+    "cluster_description": "Multiple-choice conclusion selection; primary scenario: Student eligibility / learning condition scenario; top keywords: statement, premises, premises statement, based, based premises, student; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 13.8, and average question length is about 45.1 words.",
+    "knn_fine_class": "Option_A",
+    "count": 6,
+    "percent_total": 0.007426,
+    "percent_in_cluster": 0.063158,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 12.0,
+    "mean_question_word_count": 17.667,
+    "top_answer_class": "Yes",
+    "answer_class_distribution": {
+      "Yes": 4,
+      "No": 2
+    }
+  },
+  {
+    "coarse_cluster": 6,
+    "cluster_description": "Multiple-choice conclusion selection; primary scenario: Student eligibility / learning condition scenario; top keywords: statement, premises, premises statement, based, based premises, student; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 13.8, and average question length is about 45.1 words.",
+    "knn_fine_class": "Option_B",
+    "count": 3,
+    "percent_total": 0.003713,
+    "percent_in_cluster": 0.031579,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 13.0,
+    "mean_question_word_count": 24.333,
+    "top_answer_class": "Yes",
+    "answer_class_distribution": {
+      "Yes": 2,
+      "No": 1
+    }
+  },
+  {
+    "coarse_cluster": 6,
+    "cluster_description": "Multiple-choice conclusion selection; primary scenario: Student eligibility / learning condition scenario; top keywords: statement, premises, premises statement, based, based premises, student; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 13.8, and average question length is about 45.1 words.",
+    "knn_fine_class": "Option_C",
+    "count": 2,
+    "percent_total": 0.002475,
+    "percent_in_cluster": 0.021053,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 11.0,
+    "mean_question_word_count": 11.0,
+    "top_answer_class": "Yes",
+    "answer_class_distribution": {
+      "Yes": 2
+    }
+  },
+  {
+    "coarse_cluster": 6,
+    "cluster_description": "Multiple-choice conclusion selection; primary scenario: Student eligibility / learning condition scenario; top keywords: statement, premises, premises statement, based, based premises, student; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 13.8, and average question length is about 45.1 words.",
+    "knn_fine_class": "Option_D",
+    "count": 2,
+    "percent_total": 0.002475,
+    "percent_in_cluster": 0.021053,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 10.5,
+    "mean_question_word_count": 18.5,
+    "top_answer_class": "No",
+    "answer_class_distribution": {
+      "No": 2
+    }
+  },
+  {
+    "coarse_cluster": 6,
+    "cluster_description": "Multiple-choice conclusion selection; primary scenario: Student eligibility / learning condition scenario; top keywords: statement, premises, premises statement, based, based premises, student; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 13.8, and average question length is about 45.1 words.",
+    "knn_fine_class": "Unknown",
+    "count": 32,
+    "percent_total": 0.039604,
+    "percent_in_cluster": 0.336842,
+    "knn_match_rate": 0.0625,
+    "mean_premise_count": 14.438,
+    "mean_question_word_count": 27.938,
+    "top_answer_class": "No",
+    "answer_class_distribution": {
+      "No": 28,
+      "Yes": 2,
+      "Unknown": 2
+    }
+  },
+  {
+    "coarse_cluster": 6,
+    "cluster_description": "Multiple-choice conclusion selection; primary scenario: Student eligibility / learning condition scenario; top keywords: statement, premises, premises statement, based, based premises, student; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning, contains negation / contraposition reasoning; answers are relatively mixed; average premise count is about 13.8, and average question length is about 45.1 words.",
+    "knn_fine_class": "Yes",
+    "count": 10,
+    "percent_total": 0.012376,
+    "percent_in_cluster": 0.105263,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 11.4,
+    "mean_question_word_count": 51.8,
+    "top_answer_class": "Option_A",
+    "answer_class_distribution": {
+      "Option_A": 4,
+      "Option_C": 2,
+      "Unknown": 2,
+      "Option_B": 2
+    }
+  },
+  {
+    "coarse_cluster": 7,
+    "cluster_description": "Statement truth / entailment judgment; primary scenario: Python project logic scenario / Student eligibility / learning condition scenario; top keywords: statement, premises statement, based premises, premises, based, statement true; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning; answers are relatively mixed; average premise count is about 15.6, and average question length is about 28.6 words.",
+    "knn_fine_class": "No",
+    "count": 30,
+    "percent_total": 0.037129,
+    "percent_in_cluster": 0.340909,
+    "knn_match_rate": 0.2,
+    "mean_premise_count": 14.167,
+    "mean_question_word_count": 42.733,
+    "top_answer_class": "Unknown",
+    "answer_class_distribution": {
+      "Unknown": 20,
+      "No": 6,
+      "Yes": 4
+    }
+  },
+  {
+    "coarse_cluster": 7,
+    "cluster_description": "Statement truth / entailment judgment; primary scenario: Python project logic scenario / Student eligibility / learning condition scenario; top keywords: statement, premises statement, based premises, premises, based, statement true; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning; answers are relatively mixed; average premise count is about 15.6, and average question length is about 28.6 words.",
+    "knn_fine_class": "Option_A",
+    "count": 6,
+    "percent_total": 0.007426,
+    "percent_in_cluster": 0.068182,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 28.667,
+    "mean_question_word_count": 11.167,
+    "top_answer_class": "Yes",
+    "answer_class_distribution": {
+      "Yes": 5,
+      "Unknown": 1
+    }
+  },
+  {
+    "coarse_cluster": 7,
+    "cluster_description": "Statement truth / entailment judgment; primary scenario: Python project logic scenario / Student eligibility / learning condition scenario; top keywords: statement, premises statement, based premises, premises, based, statement true; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning; answers are relatively mixed; average premise count is about 15.6, and average question length is about 28.6 words.",
+    "knn_fine_class": "Option_B",
+    "count": 1,
+    "percent_total": 0.001238,
+    "percent_in_cluster": 0.011364,
+    "knn_match_rate": 0.0,
+    "mean_premise_count": 17.0,
+    "mean_question_word_count": 23.0,
+    "top_answer_class": "Yes",
+    "answer_class_distribution": {
+      "Yes": 1
+    }
+  },
+  {
+    "coarse_cluster": 7,
+    "cluster_description": "Statement truth / entailment judgment; primary scenario: Python project logic scenario / Student eligibility / learning condition scenario; top keywords: statement, premises statement, based premises, premises, based, statement true; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning; answers are relatively mixed; average premise count is about 15.6, and average question length is about 28.6 words.",
+    "knn_fine_class": "Unknown",
+    "count": 34,
+    "percent_total": 0.042079,
+    "percent_in_cluster": 0.386364,
+    "knn_match_rate": 0.294118,
+    "mean_premise_count": 13.441,
+    "mean_question_word_count": 22.235,
+    "top_answer_class": "No",
+    "answer_class_distribution": {
+      "No": 19,
+      "Unknown": 10,
+      "Yes": 4,
+      "Option_A": 1
+    }
+  },
+  {
+    "coarse_cluster": 7,
+    "cluster_description": "Statement truth / entailment judgment; primary scenario: Python project logic scenario / Student eligibility / learning condition scenario; top keywords: statement, premises statement, based premises, premises, based, statement true; logical pattern: many FOL-symbolized premises, mostly universal conditional reasoning; answers are relatively mixed; average premise count is about 15.6, and average question length is about 28.6 words.",
+    "knn_fine_class": "Yes",
+    "count": 17,
+    "percent_total": 0.02104,
+    "percent_in_cluster": 0.193182,
+    "knn_match_rate": 0.235294,
+    "mean_premise_count": 17.824,
+    "mean_question_word_count": 23.0,
+    "top_answer_class": "Option_A",
+    "answer_class_distribution": {
+      "Option_A": 5,
+      "Yes": 4,
+      "No": 4,
+      "Unknown": 3,
+      "Option_B": 1
+    }
+  }
+]
