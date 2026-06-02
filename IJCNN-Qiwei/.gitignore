@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.pyc
+type1_stage0_eval_results.json
+type1_stage0_eval_summary.json
+type1_pipeline_eval_results.json
+type1_pipeline_eval_summary.json
+processed_logic_queries_classified.json
+logic_query_classification_statistics.json
