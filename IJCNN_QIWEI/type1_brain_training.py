@@ -35,6 +35,11 @@ class BrainTrainingConfig:
     epochs: int = 80
     learning_rate: float = 0.035
     l2: float = 0.0005
+    pairwise_margin: float = 0.22
+    pairwise_weight: float = 0.75
+    hard_negative_weight: float = 0.55
+    max_hard_negatives: int = 2
+    class_balance: bool = False
     limit_records: int | None = None
     local_files_only: bool = False
     segmenter_model: str = "openai/Qwen2.5-1.5B-Instruct"
@@ -205,6 +210,7 @@ class BrainReadoutTrainer:
         feature_dim = len(groups[0][0].features)
         weights = np.zeros((feature_dim + 1,), dtype=np.float64)
         rng = random.Random(self.config.random_state)
+        label_weights = self._label_weights(groups)
         history: list[dict[str, float]] = []
         for epoch in range(1, self.config.epochs + 1):
             rng.shuffle(groups)
@@ -218,9 +224,14 @@ class BrainReadoutTrainer:
                 x = self._matrix(group, scaler)
                 scores = x @ weights
                 probs = self._softmax(scores)
-                loss = -math.log(max(float(probs[target]), 1e-12)) + self.config.l2 * float(weights[1:] @ weights[1:])
-                grad_scores = probs
-                grad_scores[target] -= 1.0
+                target_weight = label_weights.get(group[target].expected, 1.0)
+                loss = target_weight * -math.log(max(float(probs[target]), 1e-12))
+                grad_scores = target_weight * probs
+                grad_scores[target] -= target_weight
+                pairwise_loss, pairwise_grad = self._pairwise_loss_and_grad(scores, target)
+                loss += pairwise_loss
+                grad_scores += pairwise_grad
+                loss += self.config.l2 * float(weights[1:] @ weights[1:])
                 grad = x.T @ grad_scores + np.r_[0.0, 2.0 * self.config.l2 * weights[1:]]
                 weights -= self.config.learning_rate * grad
                 total_loss += loss
@@ -235,6 +246,29 @@ class BrainReadoutTrainer:
                     }
                 )
         return weights, history
+
+    def _pairwise_loss_and_grad(self, scores: np.ndarray, target: int) -> tuple[float, np.ndarray]:
+        wrong_indices = [idx for idx in range(scores.shape[0]) if idx != target]
+        if not wrong_indices:
+            return 0.0, np.zeros_like(scores)
+        wrong_indices.sort(key=lambda idx: float(scores[idx]), reverse=True)
+        selected = wrong_indices[: max(1, self.config.max_hard_negatives)]
+        grad = np.zeros_like(scores)
+        total_loss = 0.0
+        normalizer = float(len(selected))
+        for rank, wrong_idx in enumerate(selected):
+            weight = self.config.pairwise_weight
+            if rank == 0:
+                weight += self.config.hard_negative_weight
+            weight /= normalizer
+            gap = float(scores[target] - scores[wrong_idx])
+            z = self.config.pairwise_margin - gap
+            clipped_z = float(np.clip(z, -40.0, 40.0))
+            sigmoid = 1.0 / (1.0 + math.exp(-clipped_z))
+            total_loss += weight * math.log1p(math.exp(clipped_z))
+            grad[target] -= weight * sigmoid
+            grad[wrong_idx] += weight * sigmoid
+        return total_loss, grad
 
     def _predict_groups(
         self,
@@ -304,6 +338,23 @@ class BrainReadoutTrainer:
                 return idx
         return None
 
+    def _label_weights(self, groups: list[list[BrainCandidate]]) -> dict[str, float]:
+        if not self.config.class_balance:
+            return {}
+        counts: dict[str, int] = {}
+        for group in groups:
+            target = self._target_index(group)
+            if target is not None:
+                counts[group[target].expected] = counts.get(group[target].expected, 0) + 1
+        if not counts:
+            return {}
+        total = sum(counts.values())
+        class_count = len(counts)
+        return {
+            label: float(np.clip(total / max(1, class_count * count), 0.45, 2.8))
+            for label, count in counts.items()
+        }
+
     def _fit_scaler(self, candidates: list[BrainCandidate]) -> dict[str, np.ndarray]:
         matrix = np.array([item.features for item in candidates], dtype=np.float64)
         matrix = np.nan_to_num(matrix, nan=0.0, posinf=0.0, neginf=0.0)
@@ -368,6 +419,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--epochs", type=int, default=80)
     parser.add_argument("--learning-rate", type=float, default=0.035)
     parser.add_argument("--l2", type=float, default=0.0005)
+    parser.add_argument("--pairwise-margin", type=float, default=0.22)
+    parser.add_argument("--pairwise-weight", type=float, default=0.75)
+    parser.add_argument("--hard-negative-weight", type=float, default=0.55)
+    parser.add_argument("--max-hard-negatives", type=int, default=2)
+    parser.add_argument("--enable-class-balance", dest="class_balance", action="store_true", default=False)
     parser.add_argument("--limit-records", type=int)
     parser.add_argument("--local-files-only", action="store_true")
     parser.add_argument("--api-key", default="EMPTY")
@@ -389,6 +445,11 @@ def config_from_args(args: argparse.Namespace) -> BrainTrainingConfig:
         epochs=args.epochs,
         learning_rate=args.learning_rate,
         l2=args.l2,
+        pairwise_margin=args.pairwise_margin,
+        pairwise_weight=args.pairwise_weight,
+        hard_negative_weight=args.hard_negative_weight,
+        max_hard_negatives=args.max_hard_negatives,
+        class_balance=args.class_balance,
         limit_records=args.limit_records,
         local_files_only=args.local_files_only,
         api_key=args.api_key,

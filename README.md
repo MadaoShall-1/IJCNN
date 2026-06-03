@@ -79,18 +79,26 @@ python run_type1_pipeline_evaluation.py \
   --local-files-only
 ```
 
-Train the retained Transformer Brain readout with an 8/2 split and validate it:
+Train the retained candidate-level Transformer Brain with an 8/2 split and validate it:
 
 ```bash
-python run_type1_brain_training.py \
+python run_type1_candidate_transformer_training.py \
   --input ../Logic_Based_Educational_Queries.json \
   --local-files-only \
   --epochs 100 \
-  --learning-rate 0.025 \
+  --learning-rate 0.001 \
+  --transformer-layers 2 \
+  --transformer-heads 4 \
+  --transformer-hidden-dim 64 \
+  --transformer-ff-dim 128 \
   --output type1_brain_train_eval_results.json \
   --summary-output type1_brain_train_eval_summary.json \
   --model-output type1_trained_brain_readout.json
 ```
+
+The retained trainable evaluator uses candidate self-attention with RoPE,
+RMSNorm, SwiGLU, softmax supervision, and hard-negative pairwise ranking. The
+old softmax-only training path is not retained.
 
 Useful pipeline controls:
 
