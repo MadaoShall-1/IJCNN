@@ -6,7 +6,7 @@ services:
     image: exact-vllm:local
     container_name: exact-vllm
     ports:
-      - "8000:8000"
+      - "${VLLM_HOST_PORT:-8000}:8000"
     volumes:
       - ${USERPROFILE:-${HOME}}/.cache/huggingface:/root/.cache/huggingface
     environment:

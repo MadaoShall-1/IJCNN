@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Validate Type2 (strict)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/validate/validate_type2_full_dataset.py",
+      "cwd": "${workspaceFolder}",
+      "env": { "PYTHONPATH": "${workspaceFolder};${workspaceFolder}/pipeline" },
+      "args": [
+        "--input", "Dataset/Physics_Problems_Text_Only.csv",
+        "--output", "outputs/type2_full_dataset_validation_sanity_calibrated_strict.json",
+        "--save-jsonl", "outputs/type2_full_dataset_rows_sanity_calibrated_strict.jsonl",
+        "--max-candidates", "8",
+        "--compact",
+        "--downgrade-high-risk-numeric"
+      ]
+    }
+  ]
+}

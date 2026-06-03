@@ -68,7 +68,140 @@ def power_vi_entry() -> FormulaEntry:
     )
 
 
+def lc_frequency_entry() -> FormulaEntry:
+    return FormulaEntry(
+        id="CKT-008",
+        topic="circuits",
+        subtopic="lc_resonance",
+        target_quantities=["f", "L", "C"],
+        canonical_quantity_names=["frequency", "inductance", "capacitance"],
+        text="LC resonance frequency.",
+        formula="f = 1 / (2*pi*sqrt(L*C))",
+        sympy_expr="Eq(f, 1 / (2*pi*sqrt(L*C)))",
+        tool_dispatch="sympy",
+        variables={
+            "f": {"symbol": "f", "name": "frequency", "unit_symbol": "Hz", "unit_name": "hertz"},
+            "L": {"symbol": "L", "name": "inductance", "unit_symbol": "H", "unit_name": "henry"},
+            "C": {"symbol": "C", "name": "capacitance", "unit_symbol": "F", "unit_name": "farad"},
+        },
+        premise_text="LC resonance: f = 1/(2*pi*sqrt(LC))",
+        fol_axiom="forall f L C: f = 1/(2*pi*sqrt(L*C))",
+    )
+
+
+def lc_frequency_lowercase_capacitance_entry() -> FormulaEntry:
+    entry = lc_frequency_entry()
+    entry.variables = {
+        "f": entry.variables["f"],
+        "L": entry.variables["L"],
+        "c": {"symbol": "c", "name": "capacitance", "unit_symbol": "F", "unit_name": "farad"},
+    }
+    entry.target_quantities = ["f", "L", "c"]
+    entry.sympy_expr = "Eq(f, 1 / (2*pi*sqrt(L*c)))"
+    entry.formula = "f = 1 / (2*pi*sqrt(L*c))"
+    return entry
+
+
+def capacitor_charge_entry() -> FormulaEntry:
+    return FormulaEntry(
+        id="CKT-016",
+        topic="circuits",
+        subtopic="capacitor_charge",
+        target_quantities=["Q", "C_cap", "V"],
+        canonical_quantity_names=[
+            "electric_charge",
+            "capacitance",
+            "electric_potential",
+        ],
+        text="Charge on a capacitor.",
+        formula="Q = C_cap * V",
+        sympy_expr="Eq(Q, C_cap * V)",
+        tool_dispatch="sympy",
+        variables={
+            "Q": {"symbol": "Q", "name": "charge", "unit_symbol": "C", "unit_name": "coulomb"},
+            "C_cap": {"symbol": "C", "name": "capacitance", "unit_symbol": "F", "unit_name": "farad"},
+            "V": {"symbol": "V", "name": "voltage", "unit_symbol": "V", "unit_name": "volt"},
+        },
+        premise_text="Capacitor charge: Q = CV",
+        fol_axiom="forall Q C V: Q = C * V",
+    )
+
+
 class DeterministicSolveTraceTests(unittest.TestCase):
+    def test_init_vso_uses_normalized_stage0_values(self) -> None:
+        parse_obj = ProblemParseObject(
+            problem_text="A capacitor has capacitance 200 pF.",
+            known_quantities={
+                "C_cap": {
+                    "value": 200.0,
+                    "unit_symbol": "pF",
+                    "unit_name": "picofarad",
+                    "normalized_value": 2e-10,
+                    "normalized_unit_symbol": "F",
+                }
+            },
+        )
+
+        vso = init_vso(parse_obj)
+
+        self.assertAlmostEqual(vso["C_cap"].value, 2e-10)
+        self.assertEqual(vso["C_cap"].unit_symbol, "F")
+
+    def test_capacitor_charge_formats_requested_nano_coulombs(self) -> None:
+        parse_obj = ProblemParseObject(
+            problem_text="A 200 pF capacitor is connected to a 5 V supply. Find charge in nC.",
+            domains=["circuits"],
+            sub_domains=["capacitor_charge"],
+            known_quantities={
+                "C_cap": {
+                    "value": 200.0,
+                    "unit_symbol": "pF",
+                    "unit_name": "picofarad",
+                    "normalized_value": 2e-10,
+                    "normalized_unit_symbol": "F",
+                },
+                "V": {
+                    "value": 5.0,
+                    "unit_symbol": "V",
+                    "unit_name": "volt",
+                    "normalized_value": 5.0,
+                    "normalized_unit_symbol": "V",
+                },
+            },
+            unknown_quantity="Q",
+            unknown_unit="nC",
+            step_plan=[
+                {
+                    "step_id": "step_1",
+                    "goal": "Compute capacitor charge.",
+                    "type": "formula_application",
+                    "input_var": {"C_cap": "C_cap", "V": "V"},
+                    "output_var": {"Q": "Q"},
+                },
+                {
+                    "step_id": "step_2",
+                    "goal": "Report final charge.",
+                    "type": "conclusion",
+                    "input_var": {"Q": "Q"},
+                    "output_var": {"Q": "Q"},
+                },
+            ],
+        )
+        formula_set = FormulaSet({"step_1": capacitor_charge_entry()}, 1.0, 0)
+
+        trace = DeterministicSolveTrace().forward(parse_obj, formula_set, "cap_charge")
+
+        self.assertEqual(trace.trace_status, "PASS")
+        self.assertEqual(trace.final_answer, "1 nC")
+
+    def test_empty_final_answer_does_not_pass(self) -> None:
+        parse_obj = ProblemParseObject(problem_text="Report missing value.", step_plan=[])
+        formula_set = FormulaSet({}, 1.0, 0)
+
+        trace = DeterministicSolveTrace().forward(parse_obj, formula_set, "empty")
+
+        self.assertEqual(trace.trace_status, "FAIL")
+
     def test_solves_ohms_law_current_without_llm(self) -> None:
         parse_obj = ProblemParseObject(
             problem_text="A 10 ohm resistor is connected to a 5 V battery. Find current.",
@@ -138,6 +271,77 @@ class DeterministicSolveTraceTests(unittest.TestCase):
         self.assertAlmostEqual(trace.vso["R_total"]["value"], 10.0)
         self.assertAlmostEqual(trace.vso["R"]["value"], 10.0)
         self.assertEqual(trace.final_answer, "10 ohm")
+
+    def test_target_alias_is_not_treated_as_known_input(self) -> None:
+        parse_obj = ProblemParseObject(
+            problem_text="An LC circuit has L = 0.07 H and f = 350 Hz. Find C.",
+            domains=["electricity"],
+            sub_domains=["lc"],
+            known_quantities={
+                "L": {"value": 0.07, "unit_symbol": "H", "unit_name": "henry"},
+                "f": {"value": 350.0, "unit_symbol": "Hz", "unit_name": "hertz"},
+                "C_cap2": {"value": 1.0, "unit_symbol": "F", "unit_name": "farad"},
+            },
+            step_plan=[
+                {
+                    "step_id": "step_1",
+                    "goal": "Solve LC resonance condition for capacitance.",
+                    "type": "formula_application",
+                    "input_var": {"L": "L", "f": "f"},
+                    "output_var": {"C_cap": "C_cap"},
+                },
+                {
+                    "step_id": "step_2",
+                    "goal": "Report final capacitance.",
+                    "type": "conclusion",
+                    "input_var": {"C_cap": "C_cap"},
+                    "output_var": {"C_cap": "C_cap"},
+                },
+            ],
+        )
+        formula_set = FormulaSet({"step_1": lc_frequency_entry()}, 1.0, 0)
+
+        trace = DeterministicSolveTrace().forward(parse_obj, formula_set, "lc")
+
+        self.assertEqual(trace.trace_status, "PASS")
+        self.assertEqual(trace.steps[0].status, "OK")
+        self.assertAlmostEqual(trace.vso["C_cap"]["value"], 2.954799587607239e-06)
+        self.assertLess(trace.vso["C_cap"]["value"], 1e-05)
+        self.assertIn("F", trace.final_answer)
+
+    def test_lowercase_capacitance_does_not_use_speed_of_light_constant(self) -> None:
+        parse_obj = ProblemParseObject(
+            problem_text="An LC circuit has L = 0.07 H and f = 350 Hz. Find c.",
+            domains=["electricity"],
+            sub_domains=["lc"],
+            known_quantities={
+                "L": {"value": 0.07, "unit_symbol": "H", "unit_name": "henry"},
+                "f": {"value": 350.0, "unit_symbol": "Hz", "unit_name": "hertz"},
+            },
+            step_plan=[
+                {
+                    "step_id": "step_1",
+                    "goal": "Solve LC resonance condition for capacitance.",
+                    "type": "formula_application",
+                    "input_var": {"L": "L", "f": "f"},
+                    "output_var": {"C_cap": "C_cap"},
+                },
+                {
+                    "step_id": "step_2",
+                    "goal": "Report final capacitance.",
+                    "type": "conclusion",
+                    "input_var": {"C_cap": "C_cap"},
+                    "output_var": {"C_cap": "C_cap"},
+                },
+            ],
+        )
+        formula_set = FormulaSet({"step_1": lc_frequency_lowercase_capacitance_entry()}, 1.0, 0)
+
+        trace = DeterministicSolveTrace().forward(parse_obj, formula_set, "lc_lower")
+
+        self.assertEqual(trace.trace_status, "PASS")
+        self.assertAlmostEqual(trace.vso["C_cap"]["value"], 2.954799587607239e-06)
+        self.assertNotAlmostEqual(trace.vso["C_cap"]["value"], 299792458.0)
 
     def test_canonical_mapping_does_not_use_constants_as_problem_values(self) -> None:
         parse_obj = ProblemParseObject(problem_text="Find the electric field.")
