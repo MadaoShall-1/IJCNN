@@ -20,6 +20,8 @@ from collections import Counter
 from dataclasses import asdict, dataclass, field
 from typing import Any
 
+import numpy as np
+
 from .common import Stage0Input
 from .semantic_hybrid_parser import (
     SemanticHybridCandidate,
@@ -28,6 +30,8 @@ from .semantic_hybrid_parser import (
     Type1SemanticHybridParser,
     normalize_for_eval,
 )
+from .semantic_tree_rag import BGEVectorIndex, SemanticRAGConfig
+from .type1_transformer_world_model import LocalTransformerWorldModel, TransformerWorldModelConfig
 from .type1_preprocessing import TextTools, Type1QuestionClassifier
 
 
@@ -143,6 +147,34 @@ class Stage2OptionScore:
     proof_depth: int | None
     evidence: list[str]
     decision: str
+    global_semantic_prior: float = 0.0
+    premise_alignment_score: float = 0.0
+    posterior_probability: float = 0.0
+
+
+@dataclass
+class PremiseOptionJudgment:
+    label: str
+    option_text: str
+    premise_index: int
+    premise_text: str
+    semantic_similarity: float
+    lexical_overlap: float
+    support_probability: float
+    contradiction_probability: float
+    relevance_probability: float
+    contribution: float
+    judge_source: str
+
+
+@dataclass
+class GlobalOptionDistribution:
+    selected_option: str
+    option_distribution: dict[str, float]
+    option_logits: dict[str, float]
+    margin: float
+    entropy: float
+    judgments: list[PremiseOptionJudgment]
 
 
 @dataclass
@@ -264,6 +296,21 @@ class Type1PipelineConfig:
     recurrent_planning_rounds: int = 4
     belief_confidence_threshold: float = 0.72
     belief_convergence_delta: float = 0.035
+    enable_global_option_distribution: bool = True
+    global_option_distribution_weight: float = 0.44
+    option_distribution_temperature: float = 0.36
+    premise_alignment_top_k: int = 6
+    enable_transformer_brain_world_model: bool = True
+    transformer_brain_hidden_dim: int = 32
+    transformer_brain_imagination_layers: int = 2
+    transformer_brain_attention_heads: int = 4
+    transformer_brain_frame_local_window: int = 4
+    transformer_brain_ssm_block_size: int = 4
+    transformer_brain_allow_override: bool = False
+    transformer_brain_temperature: float = 0.52
+    transformer_brain_override_margin: float = 0.15
+    transformer_brain_minimum_override_confidence: float = 0.45
+    transformer_brain_minimum_override_winner_margin: float = 0.08
 
 
 class FormulaParser:
@@ -1264,12 +1311,209 @@ class Type1CausalInferenceWorldModel:
         )
 
 
+class GlobalOptionSemanticComparator:
+    """Build a global option prior from premise-option semantic evidence.
+
+    This module does not ask an LLM to choose the answer. It estimates how each
+    premise supports or conflicts with each option, then converts those
+    premise-level judgments into an option probability distribution.
+    """
+
+    def __init__(self, config: Type1PipelineConfig) -> None:
+        self.config = config
+        rag_config = SemanticRAGConfig(
+            segmenter_model=config.stage0.segmenter_model,
+            segmenter_api_base=config.stage0.segmenter_api_base,
+            segmenter_api_key=config.stage0.segmenter_api_key,
+            embedding_model=config.stage0.embedding_model,
+            local_files_only=config.stage0.local_files_only,
+            top_k=config.stage0.top_k,
+        )
+        self.vector_index = BGEVectorIndex(rag_config)
+
+    def compare(
+        self,
+        stage_input: Stage0Input,
+        classification: dict[str, Any],
+        graph: EvidenceGraph,
+        stage0_result: dict[str, Any],
+    ) -> GlobalOptionDistribution:
+        options = classification.get("mcq_options") or {}
+        if not options:
+            return GlobalOptionDistribution("", {}, {}, 0.0, 0.0, [])
+
+        premise_texts = self._premise_texts(stage_input, graph, stage0_result)
+        if not premise_texts:
+            premise_texts = [stage_input.question]
+
+        judgments = self._semantic_judgments(options, premise_texts)
+        logits = self._option_logits(options, judgments)
+        distribution = self._softmax(logits, self.config.option_distribution_temperature)
+        ranked = sorted(distribution.items(), key=lambda item: item[1], reverse=True)
+        selected = ranked[0][0] if ranked else ""
+        margin = ranked[0][1] - ranked[1][1] if len(ranked) > 1 else (ranked[0][1] if ranked else 0.0)
+        entropy = -sum(prob * math.log(max(prob, 1e-12)) for prob in distribution.values())
+        return GlobalOptionDistribution(
+            selected_option=selected,
+            option_distribution={label: round(prob, 6) for label, prob in distribution.items()},
+            option_logits={label: round(value, 6) for label, value in logits.items()},
+            margin=round(margin, 6),
+            entropy=round(entropy, 6),
+            judgments=judgments[: max(1, self.config.premise_alignment_top_k) * max(1, len(options))],
+        )
+
+    def _premise_texts(
+        self,
+        stage_input: Stage0Input,
+        graph: EvidenceGraph,
+        stage0_result: dict[str, Any],
+    ) -> list[str]:
+        texts: list[str] = []
+        texts.extend(TextTools.clean(item) for item in stage_input.premises_nl if TextTools.clean(item))
+        for fact in graph.derived_facts + graph.facts:
+            source = TextTools.clean(fact.source)
+            atom_text = fact.atom.lexical_text()
+            texts.append(f"{atom_text}. {source}" if source else atom_text)
+        for rule in graph.rules:
+            symbolic = " ".join(
+                [
+                    " ".join(atom.lexical_text() for atom in rule.antecedents),
+                    "implies",
+                    " ".join(atom.lexical_text() for atom in rule.consequents),
+                ]
+            )
+            source = TextTools.clean(rule.source)
+            texts.append(f"{symbolic}. {source}" if source else symbolic)
+        for match in stage0_result.get("semantic_matches", []) or []:
+            text = TextTools.clean(match.get("text", ""))
+            if text:
+                texts.append(text)
+        return [text for text in dict.fromkeys(texts) if text][:36]
+
+    def _semantic_judgments(
+        self,
+        options: dict[str, str],
+        premise_texts: list[str],
+    ) -> list[PremiseOptionJudgment]:
+        option_items = [(str(label), TextTools.clean(text)) for label, text in options.items()]
+        texts = [text for _, text in option_items] + premise_texts
+        vectors = self.vector_index.embed(texts)
+        option_vectors = vectors[: len(option_items)]
+        premise_vectors = vectors[len(option_items) :]
+        with np.errstate(over="ignore", divide="ignore", invalid="ignore"):
+            sim_matrix = np.nan_to_num(option_vectors @ premise_vectors.T, nan=0.0, posinf=0.0, neginf=0.0)
+
+        judgments: list[PremiseOptionJudgment] = []
+        for option_idx, (label, option_text) in enumerate(option_items):
+            option_tokens = self._tokens(option_text)
+            option_negative = self._is_negative(option_text)
+            for premise_idx, premise_text in enumerate(premise_texts):
+                premise_tokens = self._tokens(premise_text)
+                semantic = max(0.0, min(1.0, float(sim_matrix[option_idx][premise_idx])))
+                lexical = self._lexical_overlap(option_tokens, premise_tokens)
+                relevance = min(1.0, semantic * 0.72 + lexical * 0.28)
+                polarity_conflict = option_negative != self._is_negative(premise_text)
+                contradiction = relevance * 0.72 if polarity_conflict and lexical >= 0.16 else relevance * 0.12
+                support = max(0.0, relevance - contradiction * 0.58)
+                if self._has_entailment_cue(premise_text):
+                    support = min(1.0, support + 0.06)
+                contribution = support - contradiction + relevance * 0.18
+                judgments.append(
+                    PremiseOptionJudgment(
+                        label=label,
+                        option_text=option_text,
+                        premise_index=premise_idx,
+                        premise_text=premise_text,
+                        semantic_similarity=round(semantic, 6),
+                        lexical_overlap=round(lexical, 6),
+                        support_probability=round(support, 6),
+                        contradiction_probability=round(contradiction, 6),
+                        relevance_probability=round(relevance, 6),
+                        contribution=round(contribution, 6),
+                        judge_source="bge_global_semantic",
+                    )
+                )
+        judgments.sort(key=lambda item: (item.label, item.contribution), reverse=True)
+        return judgments
+
+    def _option_logits(
+        self,
+        options: dict[str, str],
+        judgments: list[PremiseOptionJudgment],
+    ) -> dict[str, float]:
+        logits = {str(label): 0.0 for label in options}
+        grouped: dict[str, list[PremiseOptionJudgment]] = {str(label): [] for label in options}
+        for judgment in judgments:
+            grouped.setdefault(judgment.label, []).append(judgment)
+        for label, items in grouped.items():
+            top = sorted(items, key=lambda item: item.contribution, reverse=True)[: self.config.premise_alignment_top_k]
+            if not top:
+                continue
+            support_mass = sum(item.support_probability * item.relevance_probability for item in top)
+            contradiction_mass = sum(item.contradiction_probability * item.relevance_probability for item in top)
+            coverage = len({item.premise_index for item in top if item.relevance_probability >= 0.32}) / max(1, self.config.premise_alignment_top_k)
+            logits[label] = support_mass - contradiction_mass + coverage * 0.22
+        return logits
+
+    def _softmax(self, logits: dict[str, float], temperature: float) -> dict[str, float]:
+        if not logits:
+            return {}
+        temp = max(0.05, temperature)
+        max_logit = max(logits.values())
+        exp_values = {label: math.exp((value - max_logit) / temp) for label, value in logits.items()}
+        total = sum(exp_values.values()) or 1.0
+        return {label: value / total for label, value in exp_values.items()}
+
+    def _lexical_overlap(self, left: set[str], right: set[str]) -> float:
+        if not left or not right:
+            return 0.0
+        return len(left & right) / max(1, min(len(left), len(right)))
+
+    def _has_entailment_cue(self, text: str) -> bool:
+        lower = text.lower()
+        return any(cue in lower for cue in ["if ", " then ", "implies", "requires", "must", "all ", "every "])
+
+    def _is_negative(self, text: str) -> bool:
+        lower = f" {TextTools.clean(text).lower()} "
+        return any(cue in lower for cue in [" not ", " no ", " cannot", " can't", " without", " insufficient", " lacks", " lack "])
+
+    def _tokens(self, text: str) -> set[str]:
+        stop = {
+            "the",
+            "a",
+            "an",
+            "is",
+            "are",
+            "be",
+            "to",
+            "for",
+            "of",
+            "and",
+            "or",
+            "does",
+            "do",
+            "did",
+            "based",
+            "according",
+            "premises",
+            "above",
+            "which",
+            "statement",
+            "conclusion",
+            "current",
+            "option",
+        }
+        return {token.lower().strip("'") for token in TOKEN_RE.findall(TextTools.clean(text).replace("_", " ")) if token.lower() not in stop}
+
 class Type1Stage2Reasoner:
     """Deterministic Type 1 candidate scorer over the Stage 1 evidence graph."""
 
     def __init__(self, config: Type1PipelineConfig) -> None:
         self.config = config
         self.world_model = Type1CausalInferenceWorldModel(config) if config.enable_causal_world_model else None
+        self.option_comparator = (
+            GlobalOptionSemanticComparator(config) if config.enable_global_option_distribution else None
+        )
 
     def solve(
         self,
@@ -1279,15 +1523,27 @@ class Type1Stage2Reasoner:
         stage0_result: dict[str, Any],
     ) -> Stage2Candidate:
         if classification.get("question_format") == "multiple_choice":
-            return self._solve_mcq(classification, graph, stage0_result)
+            return self._solve_mcq(stage_input, classification, graph, stage0_result)
         return self._solve_yes_no(stage_input, classification, graph, stage0_result)
 
-    def _solve_mcq(self, classification: dict[str, Any], graph: EvidenceGraph, stage0_result: dict[str, Any]) -> Stage2Candidate:
+    def _solve_mcq(
+        self,
+        stage_input: Stage0Input,
+        classification: dict[str, Any],
+        graph: EvidenceGraph,
+        stage0_result: dict[str, Any],
+    ) -> Stage2Candidate:
         options = classification.get("mcq_options") or {}
         scores = [
             self._score_text(label, text, graph, stage0_result)
             for label, text in options.items()
         ]
+        global_distribution = (
+            self.option_comparator.compare(stage_input, classification, graph, stage0_result)
+            if self.option_comparator is not None
+            else GlobalOptionDistribution("", {}, {}, 0.0, 0.0, [])
+        )
+        self._merge_global_option_distribution(scores, global_distribution)
         causal_by_option: dict[str, dict[str, Any]] = {}
         if self.world_model is not None:
             for score in scores:
@@ -1298,29 +1554,35 @@ class Type1Stage2Reasoner:
                 )
                 causal_by_option[score.label] = asdict(causal_result)
                 self._merge_causal_score(score, causal_result)
+        self._refresh_option_posteriors(scores)
         if not scores:
             return Stage2Candidate("", "No options were available for Stage 2 scoring.", "stage2_no_options", 0.0, [])
-        scores.sort(key=lambda score: (score.support - score.contradiction + score.semantic, -(score.proof_depth or 99)), reverse=True)
+        scores.sort(key=lambda score: (self._option_posterior_score(score), -(score.proof_depth or 99)), reverse=True)
         best = scores[0]
         margin = 0.0
         if len(scores) > 1:
             second = scores[1]
-            margin = (best.support - best.contradiction + best.semantic) - (
-                second.support - second.contradiction + second.semantic
-            )
+            margin = self._option_posterior_score(best) - self._option_posterior_score(second)
         if self._mcq_should_be_uncertain(best, margin):
             best.decision = "insufficient_unique_proof"
             explanation = self._explain_score(best, "not proven strongly enough for option selection")
-            confidence = min(0.72, 0.42 + best.semantic * 0.18 + max(0.0, margin) * 0.12)
+            confidence = min(0.76, 0.38 + best.posterior_probability * 0.3 + best.semantic * 0.14 + max(0.0, margin) * 0.12)
             return Stage2Candidate(
                 "Uncertain",
                 explanation,
                 "stage2_option_evidence_graph",
                 round(confidence, 4),
                 scores,
-                {"options": causal_by_option},
+                {"options": causal_by_option, "global_option_distribution": asdict(global_distribution)},
             )
-        confidence = min(0.92, 0.34 + best.support * 0.42 + best.semantic * 0.18 + max(0.0, margin) * 0.18)
+        confidence = min(
+            0.94,
+            0.28
+            + best.support * 0.3
+            + best.semantic * 0.12
+            + best.posterior_probability * 0.34
+            + max(0.0, margin) * 0.2,
+        )
         explanation = self._explain_score(best, "best-supported option")
         return Stage2Candidate(
             best.label,
@@ -1328,19 +1590,78 @@ class Type1Stage2Reasoner:
             "stage2_option_evidence_graph",
             round(confidence, 4),
             scores,
-            {"selected_option": best.label, "options": causal_by_option},
+            {
+                "selected_option": best.label,
+                "options": causal_by_option,
+                "global_option_distribution": asdict(global_distribution),
+            },
         )
 
     def _mcq_should_be_uncertain(self, best: Stage2OptionScore, margin: float) -> bool:
-        if best.support < 0.56:
+        if best.posterior_probability >= 0.52 and margin >= 0.11:
+            return False
+        if best.support < 0.5 and best.global_semantic_prior < 0.44:
             return True
-        if margin < 0.14:
+        if margin < 0.08:
             return True
         if (best.proof_depth is None or best.proof_depth == 0) and best.semantic < 0.18:
             return True
         if best.contradiction >= 0.55 and best.semantic < 0.35:
             return True
         return False
+
+    def _merge_global_option_distribution(
+        self,
+        scores: list[Stage2OptionScore],
+        distribution: GlobalOptionDistribution,
+    ) -> None:
+        alignments_by_label: dict[str, list[PremiseOptionJudgment]] = {}
+        for judgment in distribution.judgments:
+            alignments_by_label.setdefault(judgment.label, []).append(judgment)
+        for score in scores:
+            prior = float(distribution.option_distribution.get(score.label, 0.0) or 0.0)
+            alignments = sorted(
+                alignments_by_label.get(score.label, []),
+                key=lambda item: item.contribution,
+                reverse=True,
+            )[: self.config.premise_alignment_top_k]
+            alignment_score = sum(max(0.0, item.contribution) for item in alignments) / max(1, len(alignments))
+            contradiction = sum(item.contradiction_probability for item in alignments) / max(1, len(alignments))
+            score.global_semantic_prior = round(prior, 6)
+            score.premise_alignment_score = round(alignment_score, 6)
+            score.semantic = round(max(score.semantic, min(1.0, alignment_score)), 4)
+            score.support = round(max(score.support, min(1.0, score.support * 0.72 + alignment_score * 0.42 + prior * 0.24)), 4)
+            score.contradiction = round(max(score.contradiction, min(1.0, contradiction)), 4)
+        self._refresh_option_posteriors(scores)
+
+    def _refresh_option_posteriors(self, scores: list[Stage2OptionScore]) -> None:
+        if not scores:
+            return
+        logits = {
+            score.label: self._option_posterior_logit(score)
+            for score in scores
+        }
+        max_logit = max(logits.values())
+        exp_values = {label: math.exp(value - max_logit) for label, value in logits.items()}
+        total = sum(exp_values.values()) or 1.0
+        for score in scores:
+            score.posterior_probability = round(exp_values[score.label] / total, 6)
+
+    def _option_posterior_score(self, score: Stage2OptionScore) -> float:
+        return score.posterior_probability + self._option_posterior_logit(score) * 0.18
+
+    def _option_posterior_logit(self, score: Stage2OptionScore) -> float:
+        causal_support = max(0.0, score.causal_score)
+        causal_conflict = abs(min(0.0, score.causal_score))
+        return (
+            score.support * 0.34
+            - score.contradiction * 0.31
+            + score.semantic * 0.18
+            + score.global_semantic_prior * self.config.global_option_distribution_weight
+            + score.premise_alignment_score * 0.23
+            + causal_support * 0.18
+            - causal_conflict * 0.16
+        )
 
     def _solve_yes_no(
         self,
@@ -1353,6 +1674,17 @@ class Type1Stage2Reasoner:
         lower_q = stage_input.question.lower()
         asks_requirement = any(word in lower_q for word in ["requirement", "requirements", "qualify", "eligible", "can ", "meet"])
         asks_follow = "follow" in lower_q or "according to the premises" in lower_q
+        strict_entailment = asks_follow or any(
+            cue in lower_q
+            for cue in [
+                "is it true",
+                "statement:",
+                "do the premises support",
+                "does the premise support",
+                "according to the premise",
+                "based on the premises",
+            ]
+        )
         target = self._check_target_proof(stage_input.question, graph)
         causal_result = self.world_model.infer(
             stage_input.question,
@@ -1374,6 +1706,13 @@ class Type1Stage2Reasoner:
             decision = "target_contradicted"
             score.support = max(score.support, target["support"])
             score.contradiction = max(score.contradiction, target["contradiction"])
+            score.proof_depth = target["proof_depth"]
+            score.evidence = target["evidence"]
+        elif strict_entailment and target["decision"] in {"unknown", "target_rule_incomplete"}:
+            answer = "No"
+            decision = "strict_entailment_not_proven"
+            score.support = min(score.support, target["support"])
+            score.contradiction = max(score.contradiction, target["contradiction"], 0.52)
             score.proof_depth = target["proof_depth"]
             score.evidence = target["evidence"]
         elif causal_result is not None and causal_result.answer_signal == "No" and causal_result.causal_score <= self.config.causal_no_threshold:
@@ -1694,7 +2033,8 @@ class Type1Stage2Reasoner:
         evidence = "; ".join(score.evidence[:2]) if score.evidence else "no direct derived proof"
         return (
             f"Stage 2 selected {score.label} as {decision}. "
-            f"support={score.support}, contradiction={score.contradiction}, semantic={score.semantic}. "
+            f"support={score.support}, contradiction={score.contradiction}, semantic={score.semantic}, "
+            f"global_prior={score.global_semantic_prior}, posterior={score.posterior_probability}. "
             f"Evidence: {evidence}."
         )
 
@@ -1811,6 +2151,24 @@ class Type1MultiStagePipeline:
         self.stage1 = Type1EvidenceGraphBuilder(self.config.max_forward_steps)
         self.stage2 = Type1Stage2Reasoner(self.config)
         self.stage3 = Type1Stage3Controller(self.config)
+        self.transformer_brain = (
+            LocalTransformerWorldModel(
+                TransformerWorldModelConfig(
+                    hidden_dim=self.config.transformer_brain_hidden_dim,
+                    imagination_layers=self.config.transformer_brain_imagination_layers,
+                    attention_heads=self.config.transformer_brain_attention_heads,
+                    frame_local_window=self.config.transformer_brain_frame_local_window,
+                    ssm_block_size=self.config.transformer_brain_ssm_block_size,
+                    allow_override=self.config.transformer_brain_allow_override,
+                    temperature=self.config.transformer_brain_temperature,
+                    override_margin=self.config.transformer_brain_override_margin,
+                    minimum_override_confidence=self.config.transformer_brain_minimum_override_confidence,
+                    minimum_override_winner_margin=self.config.transformer_brain_minimum_override_winner_margin,
+                )
+            )
+            if self.config.enable_transformer_brain_world_model
+            else None
+        )
 
     def run(self, payload: dict[str, Any]) -> dict[str, Any]:
         stage0_result = self.stage0_parser.parse(payload)
@@ -1824,6 +2182,25 @@ class Type1MultiStagePipeline:
         )
         graph = self.stage1.build(stage_input)
         stage2_candidate = self.stage2.solve(stage_input, classification, graph, stage0_result)
+        transformer_brain_result: dict[str, Any] = {}
+        if self.transformer_brain is not None:
+            brain = self.transformer_brain.run(
+                stage_input,
+                classification,
+                graph.summary(),
+                asdict(stage2_candidate),
+            )
+            transformer_brain_result = brain.to_dict()
+            stage2_candidate.causal_inference["transformer_brain_world_model"] = transformer_brain_result
+            if brain.should_override:
+                stage2_candidate.answer = brain.final_answer
+                stage2_candidate.confidence = round(max(stage2_candidate.confidence, brain.confidence), 4)
+                stage2_candidate.source = "stage2_transformer_brain_world_model"
+                stage2_candidate.explanation = (
+                    f"Transformer brain world model overrode Stage 2 after internal imagination. "
+                    f"raw_brain_answer={brain.raw_brain_answer}, confidence={brain.confidence}, margin={brain.margin}. "
+                    f"Previous explanation: {stage2_candidate.explanation}"
+                )
         stage3_result = self.stage3.finalize(stage_input, classification, stage2_candidate, graph, stage0_result)
         final_candidate = stage3_result["candidate"]
         return {
@@ -1841,11 +2218,18 @@ class Type1MultiStagePipeline:
                 "candidate": asdict(stage2_candidate),
                 "option_scores": [asdict(score) for score in stage2_candidate.option_scores],
             },
+            "transformer_brain_world_model": transformer_brain_result,
             "stage3": stage3_result,
             "candidate": final_candidate,
             "gate": stage3_result["gate"],
             "metadata": {
-                "stages_completed": ["stage0", "stage1", "stage2", "stage3"],
+                "stages_completed": [
+                    "stage0",
+                    "stage1",
+                    "stage2",
+                    *(['transformer_brain_world_model'] if transformer_brain_result else []),
+                    "stage3",
+                ],
                 "final_answer_normalized": normalize_for_eval(final_candidate.get("answer", "")),
             },
         }

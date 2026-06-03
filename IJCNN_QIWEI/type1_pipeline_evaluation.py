@@ -11,8 +11,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
-from .semantic_hybrid_parser import SemanticHybridConfig
-from .type1_evaluation import make_jsonable, normalize_for_eval
+from .semantic_hybrid_parser import SemanticHybridConfig, normalize_for_eval
 from .type1_pipeline import Type1MultiStagePipeline, Type1PipelineConfig
 from .type1_preprocessing import TextTools
 
@@ -46,6 +45,21 @@ class Type1PipelineEvaluationConfig:
     recurrent_planning_rounds: int = 4
     belief_confidence_threshold: float = 0.72
     belief_convergence_delta: float = 0.035
+    enable_global_option_distribution: bool = True
+    global_option_distribution_weight: float = 0.44
+    option_distribution_temperature: float = 0.36
+    premise_alignment_top_k: int = 6
+    enable_transformer_brain_world_model: bool = True
+    transformer_brain_hidden_dim: int = 32
+    transformer_brain_imagination_layers: int = 2
+    transformer_brain_attention_heads: int = 4
+    transformer_brain_frame_local_window: int = 4
+    transformer_brain_ssm_block_size: int = 4
+    transformer_brain_allow_override: bool = False
+    transformer_brain_temperature: float = 0.52
+    transformer_brain_override_margin: float = 0.15
+    transformer_brain_minimum_override_confidence: float = 0.45
+    transformer_brain_minimum_override_winner_margin: float = 0.08
     limit: int | None = None
     record_start: int = 0
     question_index: int | None = None
@@ -112,6 +126,21 @@ class Type1PipelineEvaluator:
             recurrent_planning_rounds=config.recurrent_planning_rounds,
             belief_confidence_threshold=config.belief_confidence_threshold,
             belief_convergence_delta=config.belief_convergence_delta,
+            enable_global_option_distribution=config.enable_global_option_distribution,
+            global_option_distribution_weight=config.global_option_distribution_weight,
+            option_distribution_temperature=config.option_distribution_temperature,
+            premise_alignment_top_k=config.premise_alignment_top_k,
+            enable_transformer_brain_world_model=config.enable_transformer_brain_world_model,
+            transformer_brain_hidden_dim=config.transformer_brain_hidden_dim,
+            transformer_brain_imagination_layers=config.transformer_brain_imagination_layers,
+            transformer_brain_attention_heads=config.transformer_brain_attention_heads,
+            transformer_brain_frame_local_window=config.transformer_brain_frame_local_window,
+            transformer_brain_ssm_block_size=config.transformer_brain_ssm_block_size,
+            transformer_brain_allow_override=config.transformer_brain_allow_override,
+            transformer_brain_temperature=config.transformer_brain_temperature,
+            transformer_brain_override_margin=config.transformer_brain_override_margin,
+            transformer_brain_minimum_override_confidence=config.transformer_brain_minimum_override_confidence,
+            transformer_brain_minimum_override_winner_margin=config.transformer_brain_minimum_override_winner_margin,
         )
         self.pipeline = pipeline or Type1MultiStagePipeline(pipeline_config)
 
@@ -337,6 +366,16 @@ class Type1PipelineEvaluator:
         path.write_text(json.dumps(make_jsonable(payload), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def make_jsonable(value: Any) -> Any:
+    if isinstance(value, Path):
+        return str(value)
+    if isinstance(value, dict):
+        return {str(key): make_jsonable(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [make_jsonable(item) for item in value]
+    return value
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Evaluate the Type 1 Stage 0-3 pipeline on labeled data.")
     parser.add_argument("--input", type=Path, default=Path("../Logic_Based_Educational_Queries.json"))
@@ -370,6 +409,45 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--recurrent-planning-rounds", type=int, default=4)
     parser.add_argument("--belief-confidence-threshold", type=float, default=0.72)
     parser.add_argument("--belief-convergence-delta", type=float, default=0.035)
+    option_distribution_group = parser.add_mutually_exclusive_group()
+    option_distribution_group.add_argument(
+        "--enable-global-option-distribution",
+        dest="enable_global_option_distribution",
+        action="store_true",
+        default=True,
+    )
+    option_distribution_group.add_argument(
+        "--disable-global-option-distribution",
+        dest="enable_global_option_distribution",
+        action="store_false",
+    )
+    parser.add_argument("--global-option-distribution-weight", type=float, default=0.44)
+    parser.add_argument("--option-distribution-temperature", type=float, default=0.36)
+    parser.add_argument("--premise-alignment-top-k", type=int, default=6)
+    brain_group = parser.add_mutually_exclusive_group()
+    brain_group.add_argument(
+        "--enable-transformer-brain-world-model",
+        dest="enable_transformer_brain_world_model",
+        action="store_true",
+        default=True,
+    )
+    brain_group.add_argument(
+        "--disable-transformer-brain-world-model",
+        dest="enable_transformer_brain_world_model",
+        action="store_false",
+    )
+    parser.add_argument("--transformer-brain-hidden-dim", type=int, default=32)
+    parser.add_argument("--transformer-brain-imagination-layers", type=int, default=2)
+    parser.add_argument("--transformer-brain-attention-heads", type=int, default=4)
+    parser.add_argument("--transformer-brain-frame-local-window", type=int, default=4)
+    parser.add_argument("--transformer-brain-ssm-block-size", type=int, default=4)
+    override_group = parser.add_mutually_exclusive_group()
+    override_group.add_argument("--allow-transformer-brain-override", dest="transformer_brain_allow_override", action="store_true", default=False)
+    override_group.add_argument("--disable-transformer-brain-override", dest="transformer_brain_allow_override", action="store_false")
+    parser.add_argument("--transformer-brain-temperature", type=float, default=0.52)
+    parser.add_argument("--transformer-brain-override-margin", type=float, default=0.15)
+    parser.add_argument("--transformer-brain-minimum-override-confidence", type=float, default=0.45)
+    parser.add_argument("--transformer-brain-minimum-override-winner-margin", type=float, default=0.08)
     parser.add_argument("--limit", type=int)
     parser.add_argument("--record-start", type=int, default=0)
     parser.add_argument("--question-index", type=int)
@@ -406,6 +484,21 @@ def config_from_args(args: argparse.Namespace) -> Type1PipelineEvaluationConfig:
         recurrent_planning_rounds=args.recurrent_planning_rounds,
         belief_confidence_threshold=args.belief_confidence_threshold,
         belief_convergence_delta=args.belief_convergence_delta,
+        enable_global_option_distribution=args.enable_global_option_distribution,
+        global_option_distribution_weight=args.global_option_distribution_weight,
+        option_distribution_temperature=args.option_distribution_temperature,
+        premise_alignment_top_k=args.premise_alignment_top_k,
+        enable_transformer_brain_world_model=args.enable_transformer_brain_world_model,
+        transformer_brain_hidden_dim=args.transformer_brain_hidden_dim,
+        transformer_brain_imagination_layers=args.transformer_brain_imagination_layers,
+        transformer_brain_attention_heads=args.transformer_brain_attention_heads,
+        transformer_brain_frame_local_window=args.transformer_brain_frame_local_window,
+        transformer_brain_ssm_block_size=args.transformer_brain_ssm_block_size,
+        transformer_brain_allow_override=args.transformer_brain_allow_override,
+        transformer_brain_temperature=args.transformer_brain_temperature,
+        transformer_brain_override_margin=args.transformer_brain_override_margin,
+        transformer_brain_minimum_override_confidence=args.transformer_brain_minimum_override_confidence,
+        transformer_brain_minimum_override_winner_margin=args.transformer_brain_minimum_override_winner_margin,
         limit=args.limit,
         record_start=args.record_start,
         question_index=args.question_index,
