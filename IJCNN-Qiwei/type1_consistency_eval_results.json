@@ -1,0 +1,3963 @@
+{
+  "summary": {
+    "metric_definition": "consistency = 1 - total_variation_distance(answer_distribution, trace_explanation_distribution)",
+    "train_questions": 642,
+    "validation_questions": 162,
+    "train_question_group_counts": {
+      "judgment:entailment_judgment:fact_match:closed": 6,
+      "judgment:entailment_judgment:negation:closed": 32,
+      "judgment:entailment_judgment:rule_chain:closed": 5,
+      "judgment:qualification_judgment:fact_match:closed": 9,
+      "judgment:qualification_judgment:negation:closed": 39,
+      "judgment:qualification_judgment:rule_chain:closed": 13,
+      "judgment:truth_judgment:fact_match:closed": 14,
+      "judgment:truth_judgment:negation:closed": 207,
+      "judgment:truth_judgment:rule_chain:closed": 43,
+      "mcq:choice_selection:fact_match:closed": 6,
+      "mcq:choice_selection:negation:closed": 229,
+      "mcq:choice_selection:negation:uncertainty_gap": 4,
+      "mcq:choice_selection:rule_chain:closed": 11,
+      "mcq:conclusion_selection:fact_match:closed": 1,
+      "mcq:conclusion_selection:negation:closed": 21,
+      "mcq:strongest_conclusion:fact_match:closed": 1,
+      "mcq:strongest_conclusion:negation:closed": 1
+    },
+    "validation_question_group_counts": {
+      "judgment:entailment_judgment:fact_match:closed": 2,
+      "judgment:entailment_judgment:negation:closed": 9,
+      "judgment:entailment_judgment:rule_chain:closed": 2,
+      "judgment:qualification_judgment:fact_match:closed": 3,
+      "judgment:qualification_judgment:negation:closed": 10,
+      "judgment:qualification_judgment:rule_chain:closed": 2,
+      "judgment:truth_judgment:fact_match:closed": 5,
+      "judgment:truth_judgment:negation:closed": 47,
+      "judgment:truth_judgment:rule_chain:closed": 11,
+      "mcq:choice_selection:fact_match:closed": 3,
+      "mcq:choice_selection:negation:closed": 58,
+      "mcq:choice_selection:negation:uncertainty_gap": 1,
+      "mcq:choice_selection:rule_chain:closed": 4,
+      "mcq:conclusion_selection:fact_match:closed": 1,
+      "mcq:conclusion_selection:negation:closed": 2,
+      "mcq:conclusion_selection:rule_chain:closed": 2
+    },
+    "retained_model": {
+      "accuracy": 0.796296,
+      "consistency": 0.471304,
+      "top_explanation_agreement": 0.228395,
+      "mean_explanation_top_probability": 0.255916,
+      "accuracy_by_group": {
+        "judgment:entailment_judgment:fact_match:closed": {
+          "questions": 2,
+          "accuracy": 1.0
+        },
+        "judgment:entailment_judgment:negation:closed": {
+          "questions": 9,
+          "accuracy": 0.777778
+        },
+        "judgment:entailment_judgment:rule_chain:closed": {
+          "questions": 2,
+          "accuracy": 1.0
+        },
+        "judgment:qualification_judgment:fact_match:closed": {
+          "questions": 3,
+          "accuracy": 0.333333
+        },
+        "judgment:qualification_judgment:negation:closed": {
+          "questions": 10,
+          "accuracy": 1.0
+        },
+        "judgment:qualification_judgment:rule_chain:closed": {
+          "questions": 2,
+          "accuracy": 0.5
+        },
+        "judgment:truth_judgment:fact_match:closed": {
+          "questions": 5,
+          "accuracy": 1.0
+        },
+        "judgment:truth_judgment:negation:closed": {
+          "questions": 47,
+          "accuracy": 0.787234
+        },
+        "judgment:truth_judgment:rule_chain:closed": {
+          "questions": 11,
+          "accuracy": 0.636364
+        },
+        "mcq:choice_selection:fact_match:closed": {
+          "questions": 3,
+          "accuracy": 0.666667
+        },
+        "mcq:choice_selection:negation:closed": {
+          "questions": 58,
+          "accuracy": 0.810345
+        },
+        "mcq:choice_selection:negation:uncertainty_gap": {
+          "questions": 1,
+          "accuracy": 1.0
+        },
+        "mcq:choice_selection:rule_chain:closed": {
+          "questions": 4,
+          "accuracy": 1.0
+        },
+        "mcq:conclusion_selection:fact_match:closed": {
+          "questions": 1,
+          "accuracy": 0.0
+        },
+        "mcq:conclusion_selection:negation:closed": {
+          "questions": 2,
+          "accuracy": 0.5
+        },
+        "mcq:conclusion_selection:rule_chain:closed": {
+          "questions": 2,
+          "accuracy": 1.0
+        }
+      }
+    },
+    "elapsed_seconds": 59.292
+  },
+  "retained_model_rows": [
+    {
+      "record_id": 3,
+      "question_id": 0,
+      "question_group": "mcq:conclusion_selection:rule_chain:closed",
+      "expected": "A",
+      "predicted_answer": "A",
+      "correct": true,
+      "consistency": 0.917959,
+      "model_top": "A",
+      "explanation_top": "A",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "A": 0.342852,
+        "D": 0.18572,
+        "Uncertain": 0.167616,
+        "B": 0.153429,
+        "C": 0.150383
+      },
+      "trace_explanation_distribution": {
+        "A": 0.371097,
+        "B": 0.157352,
+        "C": 0.157352,
+        "D": 0.228624,
+        "Uncertain": 0.085575
+      }
+    },
+    {
+      "record_id": 3,
+      "question_id": 1,
+      "question_group": "judgment:qualification_judgment:rule_chain:closed",
+      "expected": "Yes",
+      "predicted_answer": "No",
+      "correct": false,
+      "consistency": 0.19076,
+      "model_top": "No",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.947475,
+        "Yes": 0.037574,
+        "Uncertain": 0.014951
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.538811,
+        "No": 0.138236,
+        "Uncertain": 0.322954
+      }
+    },
+    {
+      "record_id": 12,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "D",
+      "predicted_answer": "Uncertain",
+      "correct": false,
+      "consistency": 0.312635,
+      "model_top": "Uncertain",
+      "explanation_top": "D",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.785382,
+        "A": 0.096484,
+        "C": 0.04637,
+        "D": 0.042805,
+        "B": 0.028958
+      },
+      "trace_explanation_distribution": {
+        "A": 0.284306,
+        "B": 0.085575,
+        "C": 0.210077,
+        "D": 0.322024,
+        "Uncertain": 0.098018
+      }
+    },
+    {
+      "record_id": 12,
+      "question_id": 1,
+      "question_group": "judgment:qualification_judgment:fact_match:closed",
+      "expected": "No",
+      "predicted_answer": "Yes",
+      "correct": false,
+      "consistency": 0.581283,
+      "model_top": "Yes",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Yes": 0.932497,
+        "No": 0.054199,
+        "Uncertain": 0.013304
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.51378,
+        "No": 0.145859,
+        "Uncertain": 0.340361
+      }
+    },
+    {
+      "record_id": 13,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "C",
+      "correct": false,
+      "consistency": 0.743386,
+      "model_top": "C",
+      "explanation_top": "C",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "C": 0.467219,
+        "Uncertain": 0.295973,
+        "A": 0.18113,
+        "B": 0.045919,
+        "D": 0.00976
+      },
+      "trace_explanation_distribution": {
+        "A": 0.155348,
+        "B": 0.111143,
+        "C": 0.433274,
+        "D": 0.20115,
+        "Uncertain": 0.099085
+      }
+    },
+    {
+      "record_id": 13,
+      "question_id": 1,
+      "question_group": "judgment:entailment_judgment:rule_chain:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.218853,
+      "model_top": "No",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.911494,
+        "Yes": 0.071476,
+        "Uncertain": 0.01703
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.514124,
+        "No": 0.130347,
+        "Uncertain": 0.355528
+      }
+    },
+    {
+      "record_id": 15,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "A",
+      "predicted_answer": "A",
+      "correct": true,
+      "consistency": 0.590851,
+      "model_top": "A",
+      "explanation_top": "B",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "A": 0.401849,
+        "Uncertain": 0.294707,
+        "B": 0.226574,
+        "C": 0.068174,
+        "D": 0.008696
+      },
+      "trace_explanation_distribution": {
+        "A": 0.175641,
+        "B": 0.334411,
+        "C": 0.292715,
+        "D": 0.085467,
+        "Uncertain": 0.111767
+      }
+    },
+    {
+      "record_id": 15,
+      "question_id": 1,
+      "question_group": "judgment:entailment_judgment:fact_match:closed",
+      "expected": "Yes",
+      "predicted_answer": "Yes",
+      "correct": true,
+      "consistency": 0.763361,
+      "model_top": "Yes",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Yes": 0.630855,
+        "No": 0.296969,
+        "Uncertain": 0.072176
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.518134,
+        "No": 0.173051,
+        "Uncertain": 0.308815
+      }
+    },
+    {
+      "record_id": 16,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:fact_match:closed",
+      "expected": "B",
+      "predicted_answer": "Uncertain",
+      "correct": false,
+      "consistency": 0.26651,
+      "model_top": "Uncertain",
+      "explanation_top": "C",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.813917,
+        "C": 0.127966,
+        "A": 0.022567,
+        "B": 0.018578,
+        "D": 0.016973
+      },
+      "trace_explanation_distribution": {
+        "A": 0.14748,
+        "B": 0.152216,
+        "C": 0.38135,
+        "D": 0.238528,
+        "Uncertain": 0.080427
+      }
+    },
+    {
+      "record_id": 16,
+      "question_id": 1,
+      "question_group": "judgment:qualification_judgment:fact_match:closed",
+      "expected": "Yes",
+      "predicted_answer": "Yes",
+      "correct": true,
+      "consistency": 0.50899,
+      "model_top": "Yes",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Yes": 0.877861,
+        "No": 0.084005,
+        "Uncertain": 0.038133
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.386851,
+        "No": 0.335186,
+        "Uncertain": 0.277962
+      }
+    },
+    {
+      "record_id": 22,
+      "question_id": 0,
+      "question_group": "mcq:conclusion_selection:rule_chain:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.137212,
+      "model_top": "Uncertain",
+      "explanation_top": "D",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.944899,
+        "A": 0.019437,
+        "C": 0.01244,
+        "B": 0.012088,
+        "D": 0.011136
+      },
+      "trace_explanation_distribution": {
+        "A": 0.236608,
+        "B": 0.19898,
+        "C": 0.222731,
+        "D": 0.25957,
+        "Uncertain": 0.082111
+      }
+    },
+    {
+      "record_id": 22,
+      "question_id": 1,
+      "question_group": "judgment:qualification_judgment:rule_chain:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.28758,
+      "model_top": "No",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.958442,
+        "Yes": 0.026638,
+        "Uncertain": 0.01492
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.437812,
+        "No": 0.246022,
+        "Uncertain": 0.316166
+      }
+    },
+    {
+      "record_id": 23,
+      "question_id": 0,
+      "question_group": "mcq:conclusion_selection:fact_match:closed",
+      "expected": "A",
+      "predicted_answer": "Uncertain",
+      "correct": false,
+      "consistency": 0.489572,
+      "model_top": "Uncertain",
+      "explanation_top": "A",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.591661,
+        "D": 0.130644,
+        "C": 0.096791,
+        "B": 0.090574,
+        "A": 0.090331
+      },
+      "trace_explanation_distribution": {
+        "A": 0.368192,
+        "B": 0.136227,
+        "C": 0.143129,
+        "D": 0.271219,
+        "Uncertain": 0.081233
+      }
+    },
+    {
+      "record_id": 23,
+      "question_id": 1,
+      "question_group": "judgment:qualification_judgment:fact_match:closed",
+      "expected": "No",
+      "predicted_answer": "Yes",
+      "correct": false,
+      "consistency": 0.87051,
+      "model_top": "Yes",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Yes": 0.41697,
+        "No": 0.35273,
+        "Uncertain": 0.2303
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.436143,
+        "No": 0.22324,
+        "Uncertain": 0.340617
+      }
+    },
+    {
+      "record_id": 35,
+      "question_id": 0,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.602885,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.571589,
+        "Uncertain": 0.2826,
+        "Yes": 0.145812
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.220138,
+        "No": 0.174473,
+        "Uncertain": 0.605389
+      }
+    },
+    {
+      "record_id": 40,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.32904,
+      "model_top": "Uncertain",
+      "explanation_top": "C",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.817743,
+        "A": 0.163272,
+        "C": 0.01201,
+        "B": 0.006975
+      },
+      "trace_explanation_distribution": {
+        "A": 0.236125,
+        "B": 0.249396,
+        "C": 0.367696,
+        "Uncertain": 0.146783
+      }
+    },
+    {
+      "record_id": 40,
+      "question_id": 1,
+      "question_group": "judgment:entailment_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.293743,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.925557,
+        "Uncertain": 0.042096,
+        "Yes": 0.032347
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.129784,
+        "No": 0.2193,
+        "Uncertain": 0.650916
+      }
+    },
+    {
+      "record_id": 44,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:fact_match:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.108565,
+      "model_top": "Uncertain",
+      "explanation_top": "A",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.969876,
+        "B": 0.011493,
+        "A": 0.007394,
+        "C": 0.006169,
+        "D": 0.005069
+      },
+      "trace_explanation_distribution": {
+        "A": 0.280482,
+        "B": 0.213713,
+        "C": 0.207543,
+        "D": 0.219821,
+        "Uncertain": 0.078441
+      }
+    },
+    {
+      "record_id": 44,
+      "question_id": 1,
+      "question_group": "judgment:entailment_judgment:fact_match:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.282574,
+      "model_top": "No",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.961863,
+        "Yes": 0.019735,
+        "Uncertain": 0.018401
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.450254,
+        "No": 0.244438,
+        "Uncertain": 0.305308
+      }
+    },
+    {
+      "record_id": 47,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.064862,
+      "model_top": "Uncertain",
+      "explanation_top": "C",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.962262,
+        "B": 0.013965,
+        "A": 0.011659,
+        "C": 0.00645,
+        "D": 0.005665
+      },
+      "trace_explanation_distribution": {
+        "A": 0.146403,
+        "B": 0.155052,
+        "C": 0.614348,
+        "D": 0.057074,
+        "Uncertain": 0.027123
+      }
+    },
+    {
+      "record_id": 47,
+      "question_id": 1,
+      "question_group": "judgment:entailment_judgment:rule_chain:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.375312,
+      "model_top": "No",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.900975,
+        "Uncertain": 0.072101,
+        "Yes": 0.026924
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.431422,
+        "No": 0.276287,
+        "Uncertain": 0.292291
+      }
+    },
+    {
+      "record_id": 49,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.123392,
+      "model_top": "Uncertain",
+      "explanation_top": "B",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.976941,
+        "A": 0.008109,
+        "B": 0.007502,
+        "C": 0.007448
+      },
+      "trace_explanation_distribution": {
+        "A": 0.062598,
+        "B": 0.721003,
+        "C": 0.116067,
+        "Uncertain": 0.100333
+      }
+    },
+    {
+      "record_id": 49,
+      "question_id": 1,
+      "question_group": "judgment:entailment_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.39032,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.897872,
+        "Yes": 0.0535,
+        "Uncertain": 0.048628
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.165652,
+        "No": 0.288193,
+        "Uncertain": 0.546156
+      }
+    },
+    {
+      "record_id": 51,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.091639,
+      "model_top": "Uncertain",
+      "explanation_top": "B",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.970889,
+        "B": 0.007709,
+        "A": 0.007366,
+        "D": 0.007306,
+        "C": 0.00673
+      },
+      "trace_explanation_distribution": {
+        "A": 0.061528,
+        "B": 0.460601,
+        "C": 0.057675,
+        "D": 0.357668,
+        "Uncertain": 0.062527
+      }
+    },
+    {
+      "record_id": 51,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.50204,
+      "model_top": "No",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.621455,
+        "Uncertain": 0.288281,
+        "Yes": 0.090264
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.489703,
+        "No": 0.123495,
+        "Uncertain": 0.386802
+      }
+    },
+    {
+      "record_id": 52,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.316658,
+      "model_top": "Uncertain",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Uncertain": 0.94498,
+        "A": 0.019814,
+        "B": 0.015181,
+        "D": 0.011854,
+        "C": 0.008172
+      },
+      "trace_explanation_distribution": {
+        "A": 0.173617,
+        "B": 0.187048,
+        "C": 0.189571,
+        "D": 0.188126,
+        "Uncertain": 0.261638
+      }
+    },
+    {
+      "record_id": 52,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.424269,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.762228,
+        "Uncertain": 0.202922,
+        "Yes": 0.03485
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.253271,
+        "No": 0.186497,
+        "Uncertain": 0.560232
+      }
+    },
+    {
+      "record_id": 57,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.545713,
+      "model_top": "Uncertain",
+      "explanation_top": "A",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.404149,
+        "A": 0.281957,
+        "B": 0.223569,
+        "C": 0.077079,
+        "D": 0.013246
+      },
+      "trace_explanation_distribution": {
+        "A": 0.44704,
+        "B": 0.112706,
+        "C": 0.162837,
+        "D": 0.216693,
+        "Uncertain": 0.060726
+      }
+    },
+    {
+      "record_id": 57,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.348471,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.644976,
+        "Uncertain": 0.183493,
+        "Yes": 0.171531
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.082489,
+        "No": 0.082489,
+        "Uncertain": 0.835022
+      }
+    },
+    {
+      "record_id": 63,
+      "question_id": 0,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Yes",
+      "correct": false,
+      "consistency": 0.846692,
+      "model_top": "Yes",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Yes": 0.390889,
+        "Uncertain": 0.328486,
+        "No": 0.280626
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.520423,
+        "No": 0.127317,
+        "Uncertain": 0.352259
+      }
+    },
+    {
+      "record_id": 63,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "Yes",
+      "predicted_answer": "Yes",
+      "correct": true,
+      "consistency": 0.61424,
+      "model_top": "Yes",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Yes": 0.402723,
+        "Uncertain": 0.301454,
+        "No": 0.295823
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.195661,
+        "No": 0.117125,
+        "Uncertain": 0.687215
+      }
+    },
+    {
+      "record_id": 71,
+      "question_id": 0,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "Yes",
+      "correct": false,
+      "consistency": 0.501993,
+      "model_top": "Yes",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Yes": 0.421828,
+        "No": 0.337831,
+        "Uncertain": 0.240341
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.111465,
+        "No": 0.150187,
+        "Uncertain": 0.738348
+      }
+    },
+    {
+      "record_id": 71,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "Yes",
+      "predicted_answer": "Yes",
+      "correct": true,
+      "consistency": 0.511895,
+      "model_top": "Yes",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Yes": 0.461393,
+        "No": 0.328856,
+        "Uncertain": 0.20975
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.127551,
+        "No": 0.174594,
+        "Uncertain": 0.697856
+      }
+    },
+    {
+      "record_id": 79,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.127853,
+      "model_top": "Uncertain",
+      "explanation_top": "A",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.966626,
+        "A": 0.010228,
+        "C": 0.007871,
+        "D": 0.007643,
+        "B": 0.007632
+      },
+      "trace_explanation_distribution": {
+        "A": 0.339134,
+        "B": 0.199912,
+        "C": 0.178523,
+        "D": 0.187952,
+        "Uncertain": 0.094479
+      }
+    },
+    {
+      "record_id": 79,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.328133,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.753516,
+        "Uncertain": 0.208244,
+        "Yes": 0.038239
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.091752,
+        "No": 0.081649,
+        "Uncertain": 0.826599
+      }
+    },
+    {
+      "record_id": 81,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.129271,
+      "model_top": "Uncertain",
+      "explanation_top": "A",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.963953,
+        "A": 0.011215,
+        "B": 0.00853,
+        "D": 0.008502,
+        "C": 0.007799
+      },
+      "trace_explanation_distribution": {
+        "A": 0.363402,
+        "B": 0.154318,
+        "C": 0.223443,
+        "D": 0.165612,
+        "Uncertain": 0.093225
+      }
+    },
+    {
+      "record_id": 81,
+      "question_id": 1,
+      "question_group": "judgment:qualification_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.258213,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.828249,
+        "Uncertain": 0.118844,
+        "Yes": 0.052907
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.086462,
+        "No": 0.086462,
+        "Uncertain": 0.827076
+      }
+    },
+    {
+      "record_id": 83,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.230083,
+      "model_top": "Uncertain",
+      "explanation_top": "C",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.900645,
+        "A": 0.068829,
+        "C": 0.01327,
+        "B": 0.008925,
+        "D": 0.008331
+      },
+      "trace_explanation_distribution": {
+        "A": 0.18396,
+        "B": 0.188939,
+        "C": 0.302755,
+        "D": 0.193618,
+        "Uncertain": 0.130729
+      }
+    },
+    {
+      "record_id": 83,
+      "question_id": 1,
+      "question_group": "judgment:qualification_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.281285,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.801131,
+        "Yes": 0.118601,
+        "Uncertain": 0.080268
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.078239,
+        "No": 0.122778,
+        "Uncertain": 0.798983
+      }
+    },
+    {
+      "record_id": 98,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.186708,
+      "model_top": "Uncertain",
+      "explanation_top": "A",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.967718,
+        "A": 0.009635,
+        "B": 0.008125,
+        "C": 0.007391,
+        "D": 0.007131
+      },
+      "trace_explanation_distribution": {
+        "A": 0.244883,
+        "B": 0.212874,
+        "C": 0.213997,
+        "D": 0.17382,
+        "Uncertain": 0.154425
+      }
+    },
+    {
+      "record_id": 98,
+      "question_id": 1,
+      "question_group": "judgment:qualification_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.250329,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.83368,
+        "Uncertain": 0.136796,
+        "Yes": 0.029524
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.09169,
+        "No": 0.084008,
+        "Uncertain": 0.824301
+      }
+    },
+    {
+      "record_id": 101,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.118349,
+      "model_top": "Uncertain",
+      "explanation_top": "A",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.920277,
+        "A": 0.058467,
+        "B": 0.007682,
+        "C": 0.006899,
+        "D": 0.006675
+      },
+      "trace_explanation_distribution": {
+        "A": 0.624071,
+        "B": 0.144539,
+        "C": 0.084539,
+        "D": 0.108224,
+        "Uncertain": 0.038626
+      }
+    },
+    {
+      "record_id": 101,
+      "question_id": 1,
+      "question_group": "judgment:qualification_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.251339,
+      "model_top": "No",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.871275,
+        "Uncertain": 0.081475,
+        "Yes": 0.04725
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.501002,
+        "No": 0.122614,
+        "Uncertain": 0.376384
+      }
+    },
+    {
+      "record_id": 107,
+      "question_id": 0,
+      "question_group": "judgment:truth_judgment:rule_chain:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Yes",
+      "correct": false,
+      "consistency": 0.792033,
+      "model_top": "Yes",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Yes": 0.383938,
+        "No": 0.344934,
+        "Uncertain": 0.271128
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.496002,
+        "No": 0.136967,
+        "Uncertain": 0.367031
+      }
+    },
+    {
+      "record_id": 107,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:rule_chain:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Yes",
+      "correct": false,
+      "consistency": 0.702341,
+      "model_top": "Yes",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Yes": 0.420138,
+        "No": 0.381305,
+        "Uncertain": 0.198558
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.500005,
+        "No": 0.083646,
+        "Uncertain": 0.416349
+      }
+    },
+    {
+      "record_id": 110,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.230392,
+      "model_top": "Uncertain",
+      "explanation_top": "A",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.884366,
+        "C": 0.046175,
+        "A": 0.046091,
+        "B": 0.014061,
+        "D": 0.009307
+      },
+      "trace_explanation_distribution": {
+        "A": 0.282303,
+        "B": 0.278959,
+        "C": 0.065582,
+        "D": 0.258398,
+        "Uncertain": 0.114758
+      }
+    },
+    {
+      "record_id": 110,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.250127,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.830414,
+        "Uncertain": 0.141733,
+        "Yes": 0.027853
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.090508,
+        "No": 0.080541,
+        "Uncertain": 0.828951
+      }
+    },
+    {
+      "record_id": 111,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:rule_chain:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.457901,
+      "model_top": "Uncertain",
+      "explanation_top": "A",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.503808,
+        "A": 0.408688,
+        "B": 0.070399,
+        "C": 0.010164,
+        "D": 0.006941
+      },
+      "trace_explanation_distribution": {
+        "A": 0.209868,
+        "B": 0.209868,
+        "C": 0.209868,
+        "D": 0.209868,
+        "Uncertain": 0.160529
+      }
+    },
+    {
+      "record_id": 111,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:rule_chain:closed",
+      "expected": "No",
+      "predicted_answer": "Yes",
+      "correct": false,
+      "consistency": 0.959234,
+      "model_top": "Yes",
+      "explanation_top": "No",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Yes": 0.377725,
+        "No": 0.372194,
+        "Uncertain": 0.250082
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.336958,
+        "No": 0.405299,
+        "Uncertain": 0.257742
+      }
+    },
+    {
+      "record_id": 112,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.218145,
+      "model_top": "Uncertain",
+      "explanation_top": "A",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.869358,
+        "A": 0.088685,
+        "B": 0.018919,
+        "C": 0.013134,
+        "D": 0.009903
+      },
+      "trace_explanation_distribution": {
+        "A": 0.306436,
+        "B": 0.258034,
+        "C": 0.159904,
+        "D": 0.188123,
+        "Uncertain": 0.087504
+      }
+    },
+    {
+      "record_id": 112,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "Yes",
+      "predicted_answer": "No",
+      "correct": false,
+      "consistency": 0.609949,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.451993,
+        "Yes": 0.322896,
+        "Uncertain": 0.225111
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.10862,
+        "No": 0.276218,
+        "Uncertain": 0.615162
+      }
+    },
+    {
+      "record_id": 114,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.182497,
+      "model_top": "Uncertain",
+      "explanation_top": "B",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.852661,
+        "B": 0.115641,
+        "C": 0.014331,
+        "A": 0.010463,
+        "D": 0.006904
+      },
+      "trace_explanation_distribution": {
+        "A": 0.164029,
+        "B": 0.360694,
+        "C": 0.322754,
+        "D": 0.117365,
+        "Uncertain": 0.035158
+      }
+    },
+    {
+      "record_id": 114,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:rule_chain:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.456662,
+      "model_top": "No",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.649713,
+        "Uncertain": 0.195415,
+        "Yes": 0.154872
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.498487,
+        "No": 0.106375,
+        "Uncertain": 0.395138
+      }
+    },
+    {
+      "record_id": 116,
+      "question_id": 0,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "Uncertain",
+      "correct": false,
+      "consistency": 0.876223,
+      "model_top": "Uncertain",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Uncertain": 0.47213,
+        "Yes": 0.278542,
+        "No": 0.249328
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.197737,
+        "No": 0.206356,
+        "Uncertain": 0.595906
+      }
+    },
+    {
+      "record_id": 116,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.929963,
+      "model_top": "Uncertain",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Uncertain": 0.485927,
+        "Yes": 0.27496,
+        "No": 0.239112
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.222018,
+        "No": 0.222018,
+        "Uncertain": 0.555965
+      }
+    },
+    {
+      "record_id": 119,
+      "question_id": 0,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "Uncertain",
+      "correct": false,
+      "consistency": 0.809161,
+      "model_top": "Uncertain",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Uncertain": 0.394429,
+        "Yes": 0.364552,
+        "No": 0.241019
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.207366,
+        "No": 0.207366,
+        "Uncertain": 0.585267
+      }
+    },
+    {
+      "record_id": 119,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.813136,
+      "model_top": "Uncertain",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Uncertain": 0.386211,
+        "Yes": 0.361343,
+        "No": 0.252446
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.174478,
+        "No": 0.333743,
+        "Uncertain": 0.491778
+      }
+    },
+    {
+      "record_id": 125,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.403508,
+      "model_top": "Uncertain",
+      "explanation_top": "B",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.601984,
+        "A": 0.291356,
+        "B": 0.082176,
+        "D": 0.012819,
+        "C": 0.011666
+      },
+      "trace_explanation_distribution": {
+        "A": 0.143114,
+        "B": 0.315762,
+        "C": 0.235653,
+        "D": 0.151738,
+        "Uncertain": 0.153733
+      }
+    },
+    {
+      "record_id": 125,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.373629,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.567266,
+        "Yes": 0.253667,
+        "Uncertain": 0.179067
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.082315,
+        "No": 0.112247,
+        "Uncertain": 0.805438
+      }
+    },
+    {
+      "record_id": 135,
+      "question_id": 0,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.848227,
+      "model_top": "Uncertain",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Uncertain": 0.659874,
+        "No": 0.273117,
+        "Yes": 0.067009
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.218782,
+        "No": 0.197811,
+        "Uncertain": 0.583407
+      }
+    },
+    {
+      "record_id": 135,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.533948,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.660995,
+        "Uncertain": 0.256346,
+        "Yes": 0.082659
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.194943,
+        "No": 0.194943,
+        "Uncertain": 0.610114
+      }
+    },
+    {
+      "record_id": 140,
+      "question_id": 0,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.815218,
+      "model_top": "Uncertain",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Uncertain": 0.604557,
+        "No": 0.338968,
+        "Yes": 0.056476
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.241257,
+        "No": 0.179175,
+        "Uncertain": 0.579568
+      }
+    },
+    {
+      "record_id": 140,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.534607,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.695685,
+        "Uncertain": 0.218382,
+        "Yes": 0.085933
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.163199,
+        "No": 0.230292,
+        "Uncertain": 0.606509
+      }
+    },
+    {
+      "record_id": 142,
+      "question_id": 0,
+      "question_group": "judgment:truth_judgment:fact_match:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.622304,
+      "model_top": "Uncertain",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.569808,
+        "No": 0.364438,
+        "Yes": 0.065754
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.44345,
+        "No": 0.154336,
+        "Uncertain": 0.402214
+      }
+    },
+    {
+      "record_id": 142,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:fact_match:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.484895,
+      "model_top": "No",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.643069,
+        "Uncertain": 0.282573,
+        "Yes": 0.074358
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.511744,
+        "No": 0.127964,
+        "Uncertain": 0.360293
+      }
+    },
+    {
+      "record_id": 148,
+      "question_id": 0,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.640876,
+      "model_top": "No",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.498462,
+        "Uncertain": 0.316991,
+        "Yes": 0.184547
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.488172,
+        "No": 0.139338,
+        "Uncertain": 0.37249
+      }
+    },
+    {
+      "record_id": 148,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.447299,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.53724,
+        "Yes": 0.262929,
+        "Uncertain": 0.199831
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.12194,
+        "No": 0.125528,
+        "Uncertain": 0.752532
+      }
+    },
+    {
+      "record_id": 150,
+      "question_id": 0,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.390555,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.506718,
+        "Yes": 0.336612,
+        "Uncertain": 0.15667
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.137862,
+        "No": 0.096023,
+        "Uncertain": 0.766115
+      }
+    },
+    {
+      "record_id": 150,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "Yes",
+      "predicted_answer": "Yes",
+      "correct": true,
+      "consistency": 0.5685,
+      "model_top": "Yes",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Yes": 0.429104,
+        "No": 0.407194,
+        "Uncertain": 0.163703
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.150533,
+        "No": 0.254265,
+        "Uncertain": 0.595202
+      }
+    },
+    {
+      "record_id": 172,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.353338,
+      "model_top": "Uncertain",
+      "explanation_top": "A",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.727937,
+        "A": 0.232665,
+        "B": 0.022614,
+        "C": 0.009011,
+        "D": 0.007773
+      },
+      "trace_explanation_distribution": {
+        "A": 0.242212,
+        "B": 0.218892,
+        "C": 0.215963,
+        "D": 0.241658,
+        "Uncertain": 0.081275
+      }
+    },
+    {
+      "record_id": 172,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.418942,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.658582,
+        "Uncertain": 0.245742,
+        "Yes": 0.095675
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.09215,
+        "No": 0.081049,
+        "Uncertain": 0.826801
+      }
+    },
+    {
+      "record_id": 174,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.472818,
+      "model_top": "Uncertain",
+      "explanation_top": "D",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.466878,
+        "A": 0.358036,
+        "B": 0.165387,
+        "C": 0.005202,
+        "D": 0.004498
+      },
+      "trace_explanation_distribution": {
+        "A": 0.203511,
+        "B": 0.221281,
+        "C": 0.233745,
+        "D": 0.247242,
+        "Uncertain": 0.09422
+      }
+    },
+    {
+      "record_id": 174,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.451433,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.565149,
+        "Yes": 0.245008,
+        "Uncertain": 0.189842
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.075463,
+        "No": 0.186128,
+        "Uncertain": 0.738409
+      }
+    },
+    {
+      "record_id": 176,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.370598,
+      "model_top": "Uncertain",
+      "explanation_top": "A",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.583816,
+        "A": 0.38668,
+        "B": 0.015678,
+        "C": 0.007499,
+        "D": 0.006326
+      },
+      "trace_explanation_distribution": {
+        "A": 0.268955,
+        "B": 0.210215,
+        "C": 0.187551,
+        "D": 0.261139,
+        "Uncertain": 0.072139
+      }
+    },
+    {
+      "record_id": 176,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.31001,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.559114,
+        "Yes": 0.324278,
+        "Uncertain": 0.116608
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.080857,
+        "No": 0.112545,
+        "Uncertain": 0.806598
+      }
+    },
+    {
+      "record_id": 181,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.341705,
+      "model_top": "Uncertain",
+      "explanation_top": "C",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.573782,
+        "A": 0.351176,
+        "C": 0.053293,
+        "B": 0.016597,
+        "D": 0.005151
+      },
+      "trace_explanation_distribution": {
+        "A": 0.255103,
+        "B": 0.0668,
+        "C": 0.557052,
+        "D": 0.109485,
+        "Uncertain": 0.01156
+      }
+    },
+    {
+      "record_id": 181,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:rule_chain:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.602038,
+      "model_top": "No",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.496116,
+        "Yes": 0.402923,
+        "Uncertain": 0.100961
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.457902,
+        "No": 0.098154,
+        "Uncertain": 0.443944
+      }
+    },
+    {
+      "record_id": 183,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.31805,
+      "model_top": "Uncertain",
+      "explanation_top": "C",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.65187,
+        "A": 0.292117,
+        "B": 0.038474,
+        "C": 0.009893,
+        "D": 0.007646
+      },
+      "trace_explanation_distribution": {
+        "A": 0.244134,
+        "B": 0.168106,
+        "C": 0.302239,
+        "D": 0.267618,
+        "Uncertain": 0.017903
+      }
+    },
+    {
+      "record_id": 183,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.505726,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.588884,
+        "Uncertain": 0.219963,
+        "Yes": 0.191153
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.170224,
+        "No": 0.11554,
+        "Uncertain": 0.714237
+      }
+    },
+    {
+      "record_id": 185,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.22853,
+      "model_top": "Uncertain",
+      "explanation_top": "C",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.954898,
+        "C": 0.013368,
+        "D": 0.010978,
+        "A": 0.010412,
+        "B": 0.010345
+      },
+      "trace_explanation_distribution": {
+        "A": 0.208402,
+        "B": 0.180245,
+        "C": 0.232362,
+        "D": 0.195564,
+        "Uncertain": 0.183428
+      }
+    },
+    {
+      "record_id": 185,
+      "question_id": 1,
+      "question_group": "judgment:qualification_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.4698,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.716952,
+        "Yes": 0.215117,
+        "Uncertain": 0.067932
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.275141,
+        "No": 0.186752,
+        "Uncertain": 0.538107
+      }
+    },
+    {
+      "record_id": 186,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.508603,
+      "model_top": "Uncertain",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Uncertain": 0.49912,
+        "A": 0.469144,
+        "B": 0.011819,
+        "D": 0.010087,
+        "C": 0.009829
+      },
+      "trace_explanation_distribution": {
+        "A": 0.221682,
+        "B": 0.197676,
+        "C": 0.169324,
+        "D": 0.156133,
+        "Uncertain": 0.255185
+      }
+    },
+    {
+      "record_id": 186,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.492253,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.620045,
+        "Uncertain": 0.311459,
+        "Yes": 0.068496
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.165447,
+        "No": 0.112298,
+        "Uncertain": 0.722255
+      }
+    },
+    {
+      "record_id": 189,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.4609,
+      "model_top": "Uncertain",
+      "explanation_top": "A",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.633659,
+        "A": 0.337223,
+        "B": 0.015733,
+        "C": 0.00693,
+        "D": 0.006454
+      },
+      "trace_explanation_distribution": {
+        "A": 0.40166,
+        "B": 0.098138,
+        "C": 0.297552,
+        "D": 0.108091,
+        "Uncertain": 0.094559
+      }
+    },
+    {
+      "record_id": 189,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.529757,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.498643,
+        "Yes": 0.281721,
+        "Uncertain": 0.219636
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.162889,
+        "No": 0.147232,
+        "Uncertain": 0.689879
+      }
+    },
+    {
+      "record_id": 193,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.478627,
+      "model_top": "Uncertain",
+      "explanation_top": "D",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.620825,
+        "A": 0.307254,
+        "B": 0.057652,
+        "D": 0.007397,
+        "C": 0.006871
+      },
+      "trace_explanation_distribution": {
+        "A": 0.205159,
+        "B": 0.184013,
+        "C": 0.174501,
+        "D": 0.23478,
+        "Uncertain": 0.201548
+      }
+    },
+    {
+      "record_id": 193,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "Yes",
+      "correct": false,
+      "consistency": 0.477967,
+      "model_top": "Yes",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Yes": 0.434473,
+        "No": 0.431049,
+        "Uncertain": 0.134478
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.140047,
+        "No": 0.203441,
+        "Uncertain": 0.656511
+      }
+    },
+    {
+      "record_id": 194,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.394487,
+      "model_top": "Uncertain",
+      "explanation_top": "B",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.767925,
+        "A": 0.200793,
+        "D": 0.010456,
+        "C": 0.010447,
+        "B": 0.01038
+      },
+      "trace_explanation_distribution": {
+        "A": 0.163473,
+        "B": 0.338067,
+        "C": 0.134741,
+        "D": 0.163987,
+        "Uncertain": 0.199732
+      }
+    },
+    {
+      "record_id": 194,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.403936,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.576351,
+        "Yes": 0.248003,
+        "Uncertain": 0.175646
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.113048,
+        "No": 0.115242,
+        "Uncertain": 0.77171
+      }
+    },
+    {
+      "record_id": 214,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.670078,
+      "model_top": "Uncertain",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Uncertain": 0.864126,
+        "A": 0.067633,
+        "B": 0.030075,
+        "C": 0.020095,
+        "D": 0.01807
+      },
+      "trace_explanation_distribution": {
+        "A": 0.116449,
+        "B": 0.116449,
+        "C": 0.116449,
+        "D": 0.116449,
+        "Uncertain": 0.534205
+      }
+    },
+    {
+      "record_id": 214,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.269345,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.814454,
+        "Uncertain": 0.160181,
+        "Yes": 0.025366
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.091461,
+        "No": 0.083798,
+        "Uncertain": 0.824741
+      }
+    },
+    {
+      "record_id": 216,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:rule_chain:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.416833,
+      "model_top": "Uncertain",
+      "explanation_top": "A",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.626313,
+        "A": 0.32725,
+        "B": 0.031112,
+        "C": 0.008633,
+        "D": 0.006691
+      },
+      "trace_explanation_distribution": {
+        "A": 0.209868,
+        "B": 0.209868,
+        "C": 0.209868,
+        "D": 0.209868,
+        "Uncertain": 0.160529
+      }
+    },
+    {
+      "record_id": 216,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:rule_chain:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.697806,
+      "model_top": "No",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.453689,
+        "Yes": 0.356122,
+        "Uncertain": 0.190189
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.593323,
+        "No": 0.151495,
+        "Uncertain": 0.255181
+      }
+    },
+    {
+      "record_id": 229,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.432659,
+      "model_top": "Uncertain",
+      "explanation_top": "A",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.552909,
+        "A": 0.339608,
+        "B": 0.08118,
+        "C": 0.016649,
+        "D": 0.009654
+      },
+      "trace_explanation_distribution": {
+        "A": 0.254572,
+        "B": 0.219565,
+        "C": 0.235694,
+        "D": 0.219565,
+        "Uncertain": 0.070604
+      }
+    },
+    {
+      "record_id": 229,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.305289,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.599045,
+        "Yes": 0.265744,
+        "Uncertain": 0.135211
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.089994,
+        "No": 0.080084,
+        "Uncertain": 0.829922
+      }
+    },
+    {
+      "record_id": 232,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "A",
+      "predicted_answer": "Uncertain",
+      "correct": false,
+      "consistency": 0.525964,
+      "model_top": "Uncertain",
+      "explanation_top": "A",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.47522,
+        "A": 0.351266,
+        "B": 0.096149,
+        "C": 0.069257,
+        "D": 0.00811
+      },
+      "trace_explanation_distribution": {
+        "A": 0.442406,
+        "B": 0.086557,
+        "C": 0.374185,
+        "D": 0.086076,
+        "Uncertain": 0.010775
+      }
+    },
+    {
+      "record_id": 232,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:rule_chain:closed",
+      "expected": "Yes",
+      "predicted_answer": "No",
+      "correct": false,
+      "consistency": 0.620422,
+      "model_top": "No",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.446092,
+        "Yes": 0.443799,
+        "Uncertain": 0.110109
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.475426,
+        "No": 0.066514,
+        "Uncertain": 0.45806
+      }
+    },
+    {
+      "record_id": 235,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.450663,
+      "model_top": "Uncertain",
+      "explanation_top": "A",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.567879,
+        "A": 0.378334,
+        "C": 0.033818,
+        "B": 0.014761,
+        "D": 0.005207
+      },
+      "trace_explanation_distribution": {
+        "A": 0.478682,
+        "B": 0.09227,
+        "C": 0.336473,
+        "D": 0.074033,
+        "Uncertain": 0.018543
+      }
+    },
+    {
+      "record_id": 235,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:rule_chain:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.520998,
+      "model_top": "No",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.527922,
+        "Yes": 0.349339,
+        "Uncertain": 0.122739
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.481473,
+        "No": 0.04892,
+        "Uncertain": 0.469607
+      }
+    },
+    {
+      "record_id": 258,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.262435,
+      "model_top": "Uncertain",
+      "explanation_top": "D",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.9272,
+        "A": 0.042736,
+        "B": 0.010422,
+        "C": 0.009865,
+        "D": 0.009777
+      },
+      "trace_explanation_distribution": {
+        "A": 0.218346,
+        "B": 0.156027,
+        "C": 0.215925,
+        "D": 0.220068,
+        "Uncertain": 0.189635
+      }
+    },
+    {
+      "record_id": 258,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.389711,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.720128,
+        "Uncertain": 0.210668,
+        "Yes": 0.069204
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.104807,
+        "No": 0.109839,
+        "Uncertain": 0.785354
+      }
+    },
+    {
+      "record_id": 274,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "C",
+      "predicted_answer": "Uncertain",
+      "correct": false,
+      "consistency": 0.281239,
+      "model_top": "Uncertain",
+      "explanation_top": "C",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.94545,
+        "C": 0.021703,
+        "A": 0.012333,
+        "B": 0.011303,
+        "D": 0.009211
+      },
+      "trace_explanation_distribution": {
+        "A": 0.162018,
+        "B": 0.14769,
+        "C": 0.293499,
+        "D": 0.170104,
+        "Uncertain": 0.226689
+      }
+    },
+    {
+      "record_id": 274,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.763719,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.402142,
+        "Yes": 0.399695,
+        "Uncertain": 0.198163
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.282778,
+        "No": 0.282778,
+        "Uncertain": 0.434444
+      }
+    },
+    {
+      "record_id": 279,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.674499,
+      "model_top": "Uncertain",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Uncertain": 0.952854,
+        "A": 0.016746,
+        "B": 0.012131,
+        "D": 0.009319,
+        "C": 0.00895
+      },
+      "trace_explanation_distribution": {
+        "A": 0.135729,
+        "B": 0.063042,
+        "C": 0.105546,
+        "D": 0.06833,
+        "Uncertain": 0.627353
+      }
+    },
+    {
+      "record_id": 279,
+      "question_id": 1,
+      "question_group": "judgment:entailment_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.236923,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.918662,
+        "Uncertain": 0.046493,
+        "Yes": 0.034846
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.073525,
+        "No": 0.155584,
+        "Uncertain": 0.770891
+      }
+    },
+    {
+      "record_id": 282,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.630515,
+      "model_top": "Uncertain",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Uncertain": 0.601258,
+        "A": 0.378303,
+        "B": 0.007979,
+        "C": 0.007322,
+        "D": 0.005138
+      },
+      "trace_explanation_distribution": {
+        "A": 0.118461,
+        "B": 0.1653,
+        "C": 0.066329,
+        "D": 0.158295,
+        "Uncertain": 0.491614
+      }
+    },
+    {
+      "record_id": 287,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.591284,
+      "model_top": "Uncertain",
+      "explanation_top": "A",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.67827,
+        "A": 0.291613,
+        "C": 0.012214,
+        "B": 0.009428,
+        "D": 0.008475
+      },
+      "trace_explanation_distribution": {
+        "A": 0.321007,
+        "B": 0.059072,
+        "C": 0.315837,
+        "D": 0.034529,
+        "Uncertain": 0.269554
+      }
+    },
+    {
+      "record_id": 287,
+      "question_id": 1,
+      "question_group": "judgment:entailment_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.29715,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.89613,
+        "Yes": 0.05389,
+        "Uncertain": 0.04998
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.076006,
+        "No": 0.19328,
+        "Uncertain": 0.730714
+      }
+    },
+    {
+      "record_id": 295,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.431737,
+      "model_top": "Uncertain",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Uncertain": 0.880775,
+        "A": 0.061997,
+        "B": 0.026251,
+        "C": 0.020811,
+        "D": 0.010166
+      },
+      "trace_explanation_distribution": {
+        "A": 0.177684,
+        "B": 0.169342,
+        "C": 0.18577,
+        "D": 0.154692,
+        "Uncertain": 0.312512
+      }
+    },
+    {
+      "record_id": 295,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.530407,
+      "model_top": "No",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.592002,
+        "Uncertain": 0.363745,
+        "Yes": 0.044253
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.513847,
+        "No": 0.134997,
+        "Uncertain": 0.351157
+      }
+    },
+    {
+      "record_id": 301,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.557197,
+      "model_top": "Uncertain",
+      "explanation_top": "A",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.602265,
+        "A": 0.241523,
+        "B": 0.137871,
+        "D": 0.012864,
+        "C": 0.005478
+      },
+      "trace_explanation_distribution": {
+        "A": 0.245966,
+        "B": 0.218442,
+        "C": 0.149192,
+        "D": 0.226938,
+        "Uncertain": 0.159461
+      }
+    },
+    {
+      "record_id": 301,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:fact_match:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.193349,
+      "model_top": "No",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.936113,
+        "Uncertain": 0.047382,
+        "Yes": 0.016506
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.519294,
+        "No": 0.129461,
+        "Uncertain": 0.351244
+      }
+    },
+    {
+      "record_id": 302,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.458959,
+      "model_top": "Uncertain",
+      "explanation_top": "D",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.684824,
+        "A": 0.235386,
+        "B": 0.050487,
+        "D": 0.023975,
+        "C": 0.005328
+      },
+      "trace_explanation_distribution": {
+        "A": 0.232781,
+        "B": 0.2303,
+        "C": 0.060643,
+        "D": 0.329889,
+        "Uncertain": 0.146388
+      }
+    },
+    {
+      "record_id": 302,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:fact_match:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.201233,
+      "model_top": "No",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.927267,
+        "Uncertain": 0.056791,
+        "Yes": 0.015942
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.521937,
+        "No": 0.1285,
+        "Uncertain": 0.349564
+      }
+    },
+    {
+      "record_id": 308,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.29694,
+      "model_top": "Uncertain",
+      "explanation_top": "C",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.818549,
+        "A": 0.141666,
+        "C": 0.017364,
+        "B": 0.012025,
+        "D": 0.010396
+      },
+      "trace_explanation_distribution": {
+        "A": 0.126767,
+        "B": 0.141179,
+        "C": 0.362314,
+        "D": 0.239352,
+        "Uncertain": 0.130388
+      }
+    },
+    {
+      "record_id": 308,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.763069,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.430852,
+        "Yes": 0.331343,
+        "Uncertain": 0.237805
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.132934,
+        "No": 0.39233,
+        "Uncertain": 0.474736
+      }
+    },
+    {
+      "record_id": 309,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.281884,
+      "model_top": "Uncertain",
+      "explanation_top": "A",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.869006,
+        "A": 0.052135,
+        "C": 0.046175,
+        "B": 0.020814,
+        "D": 0.01187
+      },
+      "trace_explanation_distribution": {
+        "A": 0.26596,
+        "B": 0.165667,
+        "C": 0.21444,
+        "D": 0.203043,
+        "Uncertain": 0.150891
+      }
+    },
+    {
+      "record_id": 309,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "Yes",
+      "correct": false,
+      "consistency": 0.714835,
+      "model_top": "Yes",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Yes": 0.402702,
+        "No": 0.363542,
+        "Uncertain": 0.233755
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.551622,
+        "No": 0.078377,
+        "Uncertain": 0.370001
+      }
+    },
+    {
+      "record_id": 316,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:uncertainty_gap",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.343828,
+      "model_top": "Uncertain",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Uncertain": 0.940098,
+        "D": 0.017138,
+        "C": 0.015467,
+        "B": 0.013888,
+        "A": 0.013409
+      },
+      "trace_explanation_distribution": {
+        "A": 0.215364,
+        "B": 0.203332,
+        "C": 0.125891,
+        "D": 0.171487,
+        "Uncertain": 0.283927
+      }
+    },
+    {
+      "record_id": 316,
+      "question_id": 1,
+      "question_group": "judgment:qualification_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.650116,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.483808,
+        "Uncertain": 0.298335,
+        "Yes": 0.217857
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.125885,
+        "No": 0.225896,
+        "Uncertain": 0.648219
+      }
+    },
+    {
+      "record_id": 321,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.370337,
+      "model_top": "Uncertain",
+      "explanation_top": "B",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.770427,
+        "B": 0.191106,
+        "A": 0.018451,
+        "C": 0.01267,
+        "D": 0.007346
+      },
+      "trace_explanation_distribution": {
+        "A": 0.11761,
+        "B": 0.377617,
+        "C": 0.246535,
+        "D": 0.117474,
+        "Uncertain": 0.140763
+      }
+    },
+    {
+      "record_id": 321,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:rule_chain:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.539717,
+      "model_top": "No",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.607696,
+        "Uncertain": 0.355755,
+        "Yes": 0.036549
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.496832,
+        "No": 0.153425,
+        "Uncertain": 0.349743
+      }
+    },
+    {
+      "record_id": 325,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:rule_chain:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.334135,
+      "model_top": "Uncertain",
+      "explanation_top": "A",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.734801,
+        "A": 0.231614,
+        "B": 0.022253,
+        "C": 0.006172,
+        "D": 0.00516
+      },
+      "trace_explanation_distribution": {
+        "A": 0.302474,
+        "B": 0.238304,
+        "C": 0.225257,
+        "D": 0.165029,
+        "Uncertain": 0.068936
+      }
+    },
+    {
+      "record_id": 325,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:rule_chain:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.403127,
+      "model_top": "No",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.728536,
+        "Uncertain": 0.248825,
+        "Yes": 0.022639
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.519569,
+        "No": 0.131663,
+        "Uncertain": 0.348768
+      }
+    },
+    {
+      "record_id": 327,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:fact_match:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.127799,
+      "model_top": "Uncertain",
+      "explanation_top": "A",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.970823,
+        "B": 0.008195,
+        "A": 0.008067,
+        "C": 0.007072,
+        "D": 0.005842
+      },
+      "trace_explanation_distribution": {
+        "A": 0.337097,
+        "B": 0.212732,
+        "C": 0.132009,
+        "D": 0.21954,
+        "Uncertain": 0.098623
+      }
+    },
+    {
+      "record_id": 327,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:fact_match:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.355061,
+      "model_top": "Uncertain",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.979497,
+        "Yes": 0.010263,
+        "No": 0.01024
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.498082,
+        "No": 0.16736,
+        "Uncertain": 0.334558
+      }
+    },
+    {
+      "record_id": 332,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.475177,
+      "model_top": "Uncertain",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Uncertain": 0.890707,
+        "A": 0.045719,
+        "B": 0.024608,
+        "C": 0.019683,
+        "D": 0.019282
+      },
+      "trace_explanation_distribution": {
+        "A": 0.159492,
+        "B": 0.158208,
+        "C": 0.158208,
+        "D": 0.158208,
+        "Uncertain": 0.365885
+      }
+    },
+    {
+      "record_id": 332,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "Yes",
+      "predicted_answer": "Yes",
+      "correct": true,
+      "consistency": 0.902424,
+      "model_top": "Yes",
+      "explanation_top": "No",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Yes": 0.390315,
+        "No": 0.373171,
+        "Uncertain": 0.236515
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.292739,
+        "No": 0.385015,
+        "Uncertain": 0.322246
+      }
+    },
+    {
+      "record_id": 338,
+      "question_id": 0,
+      "question_group": "mcq:conclusion_selection:negation:closed",
+      "expected": "A",
+      "predicted_answer": "Uncertain",
+      "correct": false,
+      "consistency": 0.626728,
+      "model_top": "Uncertain",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Uncertain": 0.816123,
+        "C": 0.095921,
+        "A": 0.061366,
+        "B": 0.019623,
+        "D": 0.006967
+      },
+      "trace_explanation_distribution": {
+        "A": 0.117553,
+        "B": 0.130858,
+        "C": 0.10073,
+        "D": 0.208008,
+        "Uncertain": 0.442851
+      }
+    },
+    {
+      "record_id": 338,
+      "question_id": 1,
+      "question_group": "judgment:entailment_judgment:negation:closed",
+      "expected": "Yes",
+      "predicted_answer": "No",
+      "correct": false,
+      "consistency": 0.351942,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.867953,
+        "Yes": 0.084346,
+        "Uncertain": 0.047702
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.142853,
+        "No": 0.219895,
+        "Uncertain": 0.637253
+      }
+    },
+    {
+      "record_id": 346,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.827696,
+      "model_top": "Uncertain",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Uncertain": 0.598921,
+        "A": 0.272747,
+        "B": 0.078268,
+        "C": 0.030194,
+        "D": 0.01987
+      },
+      "trace_explanation_distribution": {
+        "A": 0.100442,
+        "B": 0.094809,
+        "C": 0.094809,
+        "D": 0.094809,
+        "Uncertain": 0.61513
+      }
+    },
+    {
+      "record_id": 346,
+      "question_id": 1,
+      "question_group": "judgment:entailment_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.407739,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.66599,
+        "Yes": 0.296212,
+        "Uncertain": 0.037798
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.462943,
+        "No": 0.073729,
+        "Uncertain": 0.463328
+      }
+    },
+    {
+      "record_id": 353,
+      "question_id": 0,
+      "question_group": "mcq:conclusion_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.547385,
+      "model_top": "Uncertain",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Uncertain": 0.930253,
+        "A": 0.031678,
+        "D": 0.013055,
+        "C": 0.012643,
+        "B": 0.012371
+      },
+      "trace_explanation_distribution": {
+        "A": 0.126773,
+        "B": 0.131863,
+        "C": 0.131863,
+        "D": 0.131863,
+        "Uncertain": 0.477639
+      }
+    },
+    {
+      "record_id": 353,
+      "question_id": 1,
+      "question_group": "judgment:qualification_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.276167,
+      "model_top": "No",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.847831,
+        "Yes": 0.102771,
+        "Uncertain": 0.049398
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.504497,
+        "No": 0.123998,
+        "Uncertain": 0.371505
+      }
+    },
+    {
+      "record_id": 357,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "A",
+      "predicted_answer": "Uncertain",
+      "correct": false,
+      "consistency": 0.509521,
+      "model_top": "Uncertain",
+      "explanation_top": "B",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.458054,
+        "A": 0.372019,
+        "B": 0.160821,
+        "C": 0.004642,
+        "D": 0.004464
+      },
+      "trace_explanation_distribution": {
+        "A": 0.326636,
+        "B": 0.47775,
+        "C": 0.099625,
+        "D": 0.08303,
+        "Uncertain": 0.012958
+      }
+    },
+    {
+      "record_id": 357,
+      "question_id": 1,
+      "question_group": "judgment:qualification_judgment:negation:closed",
+      "expected": "Yes",
+      "predicted_answer": "Yes",
+      "correct": true,
+      "consistency": 0.522906,
+      "model_top": "Yes",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Yes": 0.42952,
+        "No": 0.339679,
+        "Uncertain": 0.230801
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.144858,
+        "No": 0.147248,
+        "Uncertain": 0.707895
+      }
+    },
+    {
+      "record_id": 359,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.524758,
+      "model_top": "Uncertain",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Uncertain": 0.853709,
+        "A": 0.097765,
+        "B": 0.021363,
+        "D": 0.014421,
+        "C": 0.012743
+      },
+      "trace_explanation_distribution": {
+        "A": 0.23051,
+        "B": 0.125203,
+        "C": 0.145836,
+        "D": 0.119984,
+        "Uncertain": 0.378467
+      }
+    },
+    {
+      "record_id": 359,
+      "question_id": 1,
+      "question_group": "judgment:qualification_judgment:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.715085,
+      "model_top": "Uncertain",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Uncertain": 0.872255,
+        "No": 0.078345,
+        "Yes": 0.0494
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.181553,
+        "No": 0.231107,
+        "Uncertain": 0.58734
+      }
+    },
+    {
+      "record_id": 364,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.323925,
+      "model_top": "Uncertain",
+      "explanation_top": "D",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.668334,
+        "A": 0.301827,
+        "D": 0.011616,
+        "B": 0.010276,
+        "C": 0.007947
+      },
+      "trace_explanation_distribution": {
+        "A": 0.281591,
+        "B": 0.097287,
+        "C": 0.112829,
+        "D": 0.495798,
+        "Uncertain": 0.012495
+      }
+    },
+    {
+      "record_id": 364,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "Uncertain",
+      "correct": false,
+      "consistency": 0.808164,
+      "model_top": "Uncertain",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.34449,
+        "Yes": 0.338233,
+        "No": 0.317278
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.503144,
+        "No": 0.125442,
+        "Uncertain": 0.371414
+      }
+    },
+    {
+      "record_id": 366,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "A",
+      "predicted_answer": "Uncertain",
+      "correct": false,
+      "consistency": 0.581742,
+      "model_top": "Uncertain",
+      "explanation_top": "A",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.520015,
+        "A": 0.450913,
+        "B": 0.013857,
+        "D": 0.008037,
+        "C": 0.007178
+      },
+      "trace_explanation_distribution": {
+        "A": 0.600545,
+        "B": 0.114531,
+        "C": 0.092054,
+        "D": 0.091113,
+        "Uncertain": 0.101757
+      }
+    },
+    {
+      "record_id": 366,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "Yes",
+      "predicted_answer": "Yes",
+      "correct": true,
+      "consistency": 0.784106,
+      "model_top": "Yes",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Yes": 0.445782,
+        "No": 0.345654,
+        "Uncertain": 0.208563
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.548414,
+        "No": 0.12976,
+        "Uncertain": 0.321826
+      }
+    },
+    {
+      "record_id": 370,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "C",
+      "predicted_answer": "Uncertain",
+      "correct": false,
+      "consistency": 0.303144,
+      "model_top": "Uncertain",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Uncertain": 0.909311,
+        "A": 0.033818,
+        "D": 0.01963,
+        "B": 0.019269,
+        "C": 0.017972
+      },
+      "trace_explanation_distribution": {
+        "A": 0.196886,
+        "B": 0.196886,
+        "C": 0.196886,
+        "D": 0.196886,
+        "Uncertain": 0.212454
+      }
+    },
+    {
+      "record_id": 370,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.370137,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.797657,
+        "Uncertain": 0.179461,
+        "Yes": 0.022882
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.247209,
+        "No": 0.167794,
+        "Uncertain": 0.584997
+      }
+    },
+    {
+      "record_id": 376,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "A",
+      "predicted_answer": "Uncertain",
+      "correct": false,
+      "consistency": 0.318242,
+      "model_top": "Uncertain",
+      "explanation_top": "C",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.942792,
+        "A": 0.023323,
+        "B": 0.013372,
+        "C": 0.011195,
+        "D": 0.009318
+      },
+      "trace_explanation_distribution": {
+        "A": 0.055089,
+        "B": 0.051419,
+        "C": 0.358214,
+        "D": 0.274244,
+        "Uncertain": 0.261034
+      }
+    },
+    {
+      "record_id": 376,
+      "question_id": 1,
+      "question_group": "judgment:entailment_judgment:negation:closed",
+      "expected": "Yes",
+      "predicted_answer": "No",
+      "correct": false,
+      "consistency": 0.32528,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.899094,
+        "Uncertain": 0.064088,
+        "Yes": 0.036818
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.103026,
+        "No": 0.224374,
+        "Uncertain": 0.6726
+      }
+    },
+    {
+      "record_id": 377,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.233638,
+      "model_top": "Uncertain",
+      "explanation_top": "D",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.925878,
+        "A": 0.034557,
+        "B": 0.017318,
+        "C": 0.011533,
+        "D": 0.010714
+      },
+      "trace_explanation_distribution": {
+        "A": 0.247502,
+        "B": 0.078889,
+        "C": 0.219399,
+        "D": 0.294694,
+        "Uncertain": 0.159516
+      }
+    },
+    {
+      "record_id": 377,
+      "question_id": 1,
+      "question_group": "judgment:entailment_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.230975,
+      "model_top": "No",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.903256,
+        "Uncertain": 0.0602,
+        "Yes": 0.036544
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.531147,
+        "No": 0.134231,
+        "Uncertain": 0.334622
+      }
+    },
+    {
+      "record_id": 379,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "B",
+      "predicted_answer": "A",
+      "correct": false,
+      "consistency": 0.423038,
+      "model_top": "A",
+      "explanation_top": "A",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "A": 0.862995,
+        "B": 0.052039,
+        "Uncertain": 0.04157,
+        "C": 0.026267,
+        "D": 0.01713
+      },
+      "trace_explanation_distribution": {
+        "A": 0.286032,
+        "B": 0.082366,
+        "C": 0.205869,
+        "D": 0.19109,
+        "Uncertain": 0.234643
+      }
+    },
+    {
+      "record_id": 379,
+      "question_id": 1,
+      "question_group": "judgment:entailment_judgment:negation:closed",
+      "expected": "Yes",
+      "predicted_answer": "Yes",
+      "correct": true,
+      "consistency": 0.747739,
+      "model_top": "Yes",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Yes": 0.478065,
+        "No": 0.375121,
+        "Uncertain": 0.146814
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.495358,
+        "No": 0.12286,
+        "Uncertain": 0.381782
+      }
+    },
+    {
+      "record_id": 390,
+      "question_id": 0,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "Yes",
+      "predicted_answer": "No",
+      "correct": false,
+      "consistency": 0.411411,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.498827,
+        "Yes": 0.351982,
+        "Uncertain": 0.149192
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.157386,
+        "No": 0.104833,
+        "Uncertain": 0.737781
+      }
+    },
+    {
+      "record_id": 390,
+      "question_id": 1,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "A",
+      "predicted_answer": "A",
+      "correct": true,
+      "consistency": 0.57597,
+      "model_top": "A",
+      "explanation_top": "C",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "A": 0.613962,
+        "B": 0.189101,
+        "C": 0.156751,
+        "Uncertain": 0.028345,
+        "D": 0.01184
+      },
+      "trace_explanation_distribution": {
+        "A": 0.2389,
+        "B": 0.140133,
+        "C": 0.270355,
+        "D": 0.26612,
+        "Uncertain": 0.084492
+      }
+    },
+    {
+      "record_id": 392,
+      "question_id": 0,
+      "question_group": "judgment:truth_judgment:rule_chain:closed",
+      "expected": "Yes",
+      "predicted_answer": "Yes",
+      "correct": true,
+      "consistency": 0.72882,
+      "model_top": "Yes",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Yes": 0.462051,
+        "No": 0.394264,
+        "Uncertain": 0.143686
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.510696,
+        "No": 0.123084,
+        "Uncertain": 0.36622
+      }
+    },
+    {
+      "record_id": 392,
+      "question_id": 1,
+      "question_group": "mcq:choice_selection:rule_chain:closed",
+      "expected": "A",
+      "predicted_answer": "A",
+      "correct": true,
+      "consistency": 0.670107,
+      "model_top": "A",
+      "explanation_top": "C",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "A": 0.422928,
+        "B": 0.240839,
+        "Uncertain": 0.198394,
+        "C": 0.084102,
+        "D": 0.053737
+      },
+      "trace_explanation_distribution": {
+        "A": 0.221605,
+        "B": 0.211379,
+        "C": 0.242628,
+        "D": 0.225104,
+        "Uncertain": 0.099284
+      }
+    },
+    {
+      "record_id": 395,
+      "question_id": 0,
+      "question_group": "judgment:qualification_judgment:negation:closed",
+      "expected": "No",
+      "predicted_answer": "No",
+      "correct": true,
+      "consistency": 0.492862,
+      "model_top": "No",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.635697,
+        "Yes": 0.189795,
+        "Uncertain": 0.174508
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.517168,
+        "No": 0.128559,
+        "Uncertain": 0.354273
+      }
+    },
+    {
+      "record_id": 395,
+      "question_id": 1,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "A",
+      "correct": false,
+      "consistency": 0.638888,
+      "model_top": "A",
+      "explanation_top": "D",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "A": 0.47957,
+        "Uncertain": 0.260902,
+        "B": 0.246365,
+        "C": 0.007121,
+        "D": 0.006042
+      },
+      "trace_explanation_distribution": {
+        "A": 0.266843,
+        "B": 0.284071,
+        "C": 0.048717,
+        "D": 0.287851,
+        "Uncertain": 0.112517
+      }
+    },
+    {
+      "record_id": 398,
+      "question_id": 0,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "Yes",
+      "predicted_answer": "No",
+      "correct": false,
+      "consistency": 0.621796,
+      "model_top": "No",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "No": 0.368239,
+        "Yes": 0.339309,
+        "Uncertain": 0.292452
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.143908,
+        "No": 0.185436,
+        "Uncertain": 0.670656
+      }
+    },
+    {
+      "record_id": 398,
+      "question_id": 1,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "A",
+      "predicted_answer": "A",
+      "correct": true,
+      "consistency": 0.714325,
+      "model_top": "A",
+      "explanation_top": "A",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "A": 0.403217,
+        "B": 0.258422,
+        "Uncertain": 0.233564,
+        "C": 0.100235,
+        "D": 0.004562
+      },
+      "trace_explanation_distribution": {
+        "A": 0.356629,
+        "B": 0.073152,
+        "C": 0.083546,
+        "D": 0.290236,
+        "Uncertain": 0.196436
+      }
+    },
+    {
+      "record_id": 401,
+      "question_id": 0,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "Uncertain",
+      "predicted_answer": "Uncertain",
+      "correct": true,
+      "consistency": 0.754735,
+      "model_top": "Uncertain",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "Uncertain": 0.501819,
+        "No": 0.266996,
+        "Yes": 0.231185
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.47645,
+        "No": 0.160719,
+        "Uncertain": 0.362831
+      }
+    },
+    {
+      "record_id": 401,
+      "question_id": 1,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "A",
+      "predicted_answer": "A",
+      "correct": true,
+      "consistency": 0.548574,
+      "model_top": "A",
+      "explanation_top": "D",
+      "top_explanation_agreement": false,
+      "model_distribution": {
+        "A": 0.396924,
+        "Uncertain": 0.371062,
+        "B": 0.219565,
+        "C": 0.008024,
+        "D": 0.004425
+      },
+      "trace_explanation_distribution": {
+        "A": 0.216733,
+        "B": 0.196742,
+        "C": 0.21886,
+        "D": 0.245015,
+        "Uncertain": 0.12265
+      }
+    },
+    {
+      "record_id": 407,
+      "question_id": 0,
+      "question_group": "mcq:choice_selection:negation:closed",
+      "expected": "A",
+      "predicted_answer": "Uncertain",
+      "correct": false,
+      "consistency": 0.702744,
+      "model_top": "Uncertain",
+      "explanation_top": "Uncertain",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Uncertain": 0.686895,
+        "A": 0.206395,
+        "B": 0.055882,
+        "C": 0.02625,
+        "D": 0.024577
+      },
+      "trace_explanation_distribution": {
+        "A": 0.134655,
+        "B": 0.134655,
+        "C": 0.134655,
+        "D": 0.134655,
+        "Uncertain": 0.46138
+      }
+    },
+    {
+      "record_id": 407,
+      "question_id": 1,
+      "question_group": "judgment:truth_judgment:negation:closed",
+      "expected": "Yes",
+      "predicted_answer": "Yes",
+      "correct": true,
+      "consistency": 0.905891,
+      "model_top": "Yes",
+      "explanation_top": "Yes",
+      "top_explanation_agreement": true,
+      "model_distribution": {
+        "Yes": 0.435075,
+        "No": 0.331518,
+        "Uncertain": 0.233407
+      },
+      "trace_explanation_distribution": {
+        "Yes": 0.340966,
+        "No": 0.339124,
+        "Uncertain": 0.31991
+      }
+    }
+  ]
+}
