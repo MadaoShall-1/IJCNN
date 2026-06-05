@@ -1,0 +1,145 @@
+{
+  "architecture": "type1_modal_abductive_proof_state_possible_world_trace_ssm_bge_rag_transformer",
+  "train_ratio": 0.8,
+  "random_state": 42,
+  "train_questions": 642,
+  "validation_questions": 162,
+  "train_question_group_counts": {
+    "judgment:entailment_judgment:fact_match:closed": 6,
+    "judgment:entailment_judgment:negation:closed": 32,
+    "judgment:entailment_judgment:rule_chain:closed": 5,
+    "judgment:qualification_judgment:fact_match:closed": 9,
+    "judgment:qualification_judgment:negation:closed": 39,
+    "judgment:qualification_judgment:rule_chain:closed": 13,
+    "judgment:truth_judgment:fact_match:closed": 14,
+    "judgment:truth_judgment:negation:closed": 207,
+    "judgment:truth_judgment:rule_chain:closed": 43,
+    "mcq:choice_selection:fact_match:closed": 6,
+    "mcq:choice_selection:negation:closed": 229,
+    "mcq:choice_selection:negation:uncertainty_gap": 4,
+    "mcq:choice_selection:rule_chain:closed": 11,
+    "mcq:conclusion_selection:fact_match:closed": 1,
+    "mcq:conclusion_selection:negation:closed": 21,
+    "mcq:strongest_conclusion:fact_match:closed": 1,
+    "mcq:strongest_conclusion:negation:closed": 1
+  },
+  "validation_question_group_counts": {
+    "judgment:entailment_judgment:fact_match:closed": 2,
+    "judgment:entailment_judgment:negation:closed": 9,
+    "judgment:entailment_judgment:rule_chain:closed": 2,
+    "judgment:qualification_judgment:fact_match:closed": 3,
+    "judgment:qualification_judgment:negation:closed": 10,
+    "judgment:qualification_judgment:rule_chain:closed": 2,
+    "judgment:truth_judgment:fact_match:closed": 5,
+    "judgment:truth_judgment:negation:closed": 47,
+    "judgment:truth_judgment:rule_chain:closed": 11,
+    "mcq:choice_selection:fact_match:closed": 3,
+    "mcq:choice_selection:negation:closed": 58,
+    "mcq:choice_selection:negation:uncertainty_gap": 1,
+    "mcq:choice_selection:rule_chain:closed": 4,
+    "mcq:conclusion_selection:fact_match:closed": 1,
+    "mcq:conclusion_selection:negation:closed": 2,
+    "mcq:conclusion_selection:rule_chain:closed": 2
+  },
+  "train_loss": 0.619998,
+  "train_accuracy": 0.883178,
+  "validation_loss": 0.920881,
+  "model_validation_accuracy": 0.82716,
+  "validation_accuracy": 0.82716,
+  "validation_accuracy_by_group": {
+    "judgment:entailment_judgment:fact_match:closed": {
+      "questions": 2,
+      "accuracy": 1.0
+    },
+    "judgment:entailment_judgment:negation:closed": {
+      "questions": 9,
+      "accuracy": 0.777778
+    },
+    "judgment:entailment_judgment:rule_chain:closed": {
+      "questions": 2,
+      "accuracy": 0.5
+    },
+    "judgment:qualification_judgment:fact_match:closed": {
+      "questions": 3,
+      "accuracy": 0.666667
+    },
+    "judgment:qualification_judgment:negation:closed": {
+      "questions": 10,
+      "accuracy": 0.9
+    },
+    "judgment:qualification_judgment:rule_chain:closed": {
+      "questions": 2,
+      "accuracy": 1.0
+    },
+    "judgment:truth_judgment:fact_match:closed": {
+      "questions": 5,
+      "accuracy": 0.8
+    },
+    "judgment:truth_judgment:negation:closed": {
+      "questions": 47,
+      "accuracy": 0.808511
+    },
+    "judgment:truth_judgment:rule_chain:closed": {
+      "questions": 11,
+      "accuracy": 0.727273
+    },
+    "mcq:choice_selection:fact_match:closed": {
+      "questions": 3,
+      "accuracy": 0.666667
+    },
+    "mcq:choice_selection:negation:closed": {
+      "questions": 58,
+      "accuracy": 0.862069
+    },
+    "mcq:choice_selection:negation:uncertainty_gap": {
+      "questions": 1,
+      "accuracy": 1.0
+    },
+    "mcq:choice_selection:rule_chain:closed": {
+      "questions": 4,
+      "accuracy": 1.0
+    },
+    "mcq:conclusion_selection:fact_match:closed": {
+      "questions": 1,
+      "accuracy": 0.0
+    },
+    "mcq:conclusion_selection:negation:closed": {
+      "questions": 2,
+      "accuracy": 1.0
+    },
+    "mcq:conclusion_selection:rule_chain:closed": {
+      "questions": 2,
+      "accuracy": 1.0
+    }
+  },
+  "rag_backend": "bge",
+  "bge_model": "BAAI/bge-small-en-v1.5",
+  "llm_fallback_enabled": false,
+  "llm_fallback_model": null,
+  "llm_fallback_used": 0,
+  "accuracy": 0.82716,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 1.157846,
+      "train_accuracy": 0.630841,
+      "validation_loss": 1.036218,
+      "validation_accuracy": 0.691358
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.680435,
+      "train_accuracy": 0.842679,
+      "validation_loss": 1.078927,
+      "validation_accuracy": 0.685185
+    },
+    {
+      "epoch": 20,
+      "train_loss": 0.561978,
+      "train_accuracy": 0.903427,
+      "validation_loss": 1.033192,
+      "validation_accuracy": 0.746914
+    }
+  ],
+  "elapsed_seconds": 126.145
+}

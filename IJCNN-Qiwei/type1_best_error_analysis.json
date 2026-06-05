@@ -1,0 +1,1536 @@
+{
+  "model": "trace_ssm_bge_rag_memory_blockwise_local_attention_transformer",
+  "validation_accuracy": 0.796296,
+  "wrong_count": 33,
+  "validation_questions": 162,
+  "by_expected_to_predicted": {
+    "Yes->No": 7,
+    "A->Uncertain": 7,
+    "No->Yes": 6,
+    "Uncertain->Yes": 3,
+    "No->Uncertain": 3,
+    "C->Uncertain": 2,
+    "D->Uncertain": 1,
+    "Uncertain->C": 1,
+    "B->Uncertain": 1,
+    "B->A": 1,
+    "Uncertain->A": 1
+  },
+  "by_group": {
+    "mcq:choice_selection:negation:closed": 11,
+    "judgment:truth_judgment:negation:closed": 10,
+    "judgment:truth_judgment:rule_chain:closed": 4,
+    "judgment:qualification_judgment:fact_match:closed": 2,
+    "judgment:entailment_judgment:negation:closed": 2,
+    "judgment:qualification_judgment:rule_chain:closed": 1,
+    "mcq:choice_selection:fact_match:closed": 1,
+    "mcq:conclusion_selection:fact_match:closed": 1,
+    "mcq:conclusion_selection:negation:closed": 1
+  },
+  "by_failure_tag": {
+    "rule_chain": 33,
+    "quantifier": 29,
+    "negation": 26,
+    "yes_no_flip": 13,
+    "mcq_over_uncertain": 11,
+    "numeric": 8,
+    "false_entailment": 5
+  },
+  "high_confidence_wrong": [
+    {
+      "record_id": 3,
+      "question_id": 1,
+      "group": "judgment:qualification_judgment:rule_chain:closed",
+      "expected": "Yes",
+      "predicted": "No",
+      "top_probability": 0.947475,
+      "margin": 0.909901,
+      "failure_tags": [
+        "quantifier",
+        "rule_chain",
+        "numeric",
+        "yes_no_flip"
+      ],
+      "candidate_probabilities": {
+        "No": 0.947475,
+        "Yes": 0.037574,
+        "Uncertain": 0.014951
+      },
+      "premises": [
+        "If a student completes all required courses, they are eligible for graduation.",
+        "If a student is eligible for graduation and maintains a GPA above 3.5, they graduate with honors.",
+        "If a student graduates with honors and completes a thesis, they receive academic distinction.",
+        "If a student receives academic distinction, they qualify for the graduate fellowship program.",
+        "John has completed all required courses.",
+        "John maintains a GPA of 3.8.",
+        "John has completed a thesis."
+      ],
+      "question": "Does John receive academic distinction, according to the premises?"
+    },
+    {
+      "record_id": 12,
+      "question_id": 1,
+      "group": "judgment:qualification_judgment:fact_match:closed",
+      "expected": "No",
+      "predicted": "Yes",
+      "top_probability": 0.932497,
+      "margin": 0.878298,
+      "failure_tags": [
+        "quantifier",
+        "rule_chain",
+        "numeric",
+        "yes_no_flip"
+      ],
+      "candidate_probabilities": {
+        "Yes": 0.932497,
+        "No": 0.054199,
+        "Uncertain": 0.013304
+      },
+      "premises": [
+        "Students with active status who have completed at least 5 courses are eligible for advanced classes.",
+        "Eligible students must obtain advisor approval to take advanced classes.",
+        "Sarah has active student status.",
+        "Sarah has completed 4 courses.",
+        "Sarah has obtained advisor approval."
+      ],
+      "question": "Does Sarah meet all requirements to take advanced classes, according to the premises?"
+    },
+    {
+      "record_id": 16,
+      "question_id": 0,
+      "group": "mcq:choice_selection:fact_match:closed",
+      "expected": "B",
+      "predicted": "Uncertain",
+      "top_probability": 0.813917,
+      "margin": 0.685951,
+      "failure_tags": [
+        "rule_chain",
+        "numeric",
+        "mcq_over_uncertain"
+      ],
+      "candidate_probabilities": {
+        "Uncertain": 0.813917,
+        "C": 0.127966,
+        "A": 0.022567,
+        "B": 0.018578,
+        "D": 0.016973
+      },
+      "premises": [
+        "Alex has a valid membership card.",
+        "Alex has completed safety orientation.",
+        "Alex has a membership duration of 8 months.",
+        "Alex has paid annual fees on time."
+      ],
+      "question": "Based on Alex's status, which statement is correct?\nA. Alex can use equipment but can't book training\nB. Alex can book personal training sessions\nC. Alex needs longer membership duration\nD. Alex must pay additional fees"
+    },
+    {
+      "record_id": 274,
+      "question_id": 0,
+      "group": "mcq:choice_selection:negation:closed",
+      "expected": "C",
+      "predicted": "Uncertain",
+      "top_probability": 0.94545,
+      "margin": 0.923747,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "mcq_over_uncertain"
+      ],
+      "candidate_probabilities": {
+        "Uncertain": 0.94545,
+        "C": 0.021703,
+        "A": 0.012333,
+        "B": 0.011303,
+        "D": 0.009211
+      },
+      "premises": [
+        "If a student studies regularly, then they pass the exam.",
+        "All students receive an award.",
+        "If a student does not receive a recommendation letter, then they do not qualify for a scholarship.",
+        "There is at least one student who receives an award.",
+        "There is at least one student who studies regularly.",
+        "All students pass the exam.",
+        "All students study regularly.",
+        "If a student studies regularly, then they qualify for a scholarship.",
+        "If a student studies regularly, then they receive a recommendation letter.",
+        "There is at least one student who attends tutoring sessions.",
+        "If a student does not attend tutoring sessions, then they do not pass the exam.",
+        "If a student qualifies for a scholarship, then they pass the exam.",
+        "If all students pass the exam, then all students study regularly.",
+        "If qualifying for a scholarship implies passing the exam, then there is at least one student who studies regularly.",
+        "If qualifying for a scholarship implies passing the exam, then if a student studies regularly, they pass the exam.",
+        "If a student does not qualify for a scholarship, then they do not study regularly.",
+        "If a student attends tutoring sessions, then they qualify for a scholarship.",
+        "If a student qualifies for a scholarship, then they receive a recommendation letter.",
+        "If a student does not receive a recommendation letter, then they do not pass the exam."
+      ],
+      "question": "Based on the above premises, which statement can be inferred?\nA. There exists a student who does not study regularly.\nB. There exists a student who does not pass the exam.\nC. All students qualify for a scholarship.\nD. There exists a student who does not receive a recommendation letter."
+    },
+    {
+      "record_id": 338,
+      "question_id": 0,
+      "group": "mcq:conclusion_selection:negation:closed",
+      "expected": "A",
+      "predicted": "Uncertain",
+      "top_probability": 0.816123,
+      "margin": 0.720202,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "mcq_over_uncertain"
+      ],
+      "candidate_probabilities": {
+        "Uncertain": 0.816123,
+        "C": 0.095921,
+        "A": 0.061366,
+        "B": 0.019623,
+        "D": 0.006967
+      },
+      "premises": [
+        "Completing the Thesis requirement ensures eligibility for a Research grant.",
+        "At least one student has been awarded a Scholarship.",
+        "Scholarship recipients must maintain a minimum GPA.",
+        "Students who fail to maintain the required GPA lose access to University housing.",
+        "All students are required to complete a Thesis.",
+        "Access to University housing is reserved for Scholarship recipients.",
+        "Students without housing cannot participate in the Quantum Computing lab.",
+        "Non-participation in the Quantum lab leads to Scholarship revocation.",
+        "A low GPA disqualifies students from the Quantum lab.",
+        "There is at least one student with a Research grant.",
+        "Research grant recipients are guaranteed University housing.",
+        "At least one student has fulfilled the Thesis requirement.",
+        "The policy linking GPA to housing implies Thesis completion guarantees a Research grant.",
+        "The existence of Scholarships enforces GPA requirements for lab participation.",
+        "Mandatory Thesis completion ensures at least one Research grant is awarded.",
+        "Every student receives a Research grant.",
+        "Students without housing cannot complete their Thesis.",
+        "All students are Scholarship recipients.",
+        "At least one student has access to University housing.",
+        "Some students maintain the required GPA.",
+        "Housing access requires maintaining the GPA.",
+        "Failure to complete the Thesis results in loss of housing."
+      ],
+      "question": "Based on the university policies, which conclusion is valid if we know that all students are required to complete a Thesis?\nA. 'Mandatory Thesis implies Research grants' is a tautology.\nB. The policy is contradictory.\nC. Mandatory Thesis completion ensures at least one Research grant.\nD. The policy is both true and false."
+    },
+    {
+      "record_id": 338,
+      "question_id": 1,
+      "group": "judgment:entailment_judgment:negation:closed",
+      "expected": "Yes",
+      "predicted": "No",
+      "top_probability": 0.867953,
+      "margin": 0.783607,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "yes_no_flip"
+      ],
+      "candidate_probabilities": {
+        "No": 0.867953,
+        "Yes": 0.084346,
+        "Uncertain": 0.047702
+      },
+      "premises": [
+        "Completing the Thesis requirement ensures eligibility for a Research grant.",
+        "At least one student has been awarded a Scholarship.",
+        "Scholarship recipients must maintain a minimum GPA.",
+        "Students who fail to maintain the required GPA lose access to University housing.",
+        "All students are required to complete a Thesis.",
+        "Access to University housing is reserved for Scholarship recipients.",
+        "Students without housing cannot participate in the Quantum Computing lab.",
+        "Non-participation in the Quantum lab leads to Scholarship revocation.",
+        "A low GPA disqualifies students from the Quantum lab.",
+        "There is at least one student with a Research grant.",
+        "Research grant recipients are guaranteed University housing.",
+        "At least one student has fulfilled the Thesis requirement.",
+        "The policy linking GPA to housing implies Thesis completion guarantees a Research grant.",
+        "The existence of Scholarships enforces GPA requirements for lab participation.",
+        "Mandatory Thesis completion ensures at least one Research grant is awarded.",
+        "Every student receives a Research grant.",
+        "Students without housing cannot complete their Thesis.",
+        "All students are Scholarship recipients.",
+        "At least one student has access to University housing.",
+        "Some students maintain the required GPA.",
+        "Housing access requires maintaining the GPA.",
+        "Failure to complete the Thesis results in loss of housing."
+      ],
+      "question": "If all students are required to complete a Thesis, does it follow that students with low GPAs lose housing access?"
+    },
+    {
+      "record_id": 370,
+      "question_id": 0,
+      "group": "mcq:choice_selection:negation:closed",
+      "expected": "C",
+      "predicted": "Uncertain",
+      "top_probability": 0.909311,
+      "margin": 0.875493,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "mcq_over_uncertain"
+      ],
+      "candidate_probabilities": {
+        "Uncertain": 0.909311,
+        "A": 0.033818,
+        "D": 0.01963,
+        "B": 0.019269,
+        "C": 0.017972
+      },
+      "premises": [
+        "If a student spends time learning, then they will grow.",
+        "If a person is not teaching, then they cannot learn.",
+        "Everyone is a student.",
+        "There exists a teacher.",
+        "If a person is not a student, then they cannot teach.",
+        "If not teaching leads to not learning, then there exists someone who is learning.",
+        "If everyone is a student, then having knowledge leads to receiving education.",
+        "There exists someone who has graduated.",
+        "If a person has graduated, then they have knowledge.",
+        "Learning leads to the development of critical thinking and problem-solving skills."
+      ],
+      "question": "Based on the above premises, which statement can be inferred?\nA. ∀x (L(x) → (C(x) ∧ P(x) ∧ G(x)))\nB. ∀x (L(x) → ¬G(x))\nC. ∀x (S(x) → ¬L(x))\nD. ∀x (K(x) → ¬E(x))"
+    },
+    {
+      "record_id": 376,
+      "question_id": 0,
+      "group": "mcq:choice_selection:negation:closed",
+      "expected": "A",
+      "predicted": "Uncertain",
+      "top_probability": 0.942792,
+      "margin": 0.919469,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "numeric",
+        "mcq_over_uncertain"
+      ],
+      "candidate_probabilities": {
+        "Uncertain": 0.942792,
+        "A": 0.023323,
+        "B": 0.013372,
+        "C": 0.011195,
+        "D": 0.009318
+      },
+      "premises": [
+        "For courses with lab components, a student is allowed to take the exam if their lab score is at least 4.0 out of 10 and all their component scores are greater than 0.",
+        "Kelvin’s lab score for CH3002 is at least 4.0 out of 10, and all his component scores for CH3002 are positive.",
+        "Students enrolled in multiple courses must submit a project unless the course is taught by Professor X.",
+        "CH3002 has three components: Lab, Quiz, and Homework, but Quiz scores are optional for students over 20 years old.",
+        "Kelvin is 19 years old and has a Homework score of 7.0 in CH3001, which is unrelated to CH3002.",
+        "Professor Y teaches CH3002, and all courses taught by Professor Y have an extra credit option.",
+        "Extra credit can increase a student’s total score by up to 2 points, but it doesn’t affect component scores.",
+        "Another student, Liam, has a Lab score of 3.5 in CH3002 and is not allowed to take the exam.",
+        "Courses with more than 50 students require a midterm, but CH3002 has only 45 students.",
+        "Kelvin submitted his CH3002 lab report on time, which is required for lab scores to be valid.",
+        "Late submissions reduce a lab score by 1.0, unless the student has a medical excuse.",
+        "Liam has a medical excuse for CH3001 but not for CH3002.",
+        "CH3002’s final exam is scheduled for December 15th, and all eligible students must attend."
+      ],
+      "question": "Based on the above premises, which statement can be inferred if we know that Kelvin submitted his CH3002 lab report on time?\nA. Kelvin is allowed to take the exam for CH3002.\nB. Liam is allowed to take the exam for CH3002.\nC. Kelvin must submit a project for CH3002.\nD. Kelvin’s Homework score in CH3001 affects his eligibility for CH3002’s exam."
+    },
+    {
+      "record_id": 376,
+      "question_id": 1,
+      "group": "judgment:entailment_judgment:negation:closed",
+      "expected": "Yes",
+      "predicted": "No",
+      "top_probability": 0.899094,
+      "margin": 0.835006,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "numeric",
+        "yes_no_flip"
+      ],
+      "candidate_probabilities": {
+        "No": 0.899094,
+        "Uncertain": 0.064088,
+        "Yes": 0.036818
+      },
+      "premises": [
+        "For courses with lab components, a student is allowed to take the exam if their lab score is at least 4.0 out of 10 and all their component scores are greater than 0.",
+        "Kelvin’s lab score for CH3002 is at least 4.0 out of 10, and all his component scores for CH3002 are positive.",
+        "Students enrolled in multiple courses must submit a project unless the course is taught by Professor X.",
+        "CH3002 has three components: Lab, Quiz, and Homework, but Quiz scores are optional for students over 20 years old.",
+        "Kelvin is 19 years old and has a Homework score of 7.0 in CH3001, which is unrelated to CH3002.",
+        "Professor Y teaches CH3002, and all courses taught by Professor Y have an extra credit option.",
+        "Extra credit can increase a student’s total score by up to 2 points, but it doesn’t affect component scores.",
+        "Another student, Liam, has a Lab score of 3.5 in CH3002 and is not allowed to take the exam.",
+        "Courses with more than 50 students require a midterm, but CH3002 has only 45 students.",
+        "Kelvin submitted his CH3002 lab report on time, which is required for lab scores to be valid.",
+        "Late submissions reduce a lab score by 1.0, unless the student has a medical excuse.",
+        "Liam has a medical excuse for CH3001 but not for CH3002.",
+        "CH3002’s final exam is scheduled for December 15th, and all eligible students must attend."
+      ],
+      "question": "If Kelvin submitted his CH3002 lab report on time, does it follow that Kelvin is allowed to take the exam for CH3002?"
+    },
+    {
+      "record_id": 379,
+      "question_id": 0,
+      "group": "mcq:choice_selection:negation:closed",
+      "expected": "B",
+      "predicted": "A",
+      "top_probability": 0.862995,
+      "margin": 0.810956,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "numeric"
+      ],
+      "candidate_probabilities": {
+        "A": 0.862995,
+        "B": 0.052039,
+        "Uncertain": 0.04157,
+        "C": 0.026267,
+        "D": 0.01713
+      },
+      "premises": [
+        "Students must accumulate at least 65% of the total credits of their training program to be eligible for an internship.",
+        "The training program has a total of 120 credits.",
+        "Hà has accumulated 80 credits in the training program.",
+        "Students must submit an internship application by June 1st to be considered.",
+        "Hà submitted her application on May 15th.",
+        "The training program includes 30 credits of elective courses, but only 20 credits are counted toward the internship requirement.",
+        "Another student, Vinh, has accumulated 75 credits and is also in the training program.",
+        "Students with a GPA below 2.5 are required to take a remedial course before interning.",
+        "Hà’s GPA is 3.2, and she has no remedial requirements.",
+        "Internships are offered in two cycles: summer and fall, with summer priority for seniors.",
+        "Hà is a junior and applying for a fall internship.",
+        "The program advisor must approve all internship applications, and Hà’s was approved.",
+        "Vinh missed the application deadline and accumulated only 10 elective credits."
+      ],
+      "question": "Based on the above premises, which statement can be inferred if we know that Hà has accumulated 80 credits in the training program?\nA. Hà is eligible for an internship because she has accumulated 80 credits.\nB. Hà is not eligible for an internship due to insufficient credits.\nC. Hà must take remedial courses before applying for the internship.\nD. Hà’s internship application was submitted after June 1st."
+    }
+  ],
+  "wrong_cases": [
+    {
+      "record_id": 3,
+      "question_id": 1,
+      "group": "judgment:qualification_judgment:rule_chain:closed",
+      "expected": "Yes",
+      "predicted": "No",
+      "top_probability": 0.947475,
+      "margin": 0.909901,
+      "failure_tags": [
+        "quantifier",
+        "rule_chain",
+        "numeric",
+        "yes_no_flip"
+      ],
+      "candidate_probabilities": {
+        "No": 0.947475,
+        "Yes": 0.037574,
+        "Uncertain": 0.014951
+      },
+      "premises": [
+        "If a student completes all required courses, they are eligible for graduation.",
+        "If a student is eligible for graduation and maintains a GPA above 3.5, they graduate with honors.",
+        "If a student graduates with honors and completes a thesis, they receive academic distinction.",
+        "If a student receives academic distinction, they qualify for the graduate fellowship program.",
+        "John has completed all required courses.",
+        "John maintains a GPA of 3.8.",
+        "John has completed a thesis."
+      ],
+      "question": "Does John receive academic distinction, according to the premises?"
+    },
+    {
+      "record_id": 12,
+      "question_id": 0,
+      "group": "mcq:choice_selection:negation:closed",
+      "expected": "D",
+      "predicted": "Uncertain",
+      "top_probability": 0.785382,
+      "margin": 0.688898,
+      "failure_tags": [
+        "negation",
+        "rule_chain",
+        "numeric",
+        "mcq_over_uncertain"
+      ],
+      "candidate_probabilities": {
+        "Uncertain": 0.785382,
+        "A": 0.096484,
+        "C": 0.04637,
+        "D": 0.042805,
+        "B": 0.028958
+      },
+      "premises": [
+        "Students with active status who have completed at least 5 courses are eligible for advanced classes.",
+        "Eligible students must obtain advisor approval to take advanced classes.",
+        "Sarah has active student status.",
+        "Sarah has completed 4 courses.",
+        "Sarah has obtained advisor approval."
+      ],
+      "question": "Based on the requirements, which statement about Sarah is correct?\nA. She can take advanced classes because she has approval\nB. She cannot take advanced classes due to insufficient completed courses\nC. She is eligible but lacks approval\nD. Her active status alone qualifies her"
+    },
+    {
+      "record_id": 12,
+      "question_id": 1,
+      "group": "judgment:qualification_judgment:fact_match:closed",
+      "expected": "No",
+      "predicted": "Yes",
+      "top_probability": 0.932497,
+      "margin": 0.878298,
+      "failure_tags": [
+        "quantifier",
+        "rule_chain",
+        "numeric",
+        "yes_no_flip"
+      ],
+      "candidate_probabilities": {
+        "Yes": 0.932497,
+        "No": 0.054199,
+        "Uncertain": 0.013304
+      },
+      "premises": [
+        "Students with active status who have completed at least 5 courses are eligible for advanced classes.",
+        "Eligible students must obtain advisor approval to take advanced classes.",
+        "Sarah has active student status.",
+        "Sarah has completed 4 courses.",
+        "Sarah has obtained advisor approval."
+      ],
+      "question": "Does Sarah meet all requirements to take advanced classes, according to the premises?"
+    },
+    {
+      "record_id": 13,
+      "question_id": 0,
+      "group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted": "C",
+      "top_probability": 0.467219,
+      "margin": 0.171246,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "false_entailment"
+      ],
+      "candidate_probabilities": {
+        "C": 0.467219,
+        "Uncertain": 0.295973,
+        "A": 0.18113,
+        "B": 0.045919,
+        "D": 0.00976
+      },
+      "premises": [
+        "If a professor has a PhD degree, they are qualified to teach graduate courses.",
+        "A doctoral degree (PhD) is higher than a Master's degree.",
+        "If a professor holds a degree higher than a Master's, they are eligible to supervise Master's students.",
+        "All professors qualified to teach graduate courses can also supervise graduate-level research.",
+        "Professor John holds a PhD degree."
+      ],
+      "question": "Based on Professor John's qualifications, which capabilities does he have?\nA. Can teach graduate courses but cannot supervise research\nB. Can supervise Master's students but not graduate research\nC. Can both teach graduate courses and supervise research\nD. Needs additional certification to supervise"
+    },
+    {
+      "record_id": 16,
+      "question_id": 0,
+      "group": "mcq:choice_selection:fact_match:closed",
+      "expected": "B",
+      "predicted": "Uncertain",
+      "top_probability": 0.813917,
+      "margin": 0.685951,
+      "failure_tags": [
+        "rule_chain",
+        "numeric",
+        "mcq_over_uncertain"
+      ],
+      "candidate_probabilities": {
+        "Uncertain": 0.813917,
+        "C": 0.127966,
+        "A": 0.022567,
+        "B": 0.018578,
+        "D": 0.016973
+      },
+      "premises": [
+        "Alex has a valid membership card.",
+        "Alex has completed safety orientation.",
+        "Alex has a membership duration of 8 months.",
+        "Alex has paid annual fees on time."
+      ],
+      "question": "Based on Alex's status, which statement is correct?\nA. Alex can use equipment but can't book training\nB. Alex can book personal training sessions\nC. Alex needs longer membership duration\nD. Alex must pay additional fees"
+    },
+    {
+      "record_id": 23,
+      "question_id": 0,
+      "group": "mcq:conclusion_selection:fact_match:closed",
+      "expected": "A",
+      "predicted": "Uncertain",
+      "top_probability": 0.591661,
+      "margin": 0.461017,
+      "failure_tags": [
+        "negation",
+        "rule_chain",
+        "mcq_over_uncertain"
+      ],
+      "candidate_probabilities": {
+        "Uncertain": 0.591661,
+        "D": 0.130644,
+        "C": 0.096791,
+        "B": 0.090574,
+        "A": 0.090331
+      },
+      "premises": [
+        "A student who understands wave-particle duality can grasp the principle of quantum superposition.",
+        "Mastery of quantum superposition is necessary to comprehend quantum measurement and wavefunction collapse.",
+        "A deep understanding of wavefunction collapse enables a student to critique interpretations of quantum mechanics.",
+        "Critiquing quantum interpretations requires familiarity with Schrödinger's equation and its implications.",
+        "A student proficient in Schrödinger's equation can solve problems in quantum tunneling.",
+        "Successful application of quantum tunneling concepts allows engagement with quantum computing fundamentals.",
+        "A student engaging with quantum computing will explore qubit manipulation and entanglement.",
+        "A solid grasp of entanglement is required to analyze Bell's theorem.",
+        "Students who analyze Bell's theorem can assess quantum nonlocality and realism debates.",
+        "A student who can evaluate quantum realism debates is well-prepared for advanced research discussions.",
+        "A well-prepared researcher can contribute original perspectives through publications or seminars.",
+        "Avoiding both publications and seminars results in a lack of academic contribution.",
+        "Academic contribution in quantum physics is a criterion for securing a research position.",
+        "A student securing a research position gains access to specialized quantum laboratories."
+      ],
+      "question": "Based on the premises, which conclusion is correct?\nA. A student who develops through the quantum theory chain, from duality to advanced research preparation, can make academic contributions through publication or seminar\nB. Laboratory access is independent of publication/seminar participation\nC. Interpretation critique alone qualifies for research positions\nD. Understanding wave-particle duality guarantees lab access"
+    },
+    {
+      "record_id": 23,
+      "question_id": 1,
+      "group": "judgment:qualification_judgment:fact_match:closed",
+      "expected": "No",
+      "predicted": "Yes",
+      "top_probability": 0.41697,
+      "margin": 0.06424,
+      "failure_tags": [
+        "negation",
+        "rule_chain",
+        "yes_no_flip"
+      ],
+      "candidate_probabilities": {
+        "Yes": 0.41697,
+        "No": 0.35273,
+        "Uncertain": 0.2303
+      },
+      "premises": [
+        "A student who understands wave-particle duality can grasp the principle of quantum superposition.",
+        "Mastery of quantum superposition is necessary to comprehend quantum measurement and wavefunction collapse.",
+        "A deep understanding of wavefunction collapse enables a student to critique interpretations of quantum mechanics.",
+        "Critiquing quantum interpretations requires familiarity with Schrödinger's equation and its implications.",
+        "A student proficient in Schrödinger's equation can solve problems in quantum tunneling.",
+        "Successful application of quantum tunneling concepts allows engagement with quantum computing fundamentals.",
+        "A student engaging with quantum computing will explore qubit manipulation and entanglement.",
+        "A solid grasp of entanglement is required to analyze Bell's theorem.",
+        "Students who analyze Bell's theorem can assess quantum nonlocality and realism debates.",
+        "A student who can evaluate quantum realism debates is well-prepared for advanced research discussions.",
+        "A well-prepared researcher can contribute original perspectives through publications or seminars.",
+        "Avoiding both publications and seminars results in a lack of academic contribution.",
+        "Academic contribution in quantum physics is a criterion for securing a research position.",
+        "A student securing a research position gains access to specialized quantum laboratories."
+      ],
+      "question": "According to the premises, is the following statement true?\nStatement: A student who reaches advanced research preparation but avoids both publication and seminar opportunities will still qualify for laboratory access"
+    },
+    {
+      "record_id": 63,
+      "question_id": 0,
+      "group": "judgment:truth_judgment:negation:closed",
+      "expected": "Uncertain",
+      "predicted": "Yes",
+      "top_probability": 0.390889,
+      "margin": 0.062403,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "false_entailment"
+      ],
+      "candidate_probabilities": {
+        "Yes": 0.390889,
+        "Uncertain": 0.328486,
+        "No": 0.280626
+      },
+      "premises": [
+        "Every autonomous vehicle is reliable.",
+        "If an autonomous vehicle is thoroughly tested, then it is reliable.",
+        "There does not necessarily exist an autonomous vehicle that is thoroughly tested.",
+        "If an autonomous vehicle is safe, then it is thoroughly tested.",
+        "If an autonomous vehicle is thoroughly tested, then it is safe.",
+        "There exists at least one autonomous vehicle that is energy-efficient.",
+        "If there exists at least one energy-efficient autonomous vehicle, then any safe vehicle is thoroughly tested.",
+        "If every safe vehicle is thoroughly tested, then every thoroughly tested vehicle is not necessarily safe.",
+        "If an autonomous vehicle is not reliable, then it is not adopted by the market.",
+        "If an autonomous vehicle is not reliable, then it is not necessarily thoroughly tested."
+      ],
+      "question": "Are all autonomous vehicles safe?"
+    },
+    {
+      "record_id": 71,
+      "question_id": 0,
+      "group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted": "Yes",
+      "top_probability": 0.421828,
+      "margin": 0.083997,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "yes_no_flip"
+      ],
+      "candidate_probabilities": {
+        "Yes": 0.421828,
+        "No": 0.337831,
+        "Uncertain": 0.240341
+      },
+      "premises": [
+        "Every C++ project is thoroughly tested.",
+        "If a C++ project is thoroughly tested, then it is highly efficient.",
+        "If a C++ project is well-designed and maintainable, then it is robust.",
+        "If a C++ project is well-designed and maintainable, then it adheres to modern C++ standards.",
+        "Every C++ project is well-designed and maintainable.",
+        "If a C++ project is portable, then it is well-designed and maintainable.",
+        "If a C++ project is highly efficient, then it is well-designed and maintainable.",
+        "Every C++ project is robust.",
+        "If every well-designed C++ project is robust, then every C++ project is robust.",
+        "If well-designed C++ projects adhere to modern C++ standards, then any C++ project that is highly efficient is well-designed and maintainable.",
+        "There exists at least one C++ project that is portable.",
+        "If a C++ project is thoroughly tested, then it is portable.",
+        "If a C++ project is highly efficient, then it is thoroughly tested.",
+        "If a C++ project is thoroughly tested, then it is well-designed and maintainable.",
+        "If a C++ project is not thoroughly tested, then it does not adhere to modern C++ standards.",
+        "If a C++ project is not highly efficient, then it is not portable.",
+        "Every C++ project is highly efficient."
+      ],
+      "question": "Do all C++ projects adhere to modern C++ standards?"
+    },
+    {
+      "record_id": 107,
+      "question_id": 0,
+      "group": "judgment:truth_judgment:rule_chain:closed",
+      "expected": "Uncertain",
+      "predicted": "Yes",
+      "top_probability": 0.383938,
+      "margin": 0.039004,
+      "failure_tags": [
+        "quantifier",
+        "rule_chain",
+        "false_entailment"
+      ],
+      "candidate_probabilities": {
+        "Yes": 0.383938,
+        "No": 0.344934,
+        "Uncertain": 0.271128
+      },
+      "premises": [
+        "All students attend lectures.",
+        "At least one student is part of a research group.",
+        "All students complete their assignments.",
+        "If at least one student is part of a research group, then all students attend lectures.",
+        "If all students attending lectures implies that all students complete their assignments, then all students complete their assignments.",
+        "At least one student participates in extracurricular activities.",
+        "If a student is part of a research group, then they also complete their assignments."
+      ],
+      "question": "Do all students participate in extracurricular activities?"
+    },
+    {
+      "record_id": 107,
+      "question_id": 1,
+      "group": "judgment:truth_judgment:rule_chain:closed",
+      "expected": "Uncertain",
+      "predicted": "Yes",
+      "top_probability": 0.420138,
+      "margin": 0.038833,
+      "failure_tags": [
+        "quantifier",
+        "rule_chain",
+        "false_entailment"
+      ],
+      "candidate_probabilities": {
+        "Yes": 0.420138,
+        "No": 0.381305,
+        "Uncertain": 0.198558
+      },
+      "premises": [
+        "All students attend lectures.",
+        "At least one student is part of a research group.",
+        "All students complete their assignments.",
+        "If at least one student is part of a research group, then all students attend lectures.",
+        "If all students attending lectures implies that all students complete their assignments, then all students complete their assignments.",
+        "At least one student participates in extracurricular activities.",
+        "If a student is part of a research group, then they also complete their assignments."
+      ],
+      "question": "Are all students part of a research group?"
+    },
+    {
+      "record_id": 111,
+      "question_id": 1,
+      "group": "judgment:truth_judgment:rule_chain:closed",
+      "expected": "No",
+      "predicted": "Yes",
+      "top_probability": 0.377725,
+      "margin": 0.005531,
+      "failure_tags": [
+        "quantifier",
+        "rule_chain",
+        "yes_no_flip"
+      ],
+      "candidate_probabilities": {
+        "Yes": 0.377725,
+        "No": 0.372194,
+        "Uncertain": 0.250082
+      },
+      "premises": [
+        "If a person is a researcher, then they are a professional.",
+        "If a person is a professional, then they are a scholar.",
+        "All individuals are university members.",
+        "If being a professional implies being a scholar, then all individuals are university members.",
+        "If all individuals are university members, then being a researcher implies being a professional.",
+        "If a person is a university member, then they are a professional.",
+        "There exists at least one university member."
+      ],
+      "question": "Based on the premises, is the following statement true?\nStatement: ∃x U(x)"
+    },
+    {
+      "record_id": 112,
+      "question_id": 1,
+      "group": "judgment:truth_judgment:negation:closed",
+      "expected": "Yes",
+      "predicted": "No",
+      "top_probability": 0.451993,
+      "margin": 0.129097,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "yes_no_flip"
+      ],
+      "candidate_probabilities": {
+        "No": 0.451993,
+        "Yes": 0.322896,
+        "Uncertain": 0.225111
+      },
+      "premises": [
+        "If a student does not complete their homework, they will not pass the course.",
+        "All students complete their homework.",
+        "All students attend class regularly.",
+        "If all students complete their homework, then all students complete their homework (tautology).",
+        "If not completing homework leads to failing the course, then all students attend class regularly.",
+        "If a student does not join a study group, they will not complete their homework.",
+        "There exists at least one student who is reviewing for the exam."
+      ],
+      "question": "Based on the above premises, is the following statement true?\nStatement: All students complete their homework."
+    },
+    {
+      "record_id": 116,
+      "question_id": 0,
+      "group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted": "Uncertain",
+      "top_probability": 0.47213,
+      "margin": 0.193588,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain"
+      ],
+      "candidate_probabilities": {
+        "Uncertain": 0.47213,
+        "Yes": 0.278542,
+        "No": 0.249328
+      },
+      "premises": [
+        "If a student studies, then they will understand the material.",
+        "If a student does not take the test, then they will not pass.",
+        "There exists at least one student who takes the test.",
+        "If not taking the test leads to not passing, then studying leads to understanding.",
+        "If not taking the test leads to not passing, then at least one student takes the test.",
+        "If a student does not review, then they will not study.",
+        "Every student must review."
+      ],
+      "question": "Do all students understand the material?"
+    },
+    {
+      "record_id": 119,
+      "question_id": 0,
+      "group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted": "Uncertain",
+      "top_probability": 0.394429,
+      "margin": 0.029877,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain"
+      ],
+      "candidate_probabilities": {
+        "Uncertain": 0.394429,
+        "Yes": 0.364552,
+        "No": 0.241019
+      },
+      "premises": [
+        "If a student is not studying, then they are not ready.",
+        "Every student is studying.",
+        "If at least one student is studying, then if a student is not studying, they are not ready.",
+        "If at least one student is studying, then the previous statement is true.",
+        "If a student is ready, then they are studying.",
+        "There exists at least one student who is questioning."
+      ],
+      "question": "Are all students ready?"
+    },
+    {
+      "record_id": 193,
+      "question_id": 1,
+      "group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted": "Yes",
+      "top_probability": 0.434473,
+      "margin": 0.003424,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "yes_no_flip"
+      ],
+      "candidate_probabilities": {
+        "Yes": 0.434473,
+        "No": 0.431049,
+        "Uncertain": 0.134478
+      },
+      "premises": [
+        "If x does not donate blood on the university campus, then x does not receive social work points for graduation.",
+        "If x is not involved in social work, then x does not donate blood on the university campus.",
+        "If x is eligible for receiving social work points, then x is involved in social work activities.",
+        "All students donate blood on the university campus.",
+        "If x participates in university activities, then x earns graduation points."
+      ],
+      "question": "Is it true that all students are involved in social work activities?"
+    },
+    {
+      "record_id": 232,
+      "question_id": 0,
+      "group": "mcq:choice_selection:negation:closed",
+      "expected": "A",
+      "predicted": "Uncertain",
+      "top_probability": 0.47522,
+      "margin": 0.123954,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "mcq_over_uncertain"
+      ],
+      "candidate_probabilities": {
+        "Uncertain": 0.47522,
+        "A": 0.351266,
+        "B": 0.096149,
+        "C": 0.069257,
+        "D": 0.00811
+      },
+      "premises": [
+        "Every student is studying.",
+        "If a student is attending tutorials, then they are understanding the material.",
+        "There exists at least one student who is understanding the material.",
+        "If (a student attending tutorials implies they are understanding the material), then every student is studying.",
+        "If there exists at least one student who is understanding the material, then (if a student is attending tutorials, they are understanding the material).",
+        "There exists at least one student who is preparing for an exam.",
+        "If a student is revising, then they are studying."
+      ],
+      "question": "Based on the above premises, which statement can be inferred?\nA. If there exists at least one student who is understanding the material, then if a student is attending tutorials, they are understanding the material, and every student is studying.\nB. If there exists at least one student who is understanding the material, then if a student is attending tutorials, they are understanding the material, but not every student is studying.\nC. If there exists at least one student who is understanding the material, then if a student is attending tutorials, they are understanding the material, and if a student is revising, then they are studying.\nD. If there exists at least one student who is understanding the material, then if a student is attending tutorials, they are understanding the material, but if a student is revising, then they are not studying."
+    },
+    {
+      "record_id": 232,
+      "question_id": 1,
+      "group": "judgment:truth_judgment:rule_chain:closed",
+      "expected": "Yes",
+      "predicted": "No",
+      "top_probability": 0.446092,
+      "margin": 0.002293,
+      "failure_tags": [
+        "quantifier",
+        "rule_chain",
+        "yes_no_flip"
+      ],
+      "candidate_probabilities": {
+        "No": 0.446092,
+        "Yes": 0.443799,
+        "Uncertain": 0.110109
+      },
+      "premises": [
+        "Every student is studying.",
+        "If a student is attending tutorials, then they are understanding the material.",
+        "There exists at least one student who is understanding the material.",
+        "If (a student attending tutorials implies they are understanding the material), then every student is studying.",
+        "If there exists at least one student who is understanding the material, then (if a student is attending tutorials, they are understanding the material).",
+        "There exists at least one student who is preparing for an exam.",
+        "If a student is revising, then they are studying."
+      ],
+      "question": "Based on the above premises, is the following statement true?\nStatement: If there exists at least one student who is understanding the material, then if a student is attending tutorials, they are understanding the material, and every student is studying."
+    },
+    {
+      "record_id": 274,
+      "question_id": 0,
+      "group": "mcq:choice_selection:negation:closed",
+      "expected": "C",
+      "predicted": "Uncertain",
+      "top_probability": 0.94545,
+      "margin": 0.923747,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "mcq_over_uncertain"
+      ],
+      "candidate_probabilities": {
+        "Uncertain": 0.94545,
+        "C": 0.021703,
+        "A": 0.012333,
+        "B": 0.011303,
+        "D": 0.009211
+      },
+      "premises": [
+        "If a student studies regularly, then they pass the exam.",
+        "All students receive an award.",
+        "If a student does not receive a recommendation letter, then they do not qualify for a scholarship.",
+        "There is at least one student who receives an award.",
+        "There is at least one student who studies regularly.",
+        "All students pass the exam.",
+        "All students study regularly.",
+        "If a student studies regularly, then they qualify for a scholarship.",
+        "If a student studies regularly, then they receive a recommendation letter.",
+        "There is at least one student who attends tutoring sessions.",
+        "If a student does not attend tutoring sessions, then they do not pass the exam.",
+        "If a student qualifies for a scholarship, then they pass the exam.",
+        "If all students pass the exam, then all students study regularly.",
+        "If qualifying for a scholarship implies passing the exam, then there is at least one student who studies regularly.",
+        "If qualifying for a scholarship implies passing the exam, then if a student studies regularly, they pass the exam.",
+        "If a student does not qualify for a scholarship, then they do not study regularly.",
+        "If a student attends tutoring sessions, then they qualify for a scholarship.",
+        "If a student qualifies for a scholarship, then they receive a recommendation letter.",
+        "If a student does not receive a recommendation letter, then they do not pass the exam."
+      ],
+      "question": "Based on the above premises, which statement can be inferred?\nA. There exists a student who does not study regularly.\nB. There exists a student who does not pass the exam.\nC. All students qualify for a scholarship.\nD. There exists a student who does not receive a recommendation letter."
+    },
+    {
+      "record_id": 309,
+      "question_id": 1,
+      "group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted": "Yes",
+      "top_probability": 0.402702,
+      "margin": 0.03916,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "numeric",
+        "yes_no_flip"
+      ],
+      "candidate_probabilities": {
+        "Yes": 0.402702,
+        "No": 0.363542,
+        "Uncertain": 0.233755
+      },
+      "premises": [
+        "If a Python script does not have error handling, then it does not handle exceptions.",
+        "If a Python script does not have error handling, then it does not produce reliable outputs.",
+        "If a Python program follows best practices, then it is optimized.",
+        "There exists at least one Python script with error handling.",
+        "All well-structured Python programs are optimized.",
+        "All Python projects adhere to best practices.",
+        "There exists at least one optimized Python program.",
+        "If a Python script does not have error handling, then it does not follow best practices.",
+        "If a Python program is optimized, then it has error handling.",
+        "If a Python script has error handling, then it handles exceptions.",
+        "If a Python script has error handling, then it follows best practices.",
+        "All Python scripts have error handling.",
+        "There exists at least one Python project that follows best practices.",
+        "All Python programs produce reliable outputs.",
+        "If a Python project follows best practices, then it produces reliable outputs.",
+        "If all well-structured Python programs are optimized, then a script without error handling does not handle exceptions.",
+        "If a Python program is not optimized, then it does not follow best practices.",
+        "If a Python script does not have error handling, then it does not follow PEP 8.",
+        "If a Python program produces reliable outputs, then it is optimized."
+      ],
+      "question": "Based on the above premises, is the statement true?\nStatement: ForAll(x, (PythonScript(x) → HasErrorHandling(x)))"
+    },
+    {
+      "record_id": 338,
+      "question_id": 0,
+      "group": "mcq:conclusion_selection:negation:closed",
+      "expected": "A",
+      "predicted": "Uncertain",
+      "top_probability": 0.816123,
+      "margin": 0.720202,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "mcq_over_uncertain"
+      ],
+      "candidate_probabilities": {
+        "Uncertain": 0.816123,
+        "C": 0.095921,
+        "A": 0.061366,
+        "B": 0.019623,
+        "D": 0.006967
+      },
+      "premises": [
+        "Completing the Thesis requirement ensures eligibility for a Research grant.",
+        "At least one student has been awarded a Scholarship.",
+        "Scholarship recipients must maintain a minimum GPA.",
+        "Students who fail to maintain the required GPA lose access to University housing.",
+        "All students are required to complete a Thesis.",
+        "Access to University housing is reserved for Scholarship recipients.",
+        "Students without housing cannot participate in the Quantum Computing lab.",
+        "Non-participation in the Quantum lab leads to Scholarship revocation.",
+        "A low GPA disqualifies students from the Quantum lab.",
+        "There is at least one student with a Research grant.",
+        "Research grant recipients are guaranteed University housing.",
+        "At least one student has fulfilled the Thesis requirement.",
+        "The policy linking GPA to housing implies Thesis completion guarantees a Research grant.",
+        "The existence of Scholarships enforces GPA requirements for lab participation.",
+        "Mandatory Thesis completion ensures at least one Research grant is awarded.",
+        "Every student receives a Research grant.",
+        "Students without housing cannot complete their Thesis.",
+        "All students are Scholarship recipients.",
+        "At least one student has access to University housing.",
+        "Some students maintain the required GPA.",
+        "Housing access requires maintaining the GPA.",
+        "Failure to complete the Thesis results in loss of housing."
+      ],
+      "question": "Based on the university policies, which conclusion is valid if we know that all students are required to complete a Thesis?\nA. 'Mandatory Thesis implies Research grants' is a tautology.\nB. The policy is contradictory.\nC. Mandatory Thesis completion ensures at least one Research grant.\nD. The policy is both true and false."
+    },
+    {
+      "record_id": 338,
+      "question_id": 1,
+      "group": "judgment:entailment_judgment:negation:closed",
+      "expected": "Yes",
+      "predicted": "No",
+      "top_probability": 0.867953,
+      "margin": 0.783607,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "yes_no_flip"
+      ],
+      "candidate_probabilities": {
+        "No": 0.867953,
+        "Yes": 0.084346,
+        "Uncertain": 0.047702
+      },
+      "premises": [
+        "Completing the Thesis requirement ensures eligibility for a Research grant.",
+        "At least one student has been awarded a Scholarship.",
+        "Scholarship recipients must maintain a minimum GPA.",
+        "Students who fail to maintain the required GPA lose access to University housing.",
+        "All students are required to complete a Thesis.",
+        "Access to University housing is reserved for Scholarship recipients.",
+        "Students without housing cannot participate in the Quantum Computing lab.",
+        "Non-participation in the Quantum lab leads to Scholarship revocation.",
+        "A low GPA disqualifies students from the Quantum lab.",
+        "There is at least one student with a Research grant.",
+        "Research grant recipients are guaranteed University housing.",
+        "At least one student has fulfilled the Thesis requirement.",
+        "The policy linking GPA to housing implies Thesis completion guarantees a Research grant.",
+        "The existence of Scholarships enforces GPA requirements for lab participation.",
+        "Mandatory Thesis completion ensures at least one Research grant is awarded.",
+        "Every student receives a Research grant.",
+        "Students without housing cannot complete their Thesis.",
+        "All students are Scholarship recipients.",
+        "At least one student has access to University housing.",
+        "Some students maintain the required GPA.",
+        "Housing access requires maintaining the GPA.",
+        "Failure to complete the Thesis results in loss of housing."
+      ],
+      "question": "If all students are required to complete a Thesis, does it follow that students with low GPAs lose housing access?"
+    },
+    {
+      "record_id": 357,
+      "question_id": 0,
+      "group": "mcq:choice_selection:negation:closed",
+      "expected": "A",
+      "predicted": "Uncertain",
+      "top_probability": 0.458054,
+      "margin": 0.086035,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "mcq_over_uncertain"
+      ],
+      "candidate_probabilities": {
+        "Uncertain": 0.458054,
+        "A": 0.372019,
+        "B": 0.160821,
+        "C": 0.004642,
+        "D": 0.004464
+      },
+      "premises": [
+        "All students are part of the University Honors program.",
+        "If a student completes the Thesis Writing course, then they have passed the Philosophy prerequisite.",
+        "All students are enrolled in Research Methods.",
+        "If a student is enrolled in Research Methods, then they have qualified for the Quantum Physics competition.",
+        "If a student completes the Thesis Writing course, then all students are enrolled in Research Methods.",
+        "If a student is not part of the University Honors program, then they have not qualified for the Quantum Physics competition.",
+        "There exists at least one student who has completed the Thesis Writing course."
+      ],
+      "question": "Which statement can be inferred?\nA. If a student doesn't complete the Thesis Writing course, then all students are enrolled in Research Methods.\nB. If a student completes the Thesis Writing course, then all students are enrolled in Research Methods.\nC. It is false that if a student completes the Thesis Writing course, then all students are enrolled in Research Methods.\nD. It is both true and false that if a student completes the Thesis Writing course, then all students are enrolled in Research Methods."
+    },
+    {
+      "record_id": 364,
+      "question_id": 1,
+      "group": "judgment:truth_judgment:negation:closed",
+      "expected": "No",
+      "predicted": "Uncertain",
+      "top_probability": 0.34449,
+      "margin": 0.006257,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain"
+      ],
+      "candidate_probabilities": {
+        "Uncertain": 0.34449,
+        "Yes": 0.338233,
+        "No": 0.317278
+      },
+      "premises": [
+        "If a student wants to understand the lesson, they must pay attention to the teacher's lecture.",
+        "If a student does not follow the school's rules, they are not considered exemplary.",
+        "Every student must do extra exercises at home.",
+        "There exists at least one student who wants to understand the lesson.",
+        "If a student wants to understand the lesson, then there exists at least one student who does extra exercises at home.",
+        "If a student follows the school's rules, they are considered exemplary.",
+        "If a student wants to understand the lesson, they are considered exemplary."
+      ],
+      "question": "Do all students who want to understand the lesson pay attention?"
+    },
+    {
+      "record_id": 366,
+      "question_id": 0,
+      "group": "mcq:choice_selection:negation:closed",
+      "expected": "A",
+      "predicted": "Uncertain",
+      "top_probability": 0.520015,
+      "margin": 0.069102,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "mcq_over_uncertain"
+      ],
+      "candidate_probabilities": {
+        "Uncertain": 0.520015,
+        "A": 0.450913,
+        "B": 0.013857,
+        "D": 0.008037,
+        "C": 0.007178
+      },
+      "premises": [
+        "If an AI system is transparent, then it can be audited.",
+        "If an AI system is not fair, then it is not trustworthy.",
+        "All AI systems in this study are fair.",
+        "All AI systems in this study are transparent.",
+        "If an AI system is fair, then it is trustworthy.",
+        "If fairness leads to trustworthiness, then all AI systems must be transparent.",
+        "If fairness leads to trustworthiness, then transparency implies auditability.",
+        "All AI systems comply with ethical regulations."
+      ],
+      "question": "Which statement can be inferred?\nA. If fairness leads to trustworthiness, then transparency implies auditability.\nB. It is false that if fairness leads to trustworthiness, then transparency implies auditability.\nC. It is both true and false that if fairness leads to trustworthiness, then transparency implies auditability.\nD. Not all AI systems are trustworthy."
+    },
+    {
+      "record_id": 370,
+      "question_id": 0,
+      "group": "mcq:choice_selection:negation:closed",
+      "expected": "C",
+      "predicted": "Uncertain",
+      "top_probability": 0.909311,
+      "margin": 0.875493,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "mcq_over_uncertain"
+      ],
+      "candidate_probabilities": {
+        "Uncertain": 0.909311,
+        "A": 0.033818,
+        "D": 0.01963,
+        "B": 0.019269,
+        "C": 0.017972
+      },
+      "premises": [
+        "If a student spends time learning, then they will grow.",
+        "If a person is not teaching, then they cannot learn.",
+        "Everyone is a student.",
+        "There exists a teacher.",
+        "If a person is not a student, then they cannot teach.",
+        "If not teaching leads to not learning, then there exists someone who is learning.",
+        "If everyone is a student, then having knowledge leads to receiving education.",
+        "There exists someone who has graduated.",
+        "If a person has graduated, then they have knowledge.",
+        "Learning leads to the development of critical thinking and problem-solving skills."
+      ],
+      "question": "Based on the above premises, which statement can be inferred?\nA. ∀x (L(x) → (C(x) ∧ P(x) ∧ G(x)))\nB. ∀x (L(x) → ¬G(x))\nC. ∀x (S(x) → ¬L(x))\nD. ∀x (K(x) → ¬E(x))"
+    },
+    {
+      "record_id": 376,
+      "question_id": 0,
+      "group": "mcq:choice_selection:negation:closed",
+      "expected": "A",
+      "predicted": "Uncertain",
+      "top_probability": 0.942792,
+      "margin": 0.919469,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "numeric",
+        "mcq_over_uncertain"
+      ],
+      "candidate_probabilities": {
+        "Uncertain": 0.942792,
+        "A": 0.023323,
+        "B": 0.013372,
+        "C": 0.011195,
+        "D": 0.009318
+      },
+      "premises": [
+        "For courses with lab components, a student is allowed to take the exam if their lab score is at least 4.0 out of 10 and all their component scores are greater than 0.",
+        "Kelvin’s lab score for CH3002 is at least 4.0 out of 10, and all his component scores for CH3002 are positive.",
+        "Students enrolled in multiple courses must submit a project unless the course is taught by Professor X.",
+        "CH3002 has three components: Lab, Quiz, and Homework, but Quiz scores are optional for students over 20 years old.",
+        "Kelvin is 19 years old and has a Homework score of 7.0 in CH3001, which is unrelated to CH3002.",
+        "Professor Y teaches CH3002, and all courses taught by Professor Y have an extra credit option.",
+        "Extra credit can increase a student’s total score by up to 2 points, but it doesn’t affect component scores.",
+        "Another student, Liam, has a Lab score of 3.5 in CH3002 and is not allowed to take the exam.",
+        "Courses with more than 50 students require a midterm, but CH3002 has only 45 students.",
+        "Kelvin submitted his CH3002 lab report on time, which is required for lab scores to be valid.",
+        "Late submissions reduce a lab score by 1.0, unless the student has a medical excuse.",
+        "Liam has a medical excuse for CH3001 but not for CH3002.",
+        "CH3002’s final exam is scheduled for December 15th, and all eligible students must attend."
+      ],
+      "question": "Based on the above premises, which statement can be inferred if we know that Kelvin submitted his CH3002 lab report on time?\nA. Kelvin is allowed to take the exam for CH3002.\nB. Liam is allowed to take the exam for CH3002.\nC. Kelvin must submit a project for CH3002.\nD. Kelvin’s Homework score in CH3001 affects his eligibility for CH3002’s exam."
+    },
+    {
+      "record_id": 376,
+      "question_id": 1,
+      "group": "judgment:entailment_judgment:negation:closed",
+      "expected": "Yes",
+      "predicted": "No",
+      "top_probability": 0.899094,
+      "margin": 0.835006,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "numeric",
+        "yes_no_flip"
+      ],
+      "candidate_probabilities": {
+        "No": 0.899094,
+        "Uncertain": 0.064088,
+        "Yes": 0.036818
+      },
+      "premises": [
+        "For courses with lab components, a student is allowed to take the exam if their lab score is at least 4.0 out of 10 and all their component scores are greater than 0.",
+        "Kelvin’s lab score for CH3002 is at least 4.0 out of 10, and all his component scores for CH3002 are positive.",
+        "Students enrolled in multiple courses must submit a project unless the course is taught by Professor X.",
+        "CH3002 has three components: Lab, Quiz, and Homework, but Quiz scores are optional for students over 20 years old.",
+        "Kelvin is 19 years old and has a Homework score of 7.0 in CH3001, which is unrelated to CH3002.",
+        "Professor Y teaches CH3002, and all courses taught by Professor Y have an extra credit option.",
+        "Extra credit can increase a student’s total score by up to 2 points, but it doesn’t affect component scores.",
+        "Another student, Liam, has a Lab score of 3.5 in CH3002 and is not allowed to take the exam.",
+        "Courses with more than 50 students require a midterm, but CH3002 has only 45 students.",
+        "Kelvin submitted his CH3002 lab report on time, which is required for lab scores to be valid.",
+        "Late submissions reduce a lab score by 1.0, unless the student has a medical excuse.",
+        "Liam has a medical excuse for CH3001 but not for CH3002.",
+        "CH3002’s final exam is scheduled for December 15th, and all eligible students must attend."
+      ],
+      "question": "If Kelvin submitted his CH3002 lab report on time, does it follow that Kelvin is allowed to take the exam for CH3002?"
+    },
+    {
+      "record_id": 379,
+      "question_id": 0,
+      "group": "mcq:choice_selection:negation:closed",
+      "expected": "B",
+      "predicted": "A",
+      "top_probability": 0.862995,
+      "margin": 0.810956,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "numeric"
+      ],
+      "candidate_probabilities": {
+        "A": 0.862995,
+        "B": 0.052039,
+        "Uncertain": 0.04157,
+        "C": 0.026267,
+        "D": 0.01713
+      },
+      "premises": [
+        "Students must accumulate at least 65% of the total credits of their training program to be eligible for an internship.",
+        "The training program has a total of 120 credits.",
+        "Hà has accumulated 80 credits in the training program.",
+        "Students must submit an internship application by June 1st to be considered.",
+        "Hà submitted her application on May 15th.",
+        "The training program includes 30 credits of elective courses, but only 20 credits are counted toward the internship requirement.",
+        "Another student, Vinh, has accumulated 75 credits and is also in the training program.",
+        "Students with a GPA below 2.5 are required to take a remedial course before interning.",
+        "Hà’s GPA is 3.2, and she has no remedial requirements.",
+        "Internships are offered in two cycles: summer and fall, with summer priority for seniors.",
+        "Hà is a junior and applying for a fall internship.",
+        "The program advisor must approve all internship applications, and Hà’s was approved.",
+        "Vinh missed the application deadline and accumulated only 10 elective credits."
+      ],
+      "question": "Based on the above premises, which statement can be inferred if we know that Hà has accumulated 80 credits in the training program?\nA. Hà is eligible for an internship because she has accumulated 80 credits.\nB. Hà is not eligible for an internship due to insufficient credits.\nC. Hà must take remedial courses before applying for the internship.\nD. Hà’s internship application was submitted after June 1st."
+    },
+    {
+      "record_id": 390,
+      "question_id": 0,
+      "group": "judgment:truth_judgment:negation:closed",
+      "expected": "Yes",
+      "predicted": "No",
+      "top_probability": 0.498827,
+      "margin": 0.146845,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "yes_no_flip"
+      ],
+      "candidate_probabilities": {
+        "No": 0.498827,
+        "Yes": 0.351982,
+        "Uncertain": 0.149192
+      },
+      "premises": [
+        "All students belong to the university.",
+        "If a student does not participate in research, then they do not belong to the university.",
+        "If a student does not participate in research, then they are not taking the thesis course.",
+        "All students are registered.",
+        "If a student belongs to the university, then they are taking the thesis course.",
+        "All students receive a scholarship.",
+        "All students are taking the thesis course."
+      ],
+      "question": "Do all students participate in research?"
+    },
+    {
+      "record_id": 395,
+      "question_id": 1,
+      "group": "mcq:choice_selection:negation:closed",
+      "expected": "Uncertain",
+      "predicted": "A",
+      "top_probability": 0.47957,
+      "margin": 0.218668,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "false_entailment"
+      ],
+      "candidate_probabilities": {
+        "A": 0.47957,
+        "Uncertain": 0.260902,
+        "B": 0.246365,
+        "C": 0.007121,
+        "D": 0.006042
+      },
+      "premises": [
+        "If a student gives a seminar, then they receive a recommendation.",
+        "If a student participates in a project, then they earn a certification.",
+        "All students complete the training module.",
+        "If a student does not earn a certification, then they did not participate in a project.",
+        "All students earn a certification.",
+        "If a student participates in a project, then they give a seminar."
+      ],
+      "question": "Which activities do all students perform?\nA. Completing training module, participating in project, giving seminar, earning certification.\nB. Completing training module, writing paper, giving seminar.\nC. Participating in project, earning certification, writing paper.\nD. Completing training module, giving seminar, receiving recommendation."
+    },
+    {
+      "record_id": 398,
+      "question_id": 0,
+      "group": "judgment:truth_judgment:negation:closed",
+      "expected": "Yes",
+      "predicted": "No",
+      "top_probability": 0.368239,
+      "margin": 0.02893,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "yes_no_flip"
+      ],
+      "candidate_probabilities": {
+        "No": 0.368239,
+        "Yes": 0.339309,
+        "Uncertain": 0.292452
+      },
+      "premises": [
+        "All students are eligible to conduct research.",
+        "If a student has completed the training session, then they have submitted a research proposal.",
+        "If a student has not submitted a research proposal, then they are not eligible to conduct research.",
+        "If a student has not completed the training session, then they are not eligible to conduct research.",
+        "If a student has completed the training session, then they have presented at a seminar.",
+        "All students meet the qualification criteria."
+      ],
+      "question": "Do all students complete the training session?"
+    },
+    {
+      "record_id": 407,
+      "question_id": 0,
+      "group": "mcq:choice_selection:negation:closed",
+      "expected": "A",
+      "predicted": "Uncertain",
+      "top_probability": 0.686895,
+      "margin": 0.4805,
+      "failure_tags": [
+        "quantifier",
+        "negation",
+        "rule_chain",
+        "mcq_over_uncertain"
+      ],
+      "candidate_probabilities": {
+        "Uncertain": 0.686895,
+        "A": 0.206395,
+        "B": 0.055882,
+        "C": 0.02625,
+        "D": 0.024577
+      },
+      "premises": [
+        "There is at least one electric vehicle that is eco-friendly.",
+        "If an electric vehicle has a long range, then it supports fast charging.",
+        "There is at least one electric vehicle that supports fast charging.",
+        "Every electric vehicle has advanced safety features.",
+        "Every electric vehicle supports fast charging.",
+        "If an electric vehicle supports fast charging, then it has a long range.",
+        "If an electric vehicle is not affordable, then it does not support fast charging.",
+        "There is at least one electric vehicle that is affordable.",
+        "Every electric vehicle has a long range.",
+        "If an electric vehicle is not eco-friendly, then it is not energy efficient.",
+        "If an electric vehicle does not have advanced safety features, then it is not affordable.",
+        "There is at least one electric vehicle that has a long range.",
+        "If an electric vehicle does not support fast charging, then it is not eco-friendly.",
+        "If an electric vehicle is eco-friendly, then it is affordable.",
+        "If an electric vehicle is not eco-friendly, then it is not affordable.",
+        "If an electric vehicle is not energy efficient, then it does not have a long range.",
+        "If there is at least one electric vehicle with a long range, then if it is not affordable, it does not support fast charging.",
+        "If every electric vehicle has a long range, then if it is not energy efficient, then it does not have a long range.",
+        "If there is at least one electric vehicle that supports fast charging, then if it lacks advanced safety features, it is not affordable.",
+        "If every electric vehicle has a long range, then every electric vehicle supports fast charging.",
+        "If the fact that every electric vehicle having a long range implies that if it is not energy efficient then it does not have a long range, then if an electric vehicle supports fast charging, it has a long range.",
+        "If every electric vehicle having a long range implies that if it is not energy efficient then it does not have a long range, then if there is at least one electric vehicle with a long range, it follows that if it is not affordable, then it does not support fast charging.",
+        "If an electric vehicle has advanced safety features, then it is energy efficient.",
+        "If an electric vehicle is affordable, then it has advanced safety features.",
+        "If an electric vehicle does not support fast charging, then it is not affordable.",
+        "If an electric vehicle is eco-friendly, then it has a long range.",
+        "There is at least one electric vehicle that is energy efficient.",
+        "If an electric vehicle is energy efficient, then it has advanced safety features.",
+        "If an electric vehicle has a long range, then it is energy efficient."
+      ],
+      "question": "Based on the above premises, which statement can be inferred?\nA. ∀x (E(x) → (A(x) ∧ N(x)))\nB. ∃x (¬F(x) ∧ L(x))\nC. ∀x (¬S(x) → A(x))\nD. ∀x (N(x) → ¬E(x))"
+    }
+  ]
+}

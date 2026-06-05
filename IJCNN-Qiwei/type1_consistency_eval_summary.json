@@ -1,0 +1,115 @@
+{
+  "metric_definition": "consistency = 1 - total_variation_distance(answer_distribution, trace_explanation_distribution)",
+  "train_questions": 642,
+  "validation_questions": 162,
+  "train_question_group_counts": {
+    "judgment:entailment_judgment:fact_match:closed": 6,
+    "judgment:entailment_judgment:negation:closed": 32,
+    "judgment:entailment_judgment:rule_chain:closed": 5,
+    "judgment:qualification_judgment:fact_match:closed": 9,
+    "judgment:qualification_judgment:negation:closed": 39,
+    "judgment:qualification_judgment:rule_chain:closed": 13,
+    "judgment:truth_judgment:fact_match:closed": 14,
+    "judgment:truth_judgment:negation:closed": 207,
+    "judgment:truth_judgment:rule_chain:closed": 43,
+    "mcq:choice_selection:fact_match:closed": 6,
+    "mcq:choice_selection:negation:closed": 229,
+    "mcq:choice_selection:negation:uncertainty_gap": 4,
+    "mcq:choice_selection:rule_chain:closed": 11,
+    "mcq:conclusion_selection:fact_match:closed": 1,
+    "mcq:conclusion_selection:negation:closed": 21,
+    "mcq:strongest_conclusion:fact_match:closed": 1,
+    "mcq:strongest_conclusion:negation:closed": 1
+  },
+  "validation_question_group_counts": {
+    "judgment:entailment_judgment:fact_match:closed": 2,
+    "judgment:entailment_judgment:negation:closed": 9,
+    "judgment:entailment_judgment:rule_chain:closed": 2,
+    "judgment:qualification_judgment:fact_match:closed": 3,
+    "judgment:qualification_judgment:negation:closed": 10,
+    "judgment:qualification_judgment:rule_chain:closed": 2,
+    "judgment:truth_judgment:fact_match:closed": 5,
+    "judgment:truth_judgment:negation:closed": 47,
+    "judgment:truth_judgment:rule_chain:closed": 11,
+    "mcq:choice_selection:fact_match:closed": 3,
+    "mcq:choice_selection:negation:closed": 58,
+    "mcq:choice_selection:negation:uncertainty_gap": 1,
+    "mcq:choice_selection:rule_chain:closed": 4,
+    "mcq:conclusion_selection:fact_match:closed": 1,
+    "mcq:conclusion_selection:negation:closed": 2,
+    "mcq:conclusion_selection:rule_chain:closed": 2
+  },
+  "retained_model": {
+    "accuracy": 0.796296,
+    "consistency": 0.471304,
+    "top_explanation_agreement": 0.228395,
+    "mean_explanation_top_probability": 0.255916,
+    "accuracy_by_group": {
+      "judgment:entailment_judgment:fact_match:closed": {
+        "questions": 2,
+        "accuracy": 1.0
+      },
+      "judgment:entailment_judgment:negation:closed": {
+        "questions": 9,
+        "accuracy": 0.777778
+      },
+      "judgment:entailment_judgment:rule_chain:closed": {
+        "questions": 2,
+        "accuracy": 1.0
+      },
+      "judgment:qualification_judgment:fact_match:closed": {
+        "questions": 3,
+        "accuracy": 0.333333
+      },
+      "judgment:qualification_judgment:negation:closed": {
+        "questions": 10,
+        "accuracy": 1.0
+      },
+      "judgment:qualification_judgment:rule_chain:closed": {
+        "questions": 2,
+        "accuracy": 0.5
+      },
+      "judgment:truth_judgment:fact_match:closed": {
+        "questions": 5,
+        "accuracy": 1.0
+      },
+      "judgment:truth_judgment:negation:closed": {
+        "questions": 47,
+        "accuracy": 0.787234
+      },
+      "judgment:truth_judgment:rule_chain:closed": {
+        "questions": 11,
+        "accuracy": 0.636364
+      },
+      "mcq:choice_selection:fact_match:closed": {
+        "questions": 3,
+        "accuracy": 0.666667
+      },
+      "mcq:choice_selection:negation:closed": {
+        "questions": 58,
+        "accuracy": 0.810345
+      },
+      "mcq:choice_selection:negation:uncertainty_gap": {
+        "questions": 1,
+        "accuracy": 1.0
+      },
+      "mcq:choice_selection:rule_chain:closed": {
+        "questions": 4,
+        "accuracy": 1.0
+      },
+      "mcq:conclusion_selection:fact_match:closed": {
+        "questions": 1,
+        "accuracy": 0.0
+      },
+      "mcq:conclusion_selection:negation:closed": {
+        "questions": 2,
+        "accuracy": 0.5
+      },
+      "mcq:conclusion_selection:rule_chain:closed": {
+        "questions": 2,
+        "accuracy": 1.0
+      }
+    }
+  },
+  "elapsed_seconds": 59.292
+}
