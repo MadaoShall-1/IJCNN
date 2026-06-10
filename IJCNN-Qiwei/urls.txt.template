@@ -1,0 +1,2 @@
+prediction_url=https://<your-public-host>/predict
+vllm_models_url=https://<your-vllm-host>/v1/models

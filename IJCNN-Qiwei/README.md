@@ -303,3 +303,100 @@ zero_candidate_tv_delta: 0.317907
 trace_to_candidate_grad_ratio: 0.116348
 interpretation: Trace/SSM information affects predictions.
 ```
+
+## EXACT 2026 API Interface
+
+The competition requires one public prediction endpoint for both Type 1 and
+Type 2:
+
+```text
+POST /predict
+Content-Type: application/json
+```
+
+The implemented interface is:
+
+```text
+run_exact_api.py
+ijcnn_qiwei/exact_api.py
+```
+
+The endpoint does not fuse Type 1 and Type 2 and does not infer the type. The
+test request already provides the `type` field, so the API uses hard routing:
+
+```text
+type == "type1" -> Type 1 logic solver prompt
+type == "type2" -> Type 2 physics solver prompt
+```
+
+It accepts the unified EXACT schema:
+
+```json
+{
+  "query_id": "T1_0001",
+  "type": "type1",
+  "query": "Is Student A eligible for graduation?",
+  "premises": ["A student with at least 120 credits is eligible.", "Student A has completed 118 credits."],
+  "options": ["Yes", "No", "Uncertain"]
+}
+```
+
+It always returns a JSON list with one result object:
+
+```json
+[
+  {
+    "query_id": "T1_0001",
+    "answer": "No",
+    "unit": "",
+    "explanation": "Student A has 118 credits, below the 120 required, so not eligible.",
+    "premises_used": [0, 1],
+    "reasoning": {
+      "type": "fol",
+      "steps": ["118 < 120", "not eligible"]
+    }
+  }
+]
+```
+
+Run the vLLM model server first:
+
+```bash
+export VLLM_MODEL=Qwen/Qwen2.5-7B-Instruct
+bash scripts/vllm_serve_example.sh
+```
+
+The committee verifies the model through:
+
+```text
+GET http://<your-vllm-host>:8000/v1/models
+```
+
+Then run the EXACT prediction API:
+
+```bash
+export VLLM_BASE_URL=http://127.0.0.1:8000/v1
+export VLLM_MODEL=Qwen/Qwen2.5-7B-Instruct
+uvicorn run_exact_api:app --host 0.0.0.0 --port 8080
+```
+
+Your submitted `urls.txt` should contain:
+
+```text
+prediction_url=https://<your-public-host>/predict
+vllm_models_url=https://<your-vllm-host>/v1/models
+```
+
+Local contract check:
+
+```bash
+python3 scripts/check_exact_api_contract.py
+```
+
+Submission helper files:
+
+```text
+urls.txt.template
+notation_mapping.csv
+.env.example
+```
