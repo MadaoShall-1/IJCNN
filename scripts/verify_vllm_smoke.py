@@ -1,4 +1,4 @@
-"""Smoke test for the DSPy/vLLM Type 2 path.
+r"""Smoke test for the DSPy/vLLM Type 2 path.
 
 Requires an OpenAI-compatible vLLM server on http://localhost:8000/v1.
 The Docker command used during development was:
@@ -6,8 +6,8 @@ The Docker command used during development was:
 docker run -d --name exact-vllm --gpus all -p 8000:8000 ^
   -v "%USERPROFILE%\.cache\huggingface:/root/.cache/huggingface" ^
   vllm/vllm-openai:latest ^
-  --model Qwen/Qwen2.5-0.5B-Instruct ^
-  --served-model-name qwen2.5-0.5b ^
+  --model Qwen/Qwen3-8B ^
+  --served-model-name qwen3-8b ^
   --max-model-len 1024 ^
   --gpu-memory-utilization 0.65
 """
@@ -25,7 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-os.environ.setdefault("DSPY_MODEL", "openai/qwen2.5-0.5b")
+os.environ.setdefault("DSPY_MODEL", "openai/qwen3-8b")
 os.environ.setdefault("DSPY_API_BASE", "http://localhost:8000/v1")
 os.environ.setdefault("DSPY_API_KEY", "EMPTY")
 

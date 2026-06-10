@@ -5,14 +5,23 @@ This Dockerfile serves an OpenAI-compatible vLLM endpoint for DSPy.
 Default model:
 
 ```text
-Qwen/Qwen2.5-0.5B-Instruct
-served as qwen2.5-0.5b
+Qwen/Qwen3-8B
+served as qwen3-8b
 ```
 
 Start:
 
 ```powershell
 docker compose -f docker-compose.vllm.yml up --build -d
+```
+
+If another container or app already uses host port `8000`, publish vLLM on a
+different host port:
+
+```powershell
+$env:VLLM_HOST_PORT = "8002"
+docker compose -f docker-compose.vllm.yml up --build -d
+$env:DSPY_API_BASE = "http://localhost:8002/v1"
 ```
 
 Check:
@@ -25,7 +34,7 @@ python scripts\verify_vllm_smoke.py
 Configure the app to use it:
 
 ```powershell
-$env:DSPY_MODEL = "openai/qwen2.5-0.5b"
+$env:DSPY_MODEL = "openai/qwen3-8b"
 $env:DSPY_API_BASE = "http://localhost:8000/v1"
 $env:DSPY_API_KEY = "EMPTY"
 ```
@@ -49,5 +58,5 @@ docker compose -f docker-compose.vllm.yml up --build -d
 ```
 
 On the 8 GB RTX 4070 Laptop GPU tested here, `Qwen3-8B-AWQ` loaded most of
-the weights but failed to allocate KV cache, so the stable local smoke-test
-model remains `Qwen2.5-0.5B-Instruct`.
+the weights but failed to allocate KV cache. The default is now `Qwen3-8B`,
+but you may need a larger GPU or a more aggressive quantized/runtime setup.

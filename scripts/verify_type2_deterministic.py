@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import sys
 import unittest
+import csv
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -11,7 +12,9 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from parser.schemas import ProblemParseObject
+from parser.main import parse_problem
 from type2.schemas import DiagnosisObject, FormulaEntry, FormulaSet, StepObject, TraceObject
+from type2.stage1 import FormulaRetriever
 from type2.stage2 import DeterministicSolveTrace, init_vso, map_formula_vars_to_vso
 from type2.stage4 import diagnose_trace
 from type2.stage5 import repair_trace
@@ -69,6 +72,79 @@ def power_vi_entry() -> FormulaEntry:
 
 
 class DeterministicSolveTraceTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.dataset_rows = {}
+        dataset_path = ROOT / "Dataset" / "Physics_Problems_Text_Only_test.csv"
+        if dataset_path.exists():
+            with dataset_path.open("r", encoding="utf-8-sig", newline="") as handle:
+                for row in csv.DictReader(handle):
+                    cls.dataset_rows[str(row.get("id"))] = row
+
+    def _solve_dataset_row(self, dataset_id: str) -> dict:
+        row = self.dataset_rows[dataset_id]
+        parse_dict = parse_problem(row["question"], use_llm_fallback=False)
+        parse_obj = ProblemParseObject(
+            problem_text=parse_dict.get("problem_text", ""),
+            domains=parse_dict.get("domains", []),
+            sub_domains=parse_dict.get("sub_domains", []),
+            domain_confidence=parse_dict.get("domain_confidence", 0.0),
+            known_quantities=parse_dict.get("known_quantities", {}),
+            conditions=parse_dict.get("conditions", []),
+            relations=parse_dict.get("relations", []),
+            unknown_quantity=parse_dict.get("unknown_quantity"),
+            unknown_unit=parse_dict.get("unknown_unit"),
+            step_plan=parse_dict.get("step_plan", []),
+            plan_confidence=parse_dict.get("plan_confidence", 0.0),
+            parser_warnings=parse_dict.get("parser_warnings", []),
+            vso=parse_dict.get("vso", {}),
+            metadata=parse_dict.get("metadata", {}),
+        )
+        formula_sets = FormulaRetriever().retrieve(parse_obj, beam_n=3)
+        trace = DeterministicSolveTrace().forward(
+            parse_obj=parse_obj,
+            formula_set=formula_sets[0],
+            problem_id=dataset_id,
+            step_retry_limit=1,
+            trace_budget=10,
+        )
+        response = build_response(trace, parse_obj, formula_sets[0])
+        return {
+            "parse": parse_dict,
+            "trace": trace,
+            "response": response,
+        }
+
+    def assertDatasetAnswerAlmost(self, dataset_id: str, expected: float, rel_tol: float = 1e-3) -> None:
+        solved = self._solve_dataset_row(dataset_id)
+        self.assertEqual(solved["trace"].trace_status, "PASS", solved["response"])
+        answer = extract_final_answer(solved["trace"])
+        self.assertTrue(answer, solved["response"])
+        value = float(answer.split()[0])
+        self.assertLessEqual(abs(value - expected), max(abs(expected) * rel_tol, rel_tol))
+
+    def test_ld207_right_isosceles_coulomb_vector(self) -> None:
+        self.assertDatasetAnswerAlmost("LD207", 7.955, rel_tol=2e-3)
+
+    def test_ld243_right_isosceles_coulomb_vector(self) -> None:
+        self.assertDatasetAnswerAlmost("LD243", 0.5091e-3, rel_tol=2e-3)
+
+    def test_ld269_right_isosceles_coulomb_vector(self) -> None:
+        self.assertDatasetAnswerAlmost("LD269", 3.62e-3, rel_tol=2e-3)
+
+    def test_ld087_square_field_cancellation_symbolic(self) -> None:
+        solved = self._solve_dataset_row("LD087")
+        self.assertEqual(solved["parse"]["unknown_quantity"], "q_B")
+        self.assertEqual(solved["trace"].trace_status, "PASS", solved["response"])
+        answer = extract_final_answer(solved["trace"]).replace(" ", "")
+        self.assertIn("-2*sqrt(2)*q", answer)
+
+    def test_ch372_quality_factor_disambiguation(self) -> None:
+        self.assertDatasetAnswerAlmost("CH372", 1.0, rel_tol=1e-3)
+
+    def test_ch373_quality_factor_disambiguation(self) -> None:
+        self.assertDatasetAnswerAlmost("CH373", 1.77, rel_tol=2e-3)
+
     def test_solves_ohms_law_current_without_llm(self) -> None:
         parse_obj = ProblemParseObject(
             problem_text="A 10 ohm resistor is connected to a 5 V battery. Find current.",

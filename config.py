@@ -111,6 +111,8 @@ class SolverConfig:
     dspy_model: str = field(default_factory=lambda: os.getenv("DSPY_MODEL", ""))
     dspy_api_base: str = field(default_factory=lambda: os.getenv("DSPY_API_BASE", ""))
     dspy_api_key: str = field(default_factory=lambda: os.getenv("DSPY_API_KEY", "EMPTY"))
+    dspy_max_tokens: int = field(default_factory=lambda: int(os.getenv("DSPY_MAX_TOKENS", "256")))
+    dspy_temperature: float = field(default_factory=lambda: float(os.getenv("DSPY_TEMPERATURE", "0")))
 
     # ────────────────────────────────────────────────────────────────────────
     # Factory helpers

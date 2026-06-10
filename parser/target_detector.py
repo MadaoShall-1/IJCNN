@@ -47,6 +47,8 @@ TARGETS = [
     ("energy stored in capacitor", "U_cap", "J"),
     ("energy stored in magnetic field", "U_B", "J"),
     ("energy stored in electric field", "U_E", "J"),
+    ("magnetic field energy density", "u_B", "J/m^3"),
+    ("magnetic energy density", "u_B", "J/m^3"),
     ("magnetic field energy", "U_B", "J"),
     ("electric field energy", "U_E", "J"),
     ("wc", "U_E", "J"),
@@ -112,6 +114,7 @@ TARGETS = [
     ("voltage across resistor", "U_R", "V"),
     ("induced emf", "emf", "V"),
     ("electromotive force", "emf", "V"),
+    ("magnetic flux density", "B", "T"),
     ("electric field strength", "E", "V/m"),
     ("electric field", "E", "V/m"),
     ("coulomb force", "F_e", "N"),
@@ -139,6 +142,7 @@ TARGETS = [
     ("electric charge", "q", "C"),
     ("equivalent capacitance", "C_eq", "F"),
     ("capacitance", "C_cap", "F"),
+    ("total magnetic flux linkage", "Phi_link", "Wb"),
     ("magnetic flux", "Phi_B", "Wb"),
     ("total flux linkage", "Phi_link", "Wb"),
     ("flux linkage", "Phi_link", "Wb"),
@@ -265,6 +269,23 @@ SOFT_CUE_BACK_WINDOW = 60  # characters before the soft-cue match to keep
 def detect_target(problem_text: str) -> Tuple[Optional[str], Optional[str]]:
     """Detect the unknown quantity symbol and expected unit from question phrases."""
     lowered = problem_text.lower()
+    if "dielectric breakdown" in lowered and "maximum charge" in lowered:
+        return "Q_max", "C"
+    if "capacitor" in lowered and (
+        "energy after" in lowered
+        or "remaining energy" in lowered
+        or "new total energy" in lowered
+        or "total energy of the system" in lowered
+    ):
+        return "U_total", "J"
+    if "test charge" in lowered and "perpendicular bisector" in lowered and ("two charges" in lowered or "two point charges" in lowered):
+        return "F_e", "N"
+    if re.search(r"\bwhat\s+is\s+the\s+charge\s+stored\b|\bcharge\s+stored\s+on\s+a\s+.*capacitor\b", lowered, re.IGNORECASE):
+        return "Q", "C"
+    if "capacitor" in lowered and re.search(r"\b(?:calculate|find|determine)\s+the\s+energy\s+and\s+the\s+charge\b", lowered, re.IGNORECASE):
+        return "energy_charge_pair", None
+    if re.search(r"\b(?:calculate|find|determine|what\s+is)\s+the\s+capacitance\b", lowered, re.IGNORECASE):
+        return "C_cap", "F"
     # Strategy:
     #   1) Strong cues (find/calculate/what is/...): start search_text at the
     #      FIRST occurrence so a single problem with one cue selects it
@@ -297,6 +318,64 @@ def detect_target(problem_text: str) -> Tuple[Optional[str], Optional[str]]:
             else:
                 return None, None
 
+    if (
+        re.search(r"\b(?:mean|average)(?:\s+\w+)?\b", search_text)
+        and re.search(r"\b(?:mean|average)\s+absolute\s+error\b", search_text)
+    ):
+        return "mean_abs_error_pair", None
+    if "absolute error" in search_text and (
+        "relative error" in search_text
+        or "relative percentage error" in search_text
+        or "percentage relative error" in search_text
+        or "percent relative error" in search_text
+    ):
+        return "abs_rel_error_pair", None
+    if "relative error in the power" in search_text or "relative error of the power" in search_text:
+        return "percent_error", "%"
+    if (
+        "relative error" in search_text
+        or "relative uncertainty" in search_text
+        or "percent relative error" in search_text
+        or "percentage relative error" in search_text
+    ) and not re.search(r"\b(?:fraction|decimal)\b", search_text):
+        return "percent_error", "%"
+    if "angle between" in search_text:
+        return "theta", "degree"
+    if "magnitude and direction" in search_text and "resultant force" in search_text:
+        return "F_net", "N"
+    if "net electric field" in search_text and "zero" in search_text and "distance from" in search_text:
+        return "d", "m"
+    if re.search(r"\b(?:determine|calculate|find)\s+the\s+mass\b", search_text):
+        return "m", "kg"
+    if (
+        ("electric field" in search_text and "zero" in search_text)
+        and (
+            "distance from" in search_text
+            or re.search(r"\bcalculate\s+(?:am|bm)\b", search_text)
+            or re.search(r"\bdistance\s+(?:am|bm)\b", search_text)
+        )
+    ):
+        return "d", "m"
+    if (
+        "square abcd" in lowered
+        and "electric field" in lowered
+        and re.search(r"\bwhat\s+charge\b|\bcharge\s+must\s+be\s+placed\b", search_text)
+    ):
+        return "q_B", None
+    if re.search(
+        r"\b(?:calculate|determine|find|what\s+is)\s+(?:the\s+)?(?:sign\s+and\s+)?magnitude\s+of\s+(?:the\s+)?charge\s+q\b",
+        search_text,
+        re.IGNORECASE,
+    ):
+        return "Q", "C"
+    if "electric field" in search_text and "energy" not in search_text and "density" not in search_text:
+        return "E", "V/m"
+
+    if re.search(r"\b(?:(?:by|to)\s+)?what\s+multiple\b", search_text, re.IGNORECASE) and re.search(r"(?:omega|ω)\s*_?0|ω0", lowered, re.IGNORECASE):
+        return "k", None
+    if re.search(r"\bby\s+what\s+factor\b", search_text, re.IGNORECASE) and re.search(r"(?:omega|ω)\s*_?0|ω0", lowered, re.IGNORECASE):
+        return "k", None
+
     if "how many times" in search_text or "times greater" in search_text or "times smaller" in search_text:
         return "ratio", None
 
@@ -314,8 +393,69 @@ def detect_target(problem_text: str) -> Tuple[Optional[str], Optional[str]]:
     if re.search(r"\bhow\s+fast\b", search_text, re.IGNORECASE):
         return "v", "m/s"
 
+    if re.search(r"\b(?:initial\s+)?(?:z_l|zl)\b", search_text, re.IGNORECASE):
+        return "X_L", "Ω"
+    if re.search(r"\b(?:initial\s+)?(?:z_c|zc)\b", search_text, re.IGNORECASE):
+        return "X_C", "Ω"
+
     if re.search(r"\bfind\s+C['′]|\bwhat\s+is\s+C['′]", problem_text, re.IGNORECASE):
         return "C_after", "F"
+
+    if (
+        "square abcd" in lowered
+        and "electric field" in lowered
+        and re.search(r"\bwhat\s+charge\b|\bcharge\s+must\s+be\s+placed\b", search_text)
+    ):
+        return "q_B", None
+
+    if re.search(r"\bvoltage\s+across\s+(?:the\s+)?(?:resistor|r)\b", search_text, re.IGNORECASE):
+        return "U_R", "V"
+
+    if re.search(r"\b(?:determine|find|calculate|what\s+is|value\s+of)\s+q\b", search_text):
+        if re.search(r"\bl\s*=", lowered) and re.search(r"\bc\s*=", lowered) and re.search(r"\br\s*=", lowered):
+            return "Q_factor", None
+
+    if "magnetic field energy density" in search_text or "magnetic energy density" in search_text:
+        return "u_B", "J/m^3"
+    if "electric field energy density" in search_text or "electric energy density" in search_text:
+        return "u_E", "J/m^3"
+
+    if re.search(r"\b(?:rms|effective)\s+current\b", search_text, re.IGNORECASE):
+        return "I_rms", "A"
+
+    if re.search(r"\b(?:rms|effective)?\s*voltage\s+across\s+(?:segment|section)?\s*mb\b", search_text, re.IGNORECASE):
+        return "U_MB", "V"
+
+    if (
+        "lc circuit" in lowered
+        and "percentage" in search_text
+        and ("maximum current" in search_text or "peak current" in search_text)
+    ):
+        return "I_over_Imax_percent", "%"
+    if (
+        ("lc circuit" in lowered or "oscillat" in lowered)
+        and "percentage" in search_text
+        and ("energy in the capacitor" in search_text or "w_c" in search_text or "electric field energy" in search_text)
+    ):
+        return "electric_energy_fraction_percent", "%"
+
+    if re.search(r"\bcos\s*phi\b|\bcos\s*φ\b|\bcosφ\b", search_text, re.IGNORECASE):
+        return "power_factor", None
+    if re.search(r"\bto\s+what\s+multiple\b|\bwhat\s+multiple\b", search_text, re.IGNORECASE) and "resonance" in lowered:
+        return "k", None
+
+    if re.search(
+        r"\b(?:what|which)\s+inductor\b|\binductance\s+[lL]\s+is\s+required\b|\bwhat\s+inductance\b|\binductor\s+[lL]\s+should\s+be\s+chosen\b",
+        search_text,
+        re.IGNORECASE,
+    ):
+        return "L_ind", "H"
+    if re.search(
+        r"\b(?:what|which)\s+capacitor\b|\bwhat\s+capacitor\s+value\b|\bcapacitor\s+value\s+is\s+needed\b|\bwhat\s+capacitance\b",
+        search_text,
+        re.IGNORECASE,
+    ):
+        return "C_cap", "F"
 
     # Domain-aware short-circuits: when the question itself names "P / C / L"
     # etc., return the dimensionally-correct target. Order matters; more
@@ -346,7 +486,7 @@ def detect_target(problem_text: str) -> Tuple[Optional[str], Optional[str]]:
     # is clearly geometric (radius/distance), the loop further down still
     # picks the right phrase first.
     find_symbol = re.search(
-        r"\b(?:find|calculate|determine|compute|what\s+is|what\s+are|"
+        r"\b(?:find|calculate|determine|compute|what\s+is|what\s+are|what\s+was|"
         r"what\s+value\s+of)\s+"
         r"(q\d*|r\d*|i\d*|v\d*|u_l|u_c|u_r|ul|uc|ur|u\d*|l\d*|c\d*|f_?0?|"
         r"z_l|z_c|zl|zc|z|b|e|p|t|cos[\u03c6\u03d5]?|cosphi)\b",

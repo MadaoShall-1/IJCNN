@@ -2,7 +2,7 @@
 
 An AI-powered educational solver that handles two types of queries:
 - **Type 1**: Logic-based reasoning (premises + yes/no, MCQ, or open-ended questions)
-- **Type 2**: Physics calculation (multi-stage pipeline: parse → formula retrieval → symbolic solve → diagnose → repair → response)
+- **Type 2**: Deterministic-first physics calculation (parse -> formula retrieval -> deterministic symbolic solve -> step verification -> optional diagnosis / guarded repair -> final-answer validation -> response)
 
 ## Project Structure
 
@@ -51,17 +51,17 @@ pip install -r requirements.txt
 
 ### 2. Configure LLM
 
-The system uses [DSPy](https://github.com/stanfordnlp/dspy) for LLM calls. Set environment variables before starting:
+The system uses [DSPy](https://github.com/stanfordnlp/dspy) for optional local LLM fallback calls. The final vLLM default is `qwen3-8b-awq` on host port `8002`. Set environment variables before starting:
+
+```powershell
+$env:DSPY_MODEL="openai/qwen3-8b-awq"
+$env:DSPY_API_BASE="http://localhost:8002/v1"
+$env:DSPY_API_KEY="EMPTY"
+```
 
 ```bash
-# Windows PowerShell
-$env:DSPY_MODEL = "openai/qwen2.5-0.5b"
-$env:DSPY_API_BASE = "http://localhost:8000/v1"
-$env:DSPY_API_KEY = "EMPTY"
-
-# Linux / macOS
-export DSPY_MODEL="openai/qwen2.5-0.5b"
-export DSPY_API_BASE="http://localhost:8000/v1"
+export DSPY_MODEL="openai/qwen3-8b-awq"
+export DSPY_API_BASE="http://localhost:8002/v1"
 export DSPY_API_KEY="EMPTY"
 ```
 
@@ -70,10 +70,18 @@ Or edit `config.py` directly via `SolverConfig`.
 ### 3. (Optional) Local model
 
 If using a local model, start the model server first, then point `DSPY_API_BASE` to it.
-The included vLLM Docker setup serves `Qwen/Qwen2.5-0.5B-Instruct`:
+The included vLLM Docker setup serves `Qwen/Qwen3-8B-AWQ` as `qwen3-8b-awq`:
 
 ```bash
 docker compose -f docker-compose.vllm.yml up --build -d
+```
+
+The final default host port is `8002`. If that port is already in use, choose another host port before starting the container and update `DSPY_API_BASE` to match:
+
+```powershell
+$env:VLLM_HOST_PORT="8002"
+docker compose -f docker-compose.vllm.yml up --build -d
+$env:DSPY_API_BASE="http://localhost:8002/v1"
 ```
 
 Then verify:
@@ -104,10 +112,15 @@ curl http://localhost:8080/health
 curl -X POST http://localhost:8080/predict \
   -H "Content-Type: application/json" \
   -d '{
-    "question": "A resistor of 10 ohm is connected to a 5V battery. Find the current.",
-    "id": "P001"
+    "query_id": "T2_0001",
+    "type": "type2",
+    "query": "A resistor of 10 ohm is connected to a 5V battery. Find the current.",
+    "premises": [],
+    "options": []
   }'
 ```
+
+`/predict` returns a JSON list, even for one query: `[{"query_id": "...", "answer": "...", "unit": "...", "explanation": "...", "premises_used": [], "reasoning": ...}]`.
 
 ### Type 1 — Logic problem
 
@@ -115,35 +128,130 @@ curl -X POST http://localhost:8080/predict \
 curl -X POST http://localhost:8080/predict \
   -H "Content-Type: application/json" \
   -d '{
-    "query_type": "type1",
-    "premises-NL": ["All birds can fly", "A penguin is a bird"],
-    "questions": [{"text": "Can a penguin fly?", "format": "yes_no"}]
+    "query_id": "T1_0001",
+    "type": "type1",
+    "query": "Can a penguin fly?",
+    "premises": ["All birds can fly", "A penguin is a bird"],
+    "options": ["Yes", "No", "Uncertain"]
   }'
 ```
 
 ### Batch processing (Stage 0 parser)
 
+Split the dataset into 80% training and 20% testing:
+
 ```bash
-python scripts/run_stage0_on_dataset.py \
+python scripts/split_dataset.py \
   --dataset Dataset/Physics_Problems_Text_Only.csv \
-  --output-dir outputs/stage0_with_llm_v2 \
-  --use-llm-fallback \
-  --limit 100
+  --train-ratio 0.8 \
+  --seed 42
 ```
+
+Then run the full API pipeline on the training split:
+
+```bash
+python scripts/run_api_on_dataset.py \
+  --dataset Dataset/Physics_Problems_Text_Only_train.csv \
+  --output-dir outputs/api_train \
+  --query-type type2 \
+  --type2-solver-mode deterministic
+```
+
+Run the same full API pipeline on the held-out test split:
+
+```bash
+python scripts/run_api_on_dataset.py \
+  --dataset Dataset/Physics_Problems_Text_Only_test.csv \
+  --output-dir outputs/api_test \
+  --query-type type2 \
+  --type2-solver-mode deterministic
+```
+
+Analyze full pipeline errors after a run:
+
+```bash
+python scripts/analyze_api_results.py \
+  --results outputs/api_test/api_results.jsonl \
+  --output-dir outputs/api_test/error_analysis
+```
+
+## Final Type2 Results
+
+Confirmed final evaluation:
+
+| Metric | Result |
+|--------|--------|
+| Dataset | `Dataset\Physics_Problems_Text_Only.csv` |
+| Output directory | `outputs\api_full_current_repaired3_20260610` |
+| Total rows | 1352 |
+| Pipeline completion / trace PASS rate | 1345 / 1352 = 99.48% |
+| Objective answer accuracy | 1251 / 1282 = 97.58% |
+| Numeric accuracy | 1223 / 1254 = 97.53% |
+| Symbolic formula accuracy | 25 / 25 = 100% |
+| Choice accuracy | 3 / 3 = 100% |
+| Concept text accuracy | 68 / 70 = 97.14% |
+
+Trace PASS means the pipeline completed and produced an internally valid trace. It is not the same as final answer correctness; final accuracy is measured by the objective answer evaluator.
+
+## Final Submission Stabilization
+
+Print the final PowerShell regression commands:
+
+```powershell
+python scripts/final_submission_check.py
+```
+
+Run syntax checks:
+
+```powershell
+python scripts/final_submission_check.py --run-syntax
+```
+
+Run the final full hybrid Type2 evaluation:
+
+```powershell
+$env:DSPY_MODEL="openai/qwen3-8b-awq"
+$env:DSPY_API_BASE="http://localhost:8002/v1"
+$env:DSPY_API_KEY="EMPTY"
+
+python scripts\run_api_on_dataset.py `
+  --dataset Dataset\Physics_Problems_Text_Only.csv `
+  --output-dir outputs\final_full_hybrid `
+  --query-type type2 `
+  --type2-solver-mode hybrid
+```
+
+After a final full run, generate error and false-pass analysis:
+
+```powershell
+python scripts\analyze_api_results.py `
+  --results outputs\final_full_hybrid\api_results.jsonl `
+  --output-dir outputs\final_full_hybrid\error_analysis `
+  --sample-limit 50
+```
+
+See `FINAL_REPORT.md`, `FINAL_REPORT_SUMMARY.md`, and `FINAL_SUBMISSION_CHECKLIST.md` for the final reports, submission checklist, current metrics, reproduction commands, and model-compliance notes.
+
+## Model Compliance
+
+The final hybrid configuration uses local vLLM with `qwen3-8b-awq`, an open-source model within the <=8B constraint. No GPT, Claude, Gemini, or other closed hosted models are required for the final Type2 run.
 
 ## Pipeline Overview
 
-### Type 2 (Physics) — 6 Stages
+### Type 2 (Physics)
 
 ```
 Question text
-  → Stage 0: Parse (extract quantities, target, domain)
-  → Stage 1: Formula retrieval (beam search, n=3)
-  → Stage 2: Symbolic solve (SymPy substitution)
-  → Stage 4: Diagnose (if solve failed)
-  → Stage 5: Repair (formula substitution retry)
-  → Stage 6: Response assembly (answer + explanation)
+  -> parse
+  -> formula retrieval
+  -> deterministic symbolic solve
+  -> step verification
+  -> optional diagnosis / guarded repair
+  -> final-answer validation
+  -> response
 ```
+
+Type2 is deterministic-first. In hybrid mode, the system calls the local vLLM-backed DSPy fallback only when deterministic solving fails or needs guarded repair. Correct deterministic traces are not sent to the LLM.
 
 ### Type 1 (Logic)
 

@@ -5,7 +5,7 @@ or Type 2 (physics calculation) request, per design §3.1.
 
 Detection priority
 ------------------
-1. Explicit ``query_type`` field in the payload  (``"type1"`` or ``"type2"``).
+1. Explicit ``type`` or ``query_type`` field in the payload  (``"type1"`` or ``"type2"``).
 2. Presence of a ``premises-NL`` or ``premises`` field → ``"type1"``.
 3. Default → ``"type2"``.
 
@@ -32,7 +32,7 @@ def detect_query_type(payload: Dict[str, Any]) -> QueryType:
         detect_query_type({"question": "Calculate ..."})        # → "type2"
         detect_query_type({})                                   # → "type2"
     """
-    explicit: str = str(payload.get("query_type", "")).lower().strip()
+    explicit: str = str(payload.get("type") or payload.get("query_type") or "").lower().strip()
     if explicit in _VALID_TYPES:
         return explicit  # type: ignore[return-value]
 

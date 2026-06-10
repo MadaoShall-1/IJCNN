@@ -164,6 +164,7 @@ def parse_type1(payload: Dict[str, Any]) -> Type1ParseObject:
     raw_questions: List[str] = _coerce_list(
         payload.get("questions") or payload.get("question") or payload.get("query")
     )
+    options = _coerce_list(payload.get("options"))
 
     warnings: List[str] = []
     if not premises_nl:
@@ -175,7 +176,14 @@ def parse_type1(payload: Dict[str, Any]) -> Type1ParseObject:
 
     parsed_questions: List[Type1Question] = []
     for q_text in raw_questions:
+        q_text = _append_options(q_text, options)
         fmt, mcq_options = detect_question_format(q_text)
+        if options:
+            if {option.strip().lower() for option in options} == {"yes", "no", "uncertain"}:
+                fmt = QuestionFormat.YES_NO_UNCERTAIN
+            else:
+                fmt = QuestionFormat.MCQ
+                mcq_options = {chr(ord("A") + i): option for i, option in enumerate(options)}
         route = detect_solver_route(premises_nl, fmt)
         parsed_questions.append(
             Type1Question(
@@ -214,6 +222,18 @@ def _coerce_list(value: Optional[Any]) -> List[str]:
     if isinstance(value, list):
         return [str(item) for item in value if item is not None and str(item).strip()]
     return [str(value)]
+
+
+def _append_options(question_text: str, options: List[str]) -> str:
+    """Include official choice options in the text seen by the reasoner."""
+    if not options:
+        return question_text
+    if all(option in question_text for option in options):
+        return question_text
+    option_text = " ".join(
+        f"{chr(ord('A') + i)}. {option}" for i, option in enumerate(options)
+    )
+    return f"{question_text}\nOptions: {option_text}"
 
 
 def _count_by(items: List[Any], key_fn: Any) -> Dict[str, int]:

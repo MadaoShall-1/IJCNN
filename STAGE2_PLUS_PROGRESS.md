@@ -44,8 +44,8 @@ Added a reproducible local vLLM setup:
 Default local model:
 
 ```text
-Qwen/Qwen2.5-0.5B-Instruct
-served as qwen2.5-0.5b
+Qwen/Qwen3-8B
+served as qwen3-8b
 ```
 
 Start command:
@@ -57,7 +57,7 @@ docker compose -f docker-compose.vllm.yml up --build -d
 DSPy environment:
 
 ```powershell
-$env:DSPY_MODEL = "openai/qwen2.5-0.5b"
+$env:DSPY_MODEL = "openai/qwen3-8b"
 $env:DSPY_API_BASE = "http://localhost:8000/v1"
 $env:DSPY_API_KEY = "EMPTY"
 ```
@@ -121,7 +121,8 @@ trace_status: PASS
 - second attempt loaded most weights with `awq_marlin`, `--enforce-eager`, and `max_model_len=1024`
 - final failure was KV cache allocation: no available memory for cache blocks
 
-Current stable local vLLM target remains `qwen2.5-0.5b`.
+The requested local vLLM target is now `qwen3-8b`, but it may require more
+than 8 GB VRAM.
 
 ## Current Status
 

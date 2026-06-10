@@ -77,6 +77,10 @@ UNIT_DEFINITIONS: Dict[str, Dict[str, object]] = {
     "m/s²": {"unit_symbol": "m/s^2", "unit_name": "meter per second squared", "dimension": "acceleration", "to_si": 1.0},
     "m/sÂ²": {"unit_symbol": "m/s^2", "unit_name": "meter per second squared", "dimension": "acceleration", "to_si": 1.0},
     "N": {"unit_symbol": "N", "unit_name": "newton", "dimension": "force", "to_si": 1.0},
+    "kN": {"unit_symbol": "kN", "unit_name": "kilonewton", "dimension": "force", "to_si": 1000.0},
+    "mN": {"unit_symbol": "mN", "unit_name": "millinewton", "dimension": "force", "to_si": 0.001},
+    "uN": {"unit_symbol": "uN", "unit_name": "micronewton", "dimension": "force", "to_si": 1e-6},
+    "Î¼N": {"unit_symbol": "Î¼N", "unit_name": "micronewton", "dimension": "force", "to_si": 1e-6},
     "J": {"unit_symbol": "J", "unit_name": "joule", "dimension": "energy", "to_si": 1.0},
     "mJ": {"unit_symbol": "mJ", "unit_name": "millijoule", "dimension": "energy", "to_si": 0.001},
     "μJ": {"unit_symbol": "μJ", "unit_name": "microjoule", "dimension": "energy", "to_si": 1e-6},
@@ -193,7 +197,6 @@ def canonicalize_unit(unit_symbol: str) -> str:
         .replace("×", "*")
         .replace("Â²", "^2")
         .replace("²", "^2")
-        .replace("?", "^2")
         .replace("·", "*")
         .replace("Â·", "*")
         .replace("ohms", "ohm")

@@ -96,6 +96,11 @@ CANONICAL_MAP: List[Tuple[str, str]] = [
     (r"^[Cc]_[a-zA-Z0-9]+$", "capacitance"),
     (r"^[Vv]_[a-zA-Z0-9]+$", "electric_potential"),
     (r"^[Ii]_[a-zA-Z0-9]+$", "electric_current"),
+    (r"^[Ll]_(ind|coil|solenoid)$", "inductance"),
+    (r"^[Uu]_(cap|c|b|e|total|after)?$", "energy"),
+    (r"^[Ee]_(energy|field)?$", "energy"),
+    (r"^[Ff]_(net|e|\d+|[a-zA-Z0-9]+)$", "force"),
+    (r"^[Qq]_(net|\d+|[a-zA-Z0-9]+)$", "electric_charge"),
     # ── Single-character conventional physics symbols ─────────────────────
     (r"^[Vv]$",   "electric_potential"),
     (r"^[Ii]$",   "electric_current"),
@@ -121,6 +126,74 @@ _COMPILED_CANONICAL_MAP: List[Tuple[re.Pattern, str]] = [
     (re.compile(pat, re.IGNORECASE), canonical)
     for pat, canonical in CANONICAL_MAP
 ]
+
+EXACT_CANONICAL_MAP: Dict[str, str] = {
+    "f": "frequency",
+    "f0": "frequency",
+    "f_res": "frequency",
+    "omega": "angular_frequency",
+    "omega0": "angular_frequency",
+    "omega_0": "angular_frequency",
+    "ω": "angular_frequency",
+    "L": "inductance",
+    "L_ind": "inductance",
+    "C": "capacitance",
+    "C_cap": "capacitance",
+    "U": "energy",
+    "U_cap": "energy",
+    "U_B": "energy",
+    "U_E": "energy",
+    "U_total": "energy",
+    "U_L": "electric_potential",
+    "U_C": "electric_potential",
+    "E_energy": "energy",
+    "I": "electric_current",
+    "V": "electric_potential",
+    "R": "resistance",
+    "F": "force",
+    "F_net": "force",
+    "E": "electric_field",
+    "X_L": "reactance",
+    "X_C": "reactance",
+    "Z": "impedance",
+    "q": "electric_charge",
+    "Q": "electric_charge",
+    "Q_factor": "quality_factor",
+    "k": "dimensionless",
+    "epsilon_r": "permittivity",
+    "kappa": "permittivity",
+    "κ": "permittivity",
+}
+
+
+def _should_disambiguate_Q_as_quality_factor(
+    parse_obj: "ProblemParseObject",
+) -> bool:
+    """Return True when target Q should be interpreted as RLC quality factor."""
+    target = str(parse_obj.unknown_quantity or "")
+    if target not in ("Q", "q", "Q_factor"):
+        return False
+    known = parse_obj.known_quantities
+    has_L = any(
+        qty.get("dimension") == "inductance" or name in ("L", "L_ind")
+        for name, qty in known.items()
+    )
+    has_C = any(
+        qty.get("dimension") == "capacitance" or name in ("C", "C_cap")
+        for name, qty in known.items()
+    )
+    has_R = any(
+        qty.get("dimension") == "resistance" or name in ("R",)
+        for name, qty in known.items()
+    )
+    if not (has_L and has_C and has_R):
+        return False
+    q_lower = parse_obj.problem_text.lower()
+    rlc_cues = any(kw in q_lower for kw in [
+        "rlc", "quality factor", "coil", "inductor", "resonan", "ac circuit",
+        "series circuit", "capacitor and resistor",
+    ])
+    return rlc_cues or (has_L and has_C and has_R)
 
 
 def _tokens(text: object) -> Set[str]:
@@ -184,6 +257,8 @@ def canonicalize_variable(name: str) -> Optional[str]:
 
     Returns the canonical name string, or ``None`` if no regex matches.
     """
+    if name in EXACT_CANONICAL_MAP:
+        return EXACT_CANONICAL_MAP[name]
     for pattern, canonical in _COMPILED_CANONICAL_MAP:
         if pattern.match(name):
             return canonical
@@ -368,6 +443,22 @@ class FormulaRetriever:
 
             step_candidates[step_id] = sorted(good, key=lambda x: -x[1])
 
+        # ── Domain constraint overrides ─────────────────────────────────
+        # Q factor disambiguation: boost quality-factor formulas when L/C/R present
+        if _should_disambiguate_Q_as_quality_factor(parse_obj):
+            for step_id, candidates in step_candidates.items():
+                boosted = []
+                for entry, score in candidates:
+                    entry_text = f"{entry.formula} {entry.subtopic} {entry.text}".lower()
+                    if "quality" in entry_text or "q_factor" in entry_text:
+                        boosted.append((entry, score + 5.0))
+                    elif "charge" in entry_text or "coulomb" in entry_text:
+                        boosted.append((entry, max(0.0, score - 2.0)))
+                    else:
+                        boosted.append((entry, score))
+                step_candidates[step_id] = sorted(boosted, key=lambda x: -x[1])
+                logger.info("Q factor disambiguation applied for step %s", step_id)
+
         step_ids = [s["step_id"] for s in formula_steps]
         return self._build_formula_sets(step_candidates, step_ids, beam_n)
 
@@ -390,6 +481,10 @@ class FormulaRetriever:
 
         domain_set = {d.lower() for d in domains}
         sub_set = {s.lower() for s in sub_domains}
+        if "electricity" in domain_set:
+            domain_set.update({"circuits", "electrostatics"})
+        if "ac_circuit" in sub_set or "rlc_resonance" in sub_set or "resonance" in sub_set:
+            domain_set.add("circuits")
 
         filtered = [
             e for e in self._library
@@ -426,9 +521,15 @@ class FormulaRetriever:
         template_tokens = _tokens(template_name)
         goal_tokens = _tokens(step_goal)
         scored = []
+        direct_output_vars = {
+            str(v)
+            for v in direct_vars
+            if str(v) in formula_name.split("=", 1)[0]
+        }
         for entry in candidates:
             entry_canonicals = set(entry.canonical_quantity_names)
             entry_symbols = set(entry.target_quantities)
+            entry_var_symbols = set(entry.variables.keys())
 
             # ── 1. Name match: template_name vs entry subtopic / id ──────
             # Strongest signal — parser already identified the formula type.
@@ -470,6 +571,15 @@ class FormulaRetriever:
             direct_overlap = len(entry_symbols & direct_vars)
             direct_score = 0.2 * direct_overlap / max(len(direct_vars), 1)
 
+            output_score = 0.0
+            if direct_output_vars:
+                for output_var in direct_output_vars:
+                    output_canon = canonicalize_variable(output_var)
+                    if output_var in entry_symbols or output_var in entry_var_symbols:
+                        output_score = max(output_score, 2.0)
+                    elif output_canon and output_canon in entry_canonicals:
+                        output_score = max(output_score, 1.0)
+
             # ── Combined score ───────────────────────────────────────────
             # Name/formula identity signals dominate; canonical overlap is
             # the tiebreaker for entries the parser didn't name exactly.
@@ -483,6 +593,7 @@ class FormulaRetriever:
                 + 0.2 * goal_score
                 + (0.5 if has_strong_signal else 1.0) * canonical_score
                 + direct_score
+                + output_score
             )
 
             if score > 0:

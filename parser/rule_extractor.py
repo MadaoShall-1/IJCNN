@@ -38,10 +38,16 @@ def _parse_number(raw: str) -> float:
         .replace(" ", "")
         .replace("{", "")
         .replace("}", "")
+        .replace("−", "-")
+        .replace("×", "*")
         .replace("×", "*")
         .replace("·", "*")
         .translate(SUPERSCRIPT_DIGITS)
     )
+    if re.search(r"[⁰¹²³⁴⁵⁶⁷⁸⁹⁻]", raw):
+        compact = re.sub(r"10\s*([⁻-]?[⁰¹²³⁴⁵⁶⁷⁸⁹]+)", r"10^\1", raw.strip().replace(" ", ""))
+        compact = compact.replace("{", "").replace("}", "").replace("×", "*").replace("·", "*").translate(SUPERSCRIPT_DIGITS)
+    compact = compact.replace("−", "-").replace("×", "*")
     compact = re.sub(r"(?<=\d)\.10(?=\^|[-⁻])", "*10", compact)
     sci_match = re.fullmatch(r"([-+]?(?:\d+\.\d+|\d+|\.\d+))(?:×|Ã—|x|\*)10(?:\^?([-+]?\d+))", compact)
     if sci_match:
@@ -69,6 +75,22 @@ def _parse_number(raw: str) -> float:
 
 def _clean_var(name: str) -> str:
     return name.replace("_", "").strip()
+
+
+def _normalize_unicode_text(text: str) -> str:
+    """Normalize common UTF-8 physics glyph variants before regex matching."""
+    return (
+        text
+        .replace("µ", "μ")
+        .replace("Ω", "Ω")
+        .replace("−", "-")
+        .replace("–", "-")
+        .replace("—", "-")
+        .replace("½", "1/2")
+        .replace("⅓", "1/3")
+        .replace("¼", "1/4")
+        .replace("¾", "3/4")
+    )
 
 
 def _relation(
@@ -185,7 +207,7 @@ def _base_variable_for_dimension(dimension: str, context: str) -> str:
             return "I_rms"
         return "I"
     if dimension == "resistance":
-        label = re.search(r"\b(R\d+|R)\s*=?\s*$", context)
+        label = re.search(r"\b(X_L|X_C|Z|R\d+|R)\s*=?\s*$", context)
         return label.group(1) if label else "R"
     if dimension == "capacitance":
         return "C_cap"
@@ -262,17 +284,55 @@ def extract_quantities(problem_text: str) -> Dict[str, Dict[str, object]]:
     """Extract explicit numeric quantities and infer variable names from local context."""
     if not isinstance(problem_text, str):
         raise TypeError("problem_text must be a string")
+    problem_text = _normalize_unicode_text(problem_text)
 
     quantities: Dict[str, Dict[str, object]] = {}
     counts: Dict[str, int] = defaultdict(int)
+    occupied_spans: List[tuple[int, int]] = []
+
+    sqrt_unit_pattern = re.compile(
+        rf"(?<![A-Za-z_])(?P<coef>{NUMBER_RE})\s*(?:√|sqrt\s*)\(?\s*(?P<radicand>{NUMBER_RE})\s*\)?\s*\(?(?P<unit>{UNIT_RE})\)?(?![A-Za-z/])",
+        re.IGNORECASE,
+    )
+    for match in sqrt_unit_pattern.finditer(problem_text):
+        raw_unit = match.group("unit")
+        context = _window(problem_text, match.start(), match.end())
+        info = get_unit_info(raw_unit, context)
+        if not info:
+            continue
+        value = _parse_number(match.group("coef")) * (_parse_number(match.group("radicand")) ** 0.5)
+        normalized_value, normalized_unit = normalize_quantity(value, raw_unit, context)
+        dimension = str(info["dimension"])
+        local_context = problem_text[max(0, match.start() - 30): min(len(problem_text), match.end() + 30)]
+        before_value = problem_text[max(0, match.start() - 30): match.start()]
+        naming_context = before_value if dimension in {"charge", "resistance"} else local_context
+        base_name = _base_variable_for_dimension(dimension, naming_context)
+        name = _dedupe_name(base_name, counts, quantities)
+        quantities[name] = {
+            "value": value,
+            "unit_symbol": str(info["unit_symbol"]),
+            "unit_name": str(info["unit_name"]),
+            "dimension": str(info["dimension"]),
+            "source_text": match.group(0).strip(),
+            "normalized_value": normalized_value,
+            "normalized_unit_symbol": normalized_unit,
+        }
+        occupied_spans.append(match.span())
+
     pattern = re.compile(
         rf"(?<![A-Za-z_])(?P<value>{NUMBER_RE})\s*\(?(?P<unit>{UNIT_RE})\)?(?![A-Za-z/])",
         re.IGNORECASE,
     )
 
     for match in pattern.finditer(problem_text):
+        if any(match.start() < end and match.end() > start for start, end in occupied_spans):
+            continue
         raw_value = match.group("value")
         raw_unit = match.group("unit")
+        split_prefix = re.match(r"^(?P<number>.+?)\s*(?P<prefix>[μµuUnNpPmMkK])$", raw_value.strip())
+        if split_prefix and raw_unit in {"F", "C", "J", "A", "H", "W", "V", "Hz"}:
+            raw_value = split_prefix.group("number")
+            raw_unit = f"{split_prefix.group('prefix')}{raw_unit}"
         context = _window(problem_text, match.start(), match.end())
         info = get_unit_info(raw_unit, context)
         if not info:
@@ -305,6 +365,7 @@ def extract_quantities(problem_text: str) -> Dict[str, Dict[str, object]]:
 
 def extract_relations(problem_text: str) -> List[Dict[str, object]]:
     """Extract symbolic relations such as ratios, uncertainties, ranges, and coordinates."""
+    problem_text = _normalize_unicode_text(problem_text)
     relations: List[Dict[str, object]] = []
     relations.extend(_extract_function_relations(problem_text))
     relations.extend(_extract_symbolic_ratio_relations(problem_text))
@@ -383,7 +444,31 @@ def _extract_dimensionless_quantities(
     counts: Dict[str, int],
 ) -> None:
     """Extract common dimensionless constants/factors that affect templates."""
+    turn_density_patterns = [
+        rf"(?:number of turns per meter|turns per meter|turn density)\s*(?:is|=)?\s*(?P<value>{NUMBER_RE})(?!\s*(?:m|meter|turn))",
+    ]
+    if re.search(r"\bsolenoid\b", problem_text, re.IGNORECASE):
+        turn_density_patterns.append(rf"\bn\s*(?:is|=)\s*(?P<value>{NUMBER_RE})(?!\s*(?:m|meter|turn))")
+    for pattern in turn_density_patterns:
+        for match in re.finditer(pattern, problem_text, re.IGNORECASE):
+            if "n_turns_per_meter" in quantities:
+                break
+            try:
+                value = _parse_number(match.group("value"))
+            except ValueError:
+                continue
+            quantities["n_turns_per_meter"] = {
+                "value": value,
+                "unit_symbol": "turn/m",
+                "unit_name": "turns per meter",
+                "dimension": "turn_density",
+                "source_text": match.group(0).strip(),
+                "normalized_value": value,
+                "normalized_unit_symbol": "turn/m",
+            }
+
     rules = [
+        ("epsilon_r", rf"(?:dielectric constant|relative permittivity)[^.]{{0,80}}?(?:=|is)\s*(?:[^\d\s=]{{0,4}}\s*=)?\s*(?P<value>{NUMBER_RE})"),
         ("epsilon_r", rf"(?:dielectric constant|relative permittivity|epsilon_r|kappa|κ|Îµ_r|ε_r|Îµ|ε)(?:\s+(?!determine\b|calculate\b|find\b)[A-Za-z]+){{0,8}}\s*(?:=|is|of)?\s*(?P<value>{NUMBER_RE})"),
         ("factor", rf"(?:factor of|by a factor of|increases by|decreases by)\s*(?P<value>{NUMBER_RE})"),
         ("k", rf"\bk\s*=\s*(?P<value>{NUMBER_RE})"),
@@ -439,7 +524,7 @@ def _extract_error_measurements(
         "actual": "true_value",
     }
     pattern = re.compile(
-        rf"\b(?P<label>measured|true|accepted|actual)(?:\s+\w+){{0,3}}\s+(?:is|was|=)\s*(?P<value>{NUMBER_RE})\s*\(?(?P<unit>{UNIT_RE})?\)?",
+        rf"\b(?P<label>measured|true|accepted|actual)(?:\s+\w+){{0,3}}\s+(?:is|was|of|as|=)\s*(?P<value>{NUMBER_RE})\s*\(?(?P<unit>{UNIT_RE})?\)?",
         re.IGNORECASE,
     )
     for match in pattern.finditer(problem_text):
@@ -635,6 +720,19 @@ def _extract_word_ratio_relations(problem_text: str) -> List[Dict[str, object]]:
         match = re.search(pattern, lowered)
         if match:
             relations.append(_relation("ratio", left, right, problem_text[match.start():match.end()], factor=factor))
+    optional_symbol = r"(?:\s*\([^)]*\))?"
+    energy_aliases = [
+        (rf"(?:electric(?:\s+field)?\s+energy|energy\s+in\s+the\s+capacitor|w_c){optional_symbol}\s+(?:is|equals|=)\s+(?P<value>{{num}})\s+of\s+(?:the\s+)?total\s+energy", "U_E"),
+        (rf"(?:magnetic(?:\s+field)?\s+energy|energy\s+in\s+the\s+inductor|w_l){optional_symbol}\s+(?:is|equals|=)\s+(?P<value>{{num}})\s+of\s+(?:the\s+)?total\s+energy", "U_B"),
+    ]
+    for pattern_template, left in energy_aliases:
+        pattern = pattern_template.format(num=NUMBER_RE)
+        for match in re.finditer(pattern, lowered):
+            relations.append(_relation("ratio", left, "U_total", problem_text[match.start():match.end()], factor=_parse_number(match.group("value"))))
+    equal_match = re.search(r"(?:electric(?:\s+field)?\s+energy|w_c)\s+equals\s+(?:the\s+)?(?:magnetic(?:\s+field)?\s+energy|w_l)", lowered)
+    if equal_match:
+        relations.append(_relation("ratio", "U_E", "U_total", problem_text[equal_match.start():equal_match.end()], factor=0.5))
+        relations.append(_relation("ratio", "U_B", "U_total", problem_text[equal_match.start():equal_match.end()], factor=0.5))
     generic = re.search(r"\b(twice|three times|half) the (charge|resistance|total energy|maximum charge)\b", lowered)
     if generic:
         factor = {"twice": 2.0, "three times": 3.0, "half": 0.5}[generic.group(1)]
@@ -711,6 +809,14 @@ def _extract_uncertainty_relations(problem_text: str) -> List[Dict[str, object]]
     relations: List[Dict[str, object]] = []
     patterns = [
         re.compile(
+            rf"\b(?P<label>voltage|current|resistance|length|mass|force)\s+(?:measurement\s+)?(?:result|reading|value)?\s*:?\s*(?P<value>{NUMBER_RE})\s*(?:±|\+/-|plus or minus)\s*(?P<delta>{NUMBER_RE})\s*\(?(?P<unit>{UNIT_RE})\)?",
+            re.IGNORECASE,
+        ),
+        re.compile(
+            rf"\b(?P<symbol>[A-Za-z][A-Za-z0-9_]*)\s*(?:=|is|was)?\s*(?P<value>{NUMBER_RE})\s*(?:±|\+/-|plus or minus)\s*(?P<delta>{NUMBER_RE})\s*\(?(?P<unit>{UNIT_RE})\)?",
+            re.IGNORECASE,
+        ),
+        re.compile(
             rf"\b(?P<symbol>[A-Za-z][A-Za-z0-9_]*)\s*(?:=|is|was)?\s*(?P<value>{NUMBER_RE})\s*(?:±|Â±|\+/-|plus or minus)\s*(?P<delta>{NUMBER_RE})\s*\(?(?P<unit>{UNIT_RE})\)?",
             re.IGNORECASE,
         ),
@@ -723,8 +829,18 @@ def _extract_uncertainty_relations(problem_text: str) -> List[Dict[str, object]]
             re.IGNORECASE,
         ),
     ]
+    extra_patterns = [
+        re.compile(
+            rf"\b(?P<label>voltage|current|resistance|length|mass|force)\s+(?:measurement\s+)?(?:result|reading|value)?\s*:?\s*(?P<value>{NUMBER_RE})\s*(?:±|\+/-|plus or minus)\s*(?P<delta>{NUMBER_RE})\s*\(?(?P<unit>{UNIT_RE})\)?",
+            re.IGNORECASE,
+        ),
+        re.compile(
+            rf"\b(?P<symbol>[A-Za-z][A-Za-z0-9_]*)\s*(?:=|is|was)?\s*(?P<value>{NUMBER_RE})\s*(?:±|\+/-|plus or minus)\s*(?P<delta>{NUMBER_RE})\s*\(?(?P<unit>{UNIT_RE})\)?",
+            re.IGNORECASE,
+        ),
+    ]
     label_symbols = {"voltage": "V", "current": "I", "resistance": "R", "length": "d", "mass": "m", "force": "F"}
-    for pattern in patterns:
+    for pattern in extra_patterns + patterns:
         for match in pattern.finditer(problem_text):
             symbol = match.groupdict().get("symbol") or label_symbols.get(match.groupdict().get("label", "").lower(), "uncertainty")
             var_name = _symbol_to_var(symbol, match.group(0))
@@ -805,6 +921,14 @@ def _extract_motion_relations(problem_text: str) -> List[Dict[str, object]]:
 def _extract_uncertainty_quantities(problem_text: str, quantities: Dict[str, Dict[str, object]]) -> None:  # type: ignore[no-redef]
     """Extract measured values and absolute uncertainties into known_quantities."""
     patterns = [
+        re.compile(
+            rf"\b(?P<label>voltage|current|resistance|length|mass|force)\s+(?:measurement\s+)?(?:result|reading|value)?\s*:?\s*(?P<value>{NUMBER_RE})\s*(?:±|\+/-|plus or minus)\s*(?P<delta>{NUMBER_RE})\s*\(?(?P<unit>{UNIT_RE})\)?",
+            re.IGNORECASE,
+        ),
+        re.compile(
+            rf"\b(?P<symbol>[A-Za-z][A-Za-z0-9_]*)\s*(?:=|is|was)?\s*(?P<value>{NUMBER_RE})\s*(?:±|\+/-|plus or minus)\s*(?P<delta>{NUMBER_RE})\s*\(?(?P<unit>{UNIT_RE})\)?",
+            re.IGNORECASE,
+        ),
         re.compile(
             rf"\b(?P<symbol>[A-Za-z][A-Za-z0-9_]*)\s*(?:=|is|was)?\s*(?P<value>{NUMBER_RE})\s*(?:±|Â±|\+/-|plus or minus)\s*(?P<delta>{NUMBER_RE})\s*\(?(?P<unit>{UNIT_RE})\)?",
             re.IGNORECASE,

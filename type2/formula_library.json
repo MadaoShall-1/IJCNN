@@ -243,6 +243,158 @@
     "premise_text": "Capacitor energy: U = Q²/(2C)"
   },
   {
+    "id": "CKT-016",
+    "topic": "circuits",
+    "subtopic": "inductor_energy",
+    "target_quantities": ["U_B", "U", "L", "I"],
+    "canonical_quantity_names": ["energy", "inductance", "electric_current"],
+    "text": "Magnetic energy stored in an inductor equals one-half times inductance times current squared.",
+    "formula": "U = 0.5 * L * I**2",
+    "sympy_expr": "Eq(U, L * I**2 / 2)",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "U": {"symbol": "U", "name": "magnetic energy", "unit_symbol": "J", "unit_name": "joules"},
+      "L": {"symbol": "L", "name": "inductance", "unit_symbol": "H", "unit_name": "henries"},
+      "I": {"symbol": "I", "name": "electric current", "unit_symbol": "A", "unit_name": "amperes"}
+    },
+    "conditions": ["Energy is stored in the magnetic field of an inductor."],
+    "fol_axiom": "forall U L I (HasInductance(L) and HasCurrent(I) -> MagneticEnergy(U = L*I**2/2))",
+    "premise_text": "Inductor energy: U = 1/2 L I^2"
+  },
+  {
+    "id": "CKT-017",
+    "topic": "circuits",
+    "subtopic": "lc_resonance_frequency",
+    "target_quantities": ["f", "L", "C"],
+    "canonical_quantity_names": ["frequency", "inductance", "capacitance"],
+    "text": "The resonant frequency of an ideal LC circuit is one over two pi times the square root of inductance times capacitance.",
+    "formula": "f = 1 / (2 * pi * sqrt(L * C))",
+    "sympy_expr": "Eq(f, 1 / (2 * pi * sqrt(L * C)))",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "f": {"symbol": "f", "name": "frequency", "unit_symbol": "Hz", "unit_name": "hertz"},
+      "L": {"symbol": "L", "name": "inductance", "unit_symbol": "H", "unit_name": "henries"},
+      "C": {"symbol": "C", "name": "capacitance", "unit_symbol": "F", "unit_name": "farads"}
+    },
+    "conditions": ["Ideal LC resonance."],
+    "fol_axiom": "forall f L C (LCResonance(L,C) -> ResonantFrequency(f = 1/(2*pi*sqrt(L*C))))",
+    "premise_text": "LC resonance frequency: f = 1/(2*pi*sqrt(LC))"
+  },
+  {
+    "id": "CKT-018",
+    "topic": "circuits",
+    "subtopic": "lc_resonance_angular_frequency",
+    "target_quantities": ["omega", "L", "C"],
+    "canonical_quantity_names": ["angular_frequency", "inductance", "capacitance"],
+    "text": "The resonant angular frequency of an ideal LC circuit is one over the square root of inductance times capacitance.",
+    "formula": "omega = 1 / sqrt(L * C)",
+    "sympy_expr": "Eq(omega, 1 / sqrt(L * C))",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "omega": {"symbol": "omega", "name": "angular frequency", "unit_symbol": "rad/s", "unit_name": "radians per second"},
+      "L": {"symbol": "L", "name": "inductance", "unit_symbol": "H", "unit_name": "henries"},
+      "C": {"symbol": "C", "name": "capacitance", "unit_symbol": "F", "unit_name": "farads"}
+    },
+    "conditions": ["Ideal LC resonance."],
+    "fol_axiom": "forall omega L C (LCResonance(L,C) -> ResonantAngularFrequency(omega = 1/sqrt(L*C)))",
+    "premise_text": "LC resonance angular frequency: omega = 1/sqrt(LC)"
+  },
+  {
+    "id": "CKT-019",
+    "topic": "circuits",
+    "subtopic": "angular_frequency_from_frequency",
+    "target_quantities": ["omega", "f"],
+    "canonical_quantity_names": ["angular_frequency", "frequency"],
+    "text": "Angular frequency equals two pi times ordinary frequency.",
+    "formula": "omega = 2 * pi * f",
+    "sympy_expr": "Eq(omega, 2 * pi * f)",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "omega": {"symbol": "omega", "name": "angular frequency", "unit_symbol": "rad/s", "unit_name": "radians per second"},
+      "f": {"symbol": "f", "name": "frequency", "unit_symbol": "Hz", "unit_name": "hertz"}
+    },
+    "conditions": ["Use when converting frequency in hertz to angular frequency."],
+    "fol_axiom": "forall omega f (Frequency(f) -> AngularFrequency(omega = 2*pi*f))",
+    "premise_text": "Angular frequency: omega = 2*pi*f"
+  },
+  {
+    "id": "CKT-020",
+    "topic": "circuits",
+    "subtopic": "inductive_reactance",
+    "target_quantities": ["X_L", "omega", "L"],
+    "canonical_quantity_names": ["reactance", "angular_frequency", "inductance"],
+    "text": "Inductive reactance equals angular frequency times inductance.",
+    "formula": "X_L = omega * L",
+    "sympy_expr": "Eq(X_L, omega * L)",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "X_L": {"symbol": "X_L", "name": "inductive reactance", "unit_symbol": "ohm", "unit_name": "ohms"},
+      "omega": {"symbol": "omega", "name": "angular frequency", "unit_symbol": "rad/s", "unit_name": "radians per second"},
+      "L": {"symbol": "L", "name": "inductance", "unit_symbol": "H", "unit_name": "henries"}
+    },
+    "conditions": ["For sinusoidal AC circuits."],
+    "fol_axiom": "forall XL omega L (Inductor(L) -> InductiveReactance(XL = omega*L))",
+    "premise_text": "Inductive reactance: X_L = omega L"
+  },
+  {
+    "id": "CKT-021",
+    "topic": "circuits",
+    "subtopic": "rlc_omega_factor_for_resonance",
+    "target_quantities": ["k", "X_L", "X_C"],
+    "canonical_quantity_names": ["dimensionless", "reactance"],
+    "text": "For fixed RLC components, if reactances are measured at angular frequency omega0, the factor needed for resonance is square root of capacitive reactance divided by inductive reactance.",
+    "formula": "k = sqrt(X_C / X_L)",
+    "sympy_expr": "Eq(k, sqrt(X_C / X_L))",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "k": {"symbol": "k", "name": "angular frequency multiplier", "unit_symbol": "", "unit_name": "dimensionless"},
+      "X_L": {"symbol": "X_L", "name": "inductive reactance at omega0", "unit_symbol": "ohm", "unit_name": "ohms"},
+      "X_C": {"symbol": "X_C", "name": "capacitive reactance at omega0", "unit_symbol": "ohm", "unit_name": "ohms"}
+    },
+    "conditions": ["For fixed L and C, X_L scales with omega and X_C scales as one over omega."],
+    "fol_axiom": "forall k XL XC (RLCFixedComponents(XL,XC) -> ResonanceMultiplier(k = sqrt(XC/XL)))",
+    "premise_text": "RLC resonance multiplier: k = sqrt(X_C/X_L)"
+  },
+  {
+    "id": "CKT-022",
+    "topic": "circuits",
+    "subtopic": "ac_voltage_across_inductor",
+    "target_quantities": ["U_L", "I", "omega", "L"],
+    "canonical_quantity_names": ["electric_potential", "electric_current", "angular_frequency", "inductance"],
+    "text": "The RMS voltage across an inductor equals current times inductive reactance, or current times angular frequency times inductance.",
+    "formula": "U_L = I * omega * L",
+    "sympy_expr": "Eq(U_L, I * omega * L)",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "U_L": {"symbol": "U_L", "name": "voltage across inductor", "unit_symbol": "V", "unit_name": "volts"},
+      "I": {"symbol": "I", "name": "electric current", "unit_symbol": "A", "unit_name": "amperes"},
+      "omega": {"symbol": "omega", "name": "angular frequency", "unit_symbol": "rad/s", "unit_name": "radians per second"},
+      "L": {"symbol": "L", "name": "inductance", "unit_symbol": "H", "unit_name": "henries"}
+    },
+    "conditions": ["For sinusoidal AC circuits; at resonance use omega_0 = 1/sqrt(LC)."],
+    "fol_axiom": "forall UL I omega L (InductorAC(I,omega,L) -> InductorVoltage(UL = I*omega*L))",
+    "premise_text": "Inductor RMS voltage: U_L = I*omega*L"
+  },
+  {
+    "id": "CKT-023",
+    "topic": "circuits",
+    "subtopic": "rlc_omega_factor_for_resonance",
+    "target_quantities": ["k", "R", "R2"],
+    "canonical_quantity_names": ["dimensionless", "resistance"],
+    "text": "For fixed RLC components when the two extracted resistance-valued quantities are positional reactances, the frequency multiplier for resonance is square root of the second reactance divided by the first.",
+    "formula": "k = sqrt(R2 / R)",
+    "sympy_expr": "Eq(k, sqrt(R2 / R))",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "k": {"symbol": "k", "name": "angular frequency multiplier", "unit_symbol": "", "unit_name": "dimensionless"},
+      "R": {"symbol": "R", "name": "first reactance value", "unit_symbol": "ohm", "unit_name": "ohms"},
+      "R2": {"symbol": "R2", "name": "second reactance value", "unit_symbol": "ohm", "unit_name": "ohms"}
+    },
+    "conditions": ["Use when Stage 0 extracted X_L and X_C as positional resistance-valued quantities."],
+    "fol_axiom": "forall k R R2 (PositionalReactances(R,R2) -> ResonanceMultiplier(k = sqrt(R2/R)))",
+    "premise_text": "RLC resonance multiplier from positional reactances: k = sqrt(R2/R)"
+  },
+  {
     "id": "CKT-013",
     "topic": "circuits",
     "subtopic": "kirchhoff_voltage",
@@ -424,6 +576,27 @@
     ],
     "fol_axiom": "∀C ∀A ∀d (ParallelPlate(A,d) → Capacitance(C = epsilon_0*A/d))",
     "premise_text": "Parallel plate capacitor: C = ε₀A/d"
+  },
+  {
+    "id": "ELS-009",
+    "topic": "electrostatics",
+    "subtopic": "parallel_plate_capacitance_dielectric",
+    "target_quantities": ["C", "epsilon_r", "epsilon_0", "A", "d"],
+    "canonical_quantity_names": ["capacitance", "area", "distance", "permittivity"],
+    "text": "Capacitance of a parallel plate capacitor filled with a dielectric: C equals relative permittivity times epsilon_0 times plate area divided by separation.",
+    "formula": "C = epsilon_r * epsilon_0 * A / d",
+    "sympy_expr": "Eq(C, epsilon_r * epsilon_0 * A / d)",
+    "tool_dispatch": "sympy",
+    "variables": {
+      "C": {"symbol": "C", "name": "capacitance", "unit_symbol": "F", "unit_name": "farads"},
+      "epsilon_r": {"symbol": "epsilon_r", "name": "relative permittivity", "unit_symbol": "", "unit_name": "dimensionless"},
+      "epsilon_0": {"symbol": "epsilon_0", "name": "permittivity of free space", "unit_symbol": "F/m", "unit_name": "farads per metre"},
+      "A": {"symbol": "A", "name": "plate area", "unit_symbol": "m^2", "unit_name": "square metres"},
+      "d": {"symbol": "d", "name": "plate separation", "unit_symbol": "m", "unit_name": "metres"}
+    },
+    "conditions": ["Applies when a dielectric fills the gap between parallel plates."],
+    "fol_axiom": "forall C epsilon_r A d (DielectricParallelPlate(A,d,epsilon_r) -> Capacitance(C = epsilon_r*epsilon_0*A/d))",
+    "premise_text": "Dielectric parallel plate capacitor: C = epsilon_r*epsilon_0*A/d"
   },
   {
     "id": "ELS-006",

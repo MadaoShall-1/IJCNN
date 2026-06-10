@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import time
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -55,10 +56,11 @@ import type1.pipeline as _type1_pipeline
 
 from parser.schemas import ProblemParseObject
 from type2.stage1 import FormulaRetriever
-from type2.stage2 import DeterministicSolveTrace
+from type2.stage2 import DeterministicSolveTrace, replay_trace_deterministically
 from type2.stage4 import diagnose_trace
 from type2.stage5 import repair_trace, select_repair_formula
 from type2.stage6 import build_response
+from type2.special_cases import try_special_case
 
 
 def _dict_to_parse_obj(d: Dict[str, Any]) -> ProblemParseObject:
@@ -177,6 +179,146 @@ def _payload_bool(payload: Dict[str, Any], key: str, default: bool) -> bool:
     return bool(raw)
 
 
+_ANSWER_UNIT_RE = re.compile(
+    r"^\s*([+-]?\d+(?:[.,]\d+)?(?:[eE][+-]?\d+)?)(?:\s*([^\d\s,;].*?))?\s*$"
+)
+
+
+def _ascii_unit(unit: Any) -> str:
+    """Normalize display units to the ASCII convention requested by EXACT."""
+    text = str(unit or "").strip()
+    if not text:
+        return ""
+    replacements = {
+        "Ω": "ohm",
+        "Ω": "ohm",
+        "μ": "u",
+        "µ": "u",
+        "·": "*",
+        "²": "^2",
+        "³": "^3",
+        "⁻": "-",
+        "°": "deg",
+    }
+    for src, dst in replacements.items():
+        text = text.replace(src, dst)
+    text = text.replace("Ohm", "ohm").replace("ohms", "ohm")
+    text = text.strip(" .,:;")
+    return re.sub(r"\s+", "", text)
+
+
+def _split_answer_unit(answer: Any) -> tuple[str, str]:
+    """Return numerical answer and unit separately for Type 2 submissions."""
+    text = str(answer or "").strip()
+    if not text:
+        return "", ""
+    match = _ANSWER_UNIT_RE.match(text)
+    if not match:
+        return text, ""
+    value = match.group(1).replace(",", ".")
+    unit = _ascii_unit(match.group(2) or "")
+    return value, unit
+
+
+def _reasoning_steps(result: Dict[str, Any], query_type: str) -> List[str]:
+    if query_type == "type1":
+        steps = result.get("fol") or result.get("cot") or []
+        return [str(step) for step in steps if str(step).strip()]
+
+    raw_steps = result.get("steps") or []
+    steps: List[str] = []
+    for step in raw_steps:
+        if not isinstance(step, dict):
+            continue
+        parts = [
+            step.get("goal"),
+            ", ".join(str(fid) for fid in step.get("formula_ids") or []),
+            step.get("intermediate_answer"),
+        ]
+        text = " | ".join(str(part) for part in parts if part)
+        if text:
+            steps.append(text)
+    return steps
+
+
+def _premises_used(payload: Dict[str, Any], result: Dict[str, Any], query_type: str) -> List[int]:
+    if query_type != "type1":
+        return []
+
+    premises = [str(item) for item in payload.get("premises") or []]
+    if not premises:
+        return []
+
+    used = result.get("premises") or []
+    if not used:
+        return list(range(len(premises)))
+
+    indices: List[int] = []
+    for premise in used:
+        try:
+            idx = premises.index(str(premise))
+        except ValueError:
+            continue
+        if idx not in indices:
+            indices.append(idx)
+    return indices or list(range(len(premises)))
+
+
+def _choice_answer(answer: str, options: Any) -> str:
+    if not isinstance(options, list) or not options:
+        return answer
+
+    choices = [str(option) for option in options]
+    if answer in choices:
+        return answer
+
+    if len(answer.strip()) == 1 and answer.strip().upper() in {"A", "B", "C", "D"}:
+        idx = ord(answer.strip().upper()) - ord("A")
+        if 0 <= idx < len(choices):
+            return choices[idx]
+
+    answer_norm = answer.strip().lower()
+    for choice in choices:
+        if choice.strip().lower() == answer_norm:
+            return choice
+    return answer
+
+
+def _submission_result(
+    payload: Dict[str, Any],
+    result: Dict[str, Any],
+    query_type: str,
+) -> Dict[str, Any]:
+    query_id = str(payload.get("query_id") or payload.get("id") or result.get("problem_id") or "")
+    raw_answer = str(result.get("answer") or "").strip()
+
+    if query_type == "type2":
+        answer, unit = _split_answer_unit(raw_answer)
+    else:
+        answer = _choice_answer(raw_answer, payload.get("options"))
+        unit = ""
+
+    explanation = str(
+        result.get("explanation")
+        or result.get("chain_of_thought")
+        or "Solved by the configured pipeline."
+    ).strip()
+    if not explanation:
+        explanation = "Solved by the configured pipeline."
+
+    steps = _reasoning_steps(result, query_type)
+    reasoning = {"type": "fol" if query_type == "type1" else "cot", "steps": steps} if steps else None
+
+    return {
+        "query_id": query_id,
+        "answer": answer,
+        "unit": unit,
+        "explanation": explanation,
+        "premises_used": _premises_used(payload, result, query_type),
+        "reasoning": reasoning,
+    }
+
+
 def _get_stage0_parse(
     problem_text: str,
     problem_id: str,
@@ -215,11 +357,12 @@ def _get_stage0_parse(
     return parse
 
 
-def _load_models(cfg: SolverConfig) -> None:
+def _load_models(cfg: SolverConfig, load_type1: bool = True) -> None:
     global _retriever, _solve_trace, _repair_module, _type1_solver, _dspy_lm_configured, _type2_solver_mode
 
-    logger.info("Loading FormulaRetriever...")
-    _retriever = FormulaRetriever()
+    if _retriever is None:
+        logger.info("Loading FormulaRetriever...")
+        _retriever = FormulaRetriever()
     _solve_trace = DeterministicSolveTrace()
     _repair_module = _solve_trace
     _type2_solver_mode = "deterministic_sympy"
@@ -229,6 +372,8 @@ def _load_models(cfg: SolverConfig) -> None:
             lm_kwargs = {
                 "model": cfg.dspy_model,
                 "api_key": cfg.dspy_api_key,
+                "max_tokens": cfg.dspy_max_tokens,
+                "temperature": cfg.dspy_temperature,
             }
             if cfg.dspy_api_base:
                 lm_kwargs["api_base"] = cfg.dspy_api_base
@@ -255,12 +400,15 @@ def _load_models(cfg: SolverConfig) -> None:
         logger.warning("DSPy not available; using deterministic SymPy Type 2 solver.")
 
     # Type 1 solver
-    try:
-        from type1.dspy_modules import Type1Solver
-        _type1_solver = Type1Solver()
-        logger.info("Type1Solver loaded.")
-    except Exception as exc:
-        logger.warning("Type1Solver not available: %s", exc)
+    if load_type1:
+        try:
+            from type1.dspy_modules import Type1Solver
+            _type1_solver = Type1Solver()
+            logger.info("Type1Solver loaded.")
+        except Exception as exc:
+            logger.warning("Type1Solver not available: %s", exc)
+    else:
+        _type1_solver = None
 
 
 # ---------------------------------------------------------------------------
@@ -275,9 +423,9 @@ def _run_type2(
     """Run the full Type 2 pipeline for a single request."""
 
     problem_text = str(
-        payload.get("question") or payload.get("problem") or payload.get("text") or ""
+        payload.get("query") or payload.get("question") or payload.get("problem") or payload.get("text") or ""
     ).strip()
-    problem_id = str(payload.get("id", "unknown"))
+    problem_id = str(payload.get("query_id") or payload.get("id") or "unknown")
 
     if not problem_text:
         return {"answer": "", "confidence": 0.0, "error": "empty problem text"}
@@ -294,6 +442,29 @@ def _run_type2(
     except Exception as exc:
         logger.error("Stage 0 parse failed for %s: %s", problem_id, exc)
         return {"answer": "", "confidence": 0.0, "error": f"parse error: {exc}"}
+
+    # ── Special-case pre-solve ────────────────────────────────────────────────
+    try:
+        special_trace = try_special_case(parse_obj, problem_id)
+    except Exception as exc:
+        logger.debug("Special-case check failed: %s", exc)
+        special_trace = None
+
+    if special_trace is not None and special_trace.trace_status == "PASS":
+        elapsed = time.monotonic() - t_start
+        from type2.schemas import FormulaSet
+        empty_fs = FormulaSet(formulas={}, retrieval_confidence=0.0, path_index=0)
+        response = build_response(
+            trace=special_trace,
+            parse_obj=parse_obj,
+            formula_set=empty_fs,
+            diagnosis=None,
+        )
+        response["latency_seconds"] = round(elapsed, 3)
+        response["problem_id"] = problem_id
+        response["hybrid_source"] = "deterministic"
+        response["query_type"] = "type2"
+        return response
 
     # ── Stage 1: formula retrieval ───────────────────────────────────────────
     elapsed = time.monotonic() - t_start
@@ -385,6 +556,16 @@ def _run_type2(
     if best_trace is None:
         return {"answer": "", "confidence": 0.0, "error": "all formula paths failed"}
 
+    if cfg.dspy_model and best_trace.trace_status in ("PASS", "REPAIRED"):
+        try:
+            best_trace = replay_trace_deterministically(
+                trace=best_trace,
+                parse_obj=parse_obj,
+                formula_set=best_formula_set,
+            )
+        except Exception as exc:
+            logger.warning("Deterministic replay of LLM trace failed: %s", exc)
+
     # ── Stage 6: response assembly ───────────────────────────────────────────
     elapsed = time.monotonic() - t_start
     assembler = None  # LLM assembler only under Tier 0
@@ -464,7 +645,7 @@ if _FASTAPI_AVAILABLE:
 
         result["query_type"] = query_type
         result["latency_seconds"] = round(time.monotonic() - t_start, 3)
-        return JSONResponse(content=result)
+        return JSONResponse(content=[_submission_result(payload, result, query_type)])
 
     @app.post("/predict/type1")
     async def predict_type1(payload: Dict[str, Any] = Body(...)) -> JSONResponse:

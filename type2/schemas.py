@@ -118,6 +118,24 @@ class TraceObject:
     final_answer: str = ""
     final_unit: str = ""
     trace_status: str = "FAIL"  # PASS | FAIL | REPAIRED
+    first_wrong_step_id: Optional[str] = None
+    first_wrong_step_goal: Optional[str] = None
+    first_wrong_step_type: Optional[str] = None
+    first_wrong_error_type: Optional[str] = None
+    first_wrong_feedback: Optional[str] = None
+    repair_hint: Optional[str] = None
+    diagnostic_tags: List[str] = field(default_factory=list)
+    final_answer_verdict: Optional[str] = None
+    final_answer_error_type: Optional[str] = None
+    answer_level_fws: bool = False
+    suspicious_step_id: Optional[str] = None
+    suspicious_step_goal: Optional[str] = None
+    numeric_repair_attempted: bool = False
+    numeric_repair_accepted: bool = False
+    deterministic_replay_attempted: bool = False
+    deterministic_replay_recomputed_steps: int = 0
+    deterministic_replay_final_rebound: bool = False
+    deterministic_replay_original_answer: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
