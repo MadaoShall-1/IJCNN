@@ -1,0 +1,25 @@
+canonical_latex,meaning,your_notation
++ ,addition,
+- ,subtraction,
+\times,multiplication,*
+\cdot,dot multiplication,*
+\div,division,/
+\pm,plus-minus,
+\mp,minus-plus,
+=,equals,
+\approx,approximately equals,
+\neq,not equal,
+<,less than,
+>,greater than,
+\leq,less than or equal,<=
+\geq,greater than or equal,>=
+\propto,proportional to,
+\infty,infinity,inf
+a^b,power,
+a_b,subscript,
+\sqrt{},square root,sqrt()
+\frac{a}{b},fraction,a/b
+\Omega,ohm,ohm
+\mu,micro prefix,u
+\degree,degree,degree
+%,percent,%

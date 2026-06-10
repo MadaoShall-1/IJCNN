@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"E:\\\\LLM-vllm\" -Recurse -File)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Sort-Object)",
+      "Bash(python -m pytest tests/test_dispatcher.py -v --tb=short)",
+      "Bash(python -m pytest tests/test_predict_api.py -v --tb=short)",
+      "Bash(git checkout *)",
+      "Bash(python -m pytest tests/ -v --tb=short)",
+      "Bash(python run_type2_sample.py)",
+      "Bash(python scripts/run_stage0_on_dataset.py --dataset Dataset/Physics_Problems_Text_Only.csv --output-dir outputs/stage0_with_llm_v2 --use-llm-fallback)",
+      "Bash(python -c ' *)",
+      "Bash(python -c \"import dis, marshal, sys; f=open\\(r'E:/LLM-vllm/type2/type2/__pycache__/special_cases.cpython-312.pyc','rb'\\); f.read\\(16\\); code=marshal.load\\(f\\); print\\([c for c in code.co_consts if isinstance\\(c,str\\)][:10]\\)\")"
+    ]
+  }
+}

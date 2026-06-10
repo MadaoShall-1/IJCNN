@@ -1,0 +1,188 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="980" viewBox="0 0 1200 980">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1F2328"/>
+    </marker>
+    <marker id="arrowPink" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#D24F91"/>
+    </marker>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#258BC5"/>
+    </marker>
+    <style>
+      .title { font: 700 31px Arial, Helvetica, sans-serif; fill: #111; }
+      .subtitle { font: italic 400 17px Arial, Helvetica, sans-serif; fill: #555; }
+      .panel { fill: #F5F7FA; stroke: none; rx: 24; }
+      .panelWarm { fill: #FFF7F1; stroke: none; rx: 24; }
+      .panelCool { fill: #F8F3FB; stroke: none; rx: 24; }
+      .block { stroke: none; rx: 8; }
+      .blue { fill: #BEDCF1; }
+      .green { fill: #BFE0D5; }
+      .orange { fill: #F5C8AC; }
+      .pink { fill: #F1B3D1; }
+      .purple { fill: #D9C8EF; }
+      .yellow { fill: #F8E7A5; }
+      .label { font: 700 26px Arial, Helvetica, sans-serif; fill: #111; }
+      .mid { font: 500 20px Arial, Helvetica, sans-serif; fill: #111; }
+      .small { font: 400 15px Arial, Helvetica, sans-serif; fill: #333; }
+      .tiny { font: 400 13px Arial, Helvetica, sans-serif; fill: #333; }
+      .line { stroke: #1F2328; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+      .dash { stroke: #1F2328; stroke-width: 2.2; fill: none; stroke-dasharray: 7 7; marker-end: url(#arrow); }
+      .thin { stroke: #1F2328; stroke-width: 2; fill: none; }
+      .pinkLine { stroke: #D24F91; stroke-width: 4; fill: none; marker-end: url(#arrowPink); }
+      .blueLine { stroke: #258BC5; stroke-width: 4; fill: none; marker-end: url(#arrowBlue); }
+      .greenLine { stroke: #43AA5B; stroke-width: 4; fill: none; marker-end: url(#arrowBlue); }
+      .orangeLine { stroke: #E18A32; stroke-width: 4; fill: none; marker-end: url(#arrowBlue); }
+      .grid { fill: #DADADA; stroke: #202020; stroke-width: 1.6; }
+      .gridA { fill: #A9D3B8; stroke: #202020; stroke-width: 1.6; }
+      .gridB { fill: #C6B6DD; stroke: #202020; stroke-width: 1.6; }
+    </style>
+  </defs>
+
+  <text x="600" y="50" text-anchor="middle" class="title">SSM-Enhanced Transformer Reasoner</text>
+  <text x="600" y="80" text-anchor="middle" class="subtitle">Transformer backbone with latent world-model state injection</text>
+
+  <!-- Main architecture -->
+  <rect x="70" y="118" width="420" height="735" class="panel"/>
+  <path d="M 280 154 L 280 105" class="line"/>
+  <line x1="280" y1="154" x2="280" y2="720" stroke="#1F2328" stroke-width="3"/>
+
+  <rect x="155" y="165" width="250" height="48" class="block blue"/>
+  <text x="280" y="197" text-anchor="middle" class="mid">Scale</text>
+  <rect x="155" y="231" width="250" height="48" class="block green"/>
+  <text x="280" y="263" text-anchor="middle" class="mid">SwiGLU FFN</text>
+  <rect x="155" y="297" width="250" height="48" class="block blue"/>
+  <text x="280" y="329" text-anchor="middle" class="mid">RMSNorm</text>
+  <circle cx="280" cy="374" r="16" fill="#FFFFFF" stroke="#1F2328" stroke-width="3"/>
+  <line x1="270" y1="374" x2="290" y2="374" stroke="#1F2328" stroke-width="3"/>
+  <line x1="280" y1="364" x2="280" y2="384" stroke="#1F2328" stroke-width="3"/>
+  <rect x="155" y="412" width="250" height="66" class="block orange"/>
+  <text x="280" y="439" text-anchor="middle" class="mid">Semantic Local</text>
+  <text x="280" y="466" text-anchor="middle" class="mid">Attention</text>
+  <rect x="155" y="498" width="250" height="48" class="block blue"/>
+  <text x="280" y="530" text-anchor="middle" class="mid">RMSNorm</text>
+  <circle cx="280" cy="575" r="16" fill="#FFFFFF" stroke="#1F2328" stroke-width="3"/>
+  <line x1="270" y1="575" x2="290" y2="575" stroke="#1F2328" stroke-width="3"/>
+  <line x1="280" y1="565" x2="280" y2="585" stroke="#1F2328" stroke-width="3"/>
+  <rect x="155" y="613" width="250" height="48" class="block blue"/>
+  <text x="280" y="645" text-anchor="middle" class="mid">Scale</text>
+  <rect x="155" y="679" width="250" height="68" class="block pink"/>
+  <text x="280" y="707" text-anchor="middle" class="mid">Block-Wise SSM</text>
+  <text x="280" y="734" text-anchor="middle" class="mid">World Model</text>
+  <rect x="155" y="767" width="250" height="48" class="block blue"/>
+  <text x="280" y="799" text-anchor="middle" class="mid">RMSNorm</text>
+
+  <text x="420" y="185" class="label">x N</text>
+  <path d="M 424 205 C 468 290 468 695 424 790" class="dash"/>
+  <path d="M 424 445 L 407 445" class="dash"/>
+  <path d="M 424 713 L 407 713" class="dash"/>
+
+  <!-- Input stack -->
+  <rect x="96" y="875" width="84" height="42" class="block blue"/>
+  <text x="138" y="903" text-anchor="middle" class="small">Input</text>
+  <polygon points="206,850 260,875 260,940 206,965" fill="#BFE0D5" stroke="#1F2328" stroke-width="2"/>
+  <text x="232" y="911" transform="rotate(90 232 911)" text-anchor="middle" class="mid">Encoder</text>
+  <rect x="302" y="860" width="118" height="84" fill="#D9C8EF" stroke="#1F2328" stroke-width="2"/>
+  <line x1="341" y1="860" x2="341" y2="944" stroke="#1F2328" stroke-width="1.4"/>
+  <line x1="380" y1="860" x2="380" y2="944" stroke="#1F2328" stroke-width="1.4"/>
+  <line x1="302" y1="888" x2="420" y2="888" stroke="#1F2328" stroke-width="1.4"/>
+  <line x1="302" y1="916" x2="420" y2="916" stroke="#1F2328" stroke-width="1.4"/>
+  <text x="361" y="968" text-anchor="middle" class="small">Tokens</text>
+
+  <rect x="80" y="930" width="382" height="38" fill="#FFFFFF" stroke="#1F2328" stroke-width="2" rx="7"/>
+  <text x="271" y="955" text-anchor="middle" class="small">SSM state injection: K = W<tspan baseline-shift="sub" font-size="10">k</tspan>h + W<tspan baseline-shift="sub" font-size="10">ks</tspan>s</text>
+
+  <!-- Adapter boxes placed inside the left panel area -->
+  <rect x="332" y="802" width="128" height="38" class="block yellow"/>
+  <text x="396" y="827" text-anchor="middle" class="small">BGE-RAG</text>
+  <rect x="332" y="848" width="128" height="38" class="block blue"/>
+  <text x="396" y="873" text-anchor="middle" class="small">Adapter</text>
+
+  <!-- Semantic local attention -->
+  <rect x="575" y="130" width="515" height="360" class="panelWarm"/>
+  <text x="833" y="188" text-anchor="middle" class="label">Semantic Local Attention</text>
+  <text x="833" y="218" text-anchor="middle" class="subtitle">nearby premise-answer token matching</text>
+  <g transform="translate(726,255)">
+    <rect x="0" y="0" width="216" height="216" fill="#DEDEDE" stroke="#1F2328" stroke-width="2.4"/>
+    <rect x="0" y="0" width="36" height="36" class="gridA"/>
+    <rect x="0" y="36" width="36" height="36" class="gridA"/>
+    <rect x="36" y="36" width="36" height="36" class="gridA"/>
+    <rect x="0" y="72" width="36" height="36" class="gridA"/>
+    <rect x="36" y="72" width="36" height="36" class="gridA"/>
+    <rect x="72" y="72" width="36" height="36" class="gridA"/>
+    <rect x="36" y="108" width="36" height="36" class="gridA"/>
+    <rect x="72" y="108" width="36" height="36" class="gridA"/>
+    <rect x="108" y="108" width="36" height="36" class="gridB"/>
+    <rect x="72" y="144" width="36" height="36" class="gridB"/>
+    <rect x="108" y="144" width="36" height="36" class="gridB"/>
+    <rect x="144" y="144" width="36" height="36" class="gridB"/>
+    <rect x="108" y="180" width="36" height="36" class="gridB"/>
+    <rect x="144" y="180" width="36" height="36" class="gridB"/>
+    <rect x="180" y="180" width="36" height="36" class="gridB"/>
+    <g stroke="#1F2328" stroke-width="1.5">
+      <line x1="36" y1="0" x2="36" y2="216"/>
+      <line x1="72" y1="0" x2="72" y2="216"/>
+      <line x1="108" y1="0" x2="108" y2="216"/>
+      <line x1="144" y1="0" x2="144" y2="216"/>
+      <line x1="180" y1="0" x2="180" y2="216"/>
+      <line x1="0" y1="36" x2="216" y2="36"/>
+      <line x1="0" y1="72" x2="216" y2="72"/>
+      <line x1="0" y1="108" x2="216" y2="108"/>
+      <line x1="0" y1="144" x2="216" y2="144"/>
+      <line x1="0" y1="180" x2="216" y2="180"/>
+    </g>
+    <path d="M 118 246 C 142 267 174 267 198 246" class="thin"/>
+    <line x1="118" y1="237" x2="118" y2="255" stroke="#1F2328" stroke-width="2"/>
+    <line x1="198" y1="237" x2="198" y2="255" stroke="#1F2328" stroke-width="2"/>
+    <text x="158" y="292" text-anchor="middle" class="mid">k</text>
+  </g>
+
+  <!-- SSM block scans -->
+  <rect x="575" y="545" width="515" height="360" class="panelCool"/>
+  <text x="833" y="603" text-anchor="middle" class="label">Block-Wise SSM</text>
+  <text x="833" y="633" text-anchor="middle" class="subtitle">latent scans over token blocks</text>
+  <g transform="translate(675,682)">
+    <g>
+      <rect x="0" y="0" width="118" height="84" fill="#D9C8EF" stroke="#1F2328" stroke-width="2"/>
+      <line x1="39" y1="0" x2="39" y2="84" stroke="#1F2328" stroke-width="1.4"/>
+      <line x1="78" y1="0" x2="78" y2="84" stroke="#1F2328" stroke-width="1.4"/>
+      <line x1="0" y1="28" x2="118" y2="28" stroke="#1F2328" stroke-width="1.4"/>
+      <line x1="0" y1="56" x2="118" y2="56" stroke="#1F2328" stroke-width="1.4"/>
+      <path d="M 16 64 L 98 22" class="pinkLine"/>
+      <circle cx="-22" cy="42" r="14" fill="#FFF" stroke="#D24F91" stroke-width="4"/>
+      <text x="-22" y="49" text-anchor="middle" font-family="Arial" font-size="17" font-weight="700" fill="#D24F91">1</text>
+    </g>
+    <g transform="translate(220,0)">
+      <rect x="0" y="0" width="118" height="84" fill="#D9C8EF" stroke="#1F2328" stroke-width="2"/>
+      <line x1="39" y1="0" x2="39" y2="84" stroke="#1F2328" stroke-width="1.4"/>
+      <line x1="78" y1="0" x2="78" y2="84" stroke="#1F2328" stroke-width="1.4"/>
+      <line x1="0" y1="28" x2="118" y2="28" stroke="#1F2328" stroke-width="1.4"/>
+      <line x1="0" y1="56" x2="118" y2="56" stroke="#1F2328" stroke-width="1.4"/>
+      <path d="M 16 64 C 52 21 84 24 104 52" class="blueLine"/>
+      <circle cx="-22" cy="42" r="14" fill="#FFF" stroke="#258BC5" stroke-width="4"/>
+      <text x="-22" y="49" text-anchor="middle" font-family="Arial" font-size="17" font-weight="700" fill="#258BC5">2</text>
+    </g>
+    <g transform="translate(0,132)">
+      <rect x="0" y="0" width="118" height="84" fill="#D9C8EF" stroke="#1F2328" stroke-width="2"/>
+      <line x1="39" y1="0" x2="39" y2="84" stroke="#1F2328" stroke-width="1.4"/>
+      <line x1="78" y1="0" x2="78" y2="84" stroke="#1F2328" stroke-width="1.4"/>
+      <line x1="0" y1="28" x2="118" y2="28" stroke="#1F2328" stroke-width="1.4"/>
+      <line x1="0" y1="56" x2="118" y2="56" stroke="#1F2328" stroke-width="1.4"/>
+      <path d="M 16 64 C 47 25 80 36 100 58" class="greenLine"/>
+    </g>
+    <g transform="translate(220,132)">
+      <rect x="0" y="0" width="118" height="84" fill="#D9C8EF" stroke="#1F2328" stroke-width="2"/>
+      <line x1="39" y1="0" x2="39" y2="84" stroke="#1F2328" stroke-width="1.4"/>
+      <line x1="78" y1="0" x2="78" y2="84" stroke="#1F2328" stroke-width="1.4"/>
+      <line x1="0" y1="28" x2="118" y2="28" stroke="#1F2328" stroke-width="1.4"/>
+      <line x1="0" y1="56" x2="118" y2="56" stroke="#1F2328" stroke-width="1.4"/>
+      <path d="M 16 64 C 47 25 83 32 102 56" class="orangeLine"/>
+    </g>
+    <path d="M -42 210 C -65 178 -65 138 -42 106" class="thin"/>
+    <text x="-84" y="162" class="mid">b<tspan baseline-shift="sub" font-size="12">h</tspan></text>
+    <path d="M 90 252 C 135 277 244 277 288 252" class="thin"/>
+    <text x="190" y="304" text-anchor="middle" class="mid">b<tspan baseline-shift="sub" font-size="12">w</tspan></text>
+    <path d="M 370 40 C 402 93 402 174 370 224" class="thin"/>
+    <text x="420" y="137" text-anchor="middle" class="mid">T</text>
+  </g>
+</svg>
