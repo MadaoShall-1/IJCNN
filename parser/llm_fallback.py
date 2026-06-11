@@ -146,12 +146,71 @@ LLM_FALLBACK_PROMPT_TEMPLATE = SYSTEM_PROMPT + "\n\n" + USER_PROMPT_TEMPLATE
 
 
 # ---------------------------------------------------------------------------
+# vLLM / OpenAI-compatible HTTP backend
+# ---------------------------------------------------------------------------
+
+
+class _VLLMChatClient:
+    """OpenAI-compatible chat client for a vLLM server.
+
+    Competition rules require every LLM component to be served via vLLM so
+    the committee can verify the model through ``/v1/models``. This client
+    duck-types ``llama_cpp.Llama.create_chat_completion`` so the rest of
+    this module is backend-agnostic.
+
+    Configuration (environment):
+    * ``DSPY_API_BASE`` — OpenAI-compatible base URL, e.g.
+      ``http://localhost:8002/v1``. Presence of this variable selects the
+      vLLM backend over the local GGUF path.
+    * ``DSPY_MODEL``    — model name; an ``openai/`` prefix is stripped.
+    * ``DSPY_API_KEY``  — bearer token (vLLM accepts any non-empty value).
+    * ``LLM_FALLBACK_TIMEOUT`` — per-request timeout in seconds (default 45).
+    """
+
+    def __init__(self, api_base: str, model: str, api_key: str = "EMPTY") -> None:
+        self.api_base = api_base.rstrip("/")
+        self.model = model
+        self.api_key = api_key or "EMPTY"
+        self.timeout = float(os.environ.get("LLM_FALLBACK_TIMEOUT", "45"))
+
+    def create_chat_completion(
+        self,
+        messages: List[Dict[str, str]],
+        max_tokens: int = DEFAULT_MAX_TOKENS,
+        temperature: float = DEFAULT_TEMPERATURE,
+        stop: Optional[List[str]] = None,
+    ) -> Dict[str, Any]:
+        import requests
+
+        resp = requests.post(
+            f"{self.api_base}/chat/completions",
+            headers={"Authorization": f"Bearer {self.api_key}"},
+            json={
+                "model": self.model,
+                "messages": messages,
+                "max_tokens": max_tokens,
+                "temperature": temperature,
+                "stop": stop or [],
+            },
+            timeout=self.timeout,
+        )
+        resp.raise_for_status()
+        return resp.json()
+
+
+# ---------------------------------------------------------------------------
 # Singleton model registry
 # ---------------------------------------------------------------------------
 
 
 class _ModelRegistry:
-    """Holds a lazily-initialized Llama instance shared across calls."""
+    """Holds a lazily-initialized LLM backend shared across calls.
+
+    Backend priority:
+    1. vLLM HTTP endpoint (``DSPY_API_BASE`` set) — competition-compliant.
+    2. Local llama-cpp GGUF — offline development only.
+    3. Mock mode — no-op fallback.
+    """
 
     _lock = threading.Lock()
     _llm: Optional[Any] = None
@@ -180,10 +239,41 @@ class _ModelRegistry:
 
     @classmethod
     def _try_load(cls) -> Optional[Any]:
-        """Attempt to load the Qwen3 GGUF model. Mark mock mode on failure."""
+        """Select a backend: vLLM endpoint first, then local GGUF, else mock."""
         if os.environ.get("QWEN3_FORCE_MOCK") == "1":
             cls._mock = True
             return None
+
+        # Preferred: vLLM / OpenAI-compatible endpoint (competition rule:
+        # all LLM components must be served via vLLM for verification, and
+        # this avoids loading a second 8B model alongside the vLLM one).
+        api_base = os.environ.get("DSPY_API_BASE", "").strip()
+        if api_base:
+            model = os.environ.get("DSPY_MODEL", "").strip()
+            if model.startswith("openai/"):
+                model = model[len("openai/"):]
+            if not model:
+                model = "qwen3-8b-awq"
+            client = _VLLMChatClient(
+                api_base=api_base,
+                model=model,
+                api_key=os.environ.get("DSPY_API_KEY", "EMPTY"),
+            )
+            try:
+                import requests
+
+                resp = requests.get(f"{client.api_base}/models", timeout=5)
+                resp.raise_for_status()
+            except Exception as exc:
+                cls._mock = True
+                cls._load_error = (
+                    f"vLLM endpoint {client.api_base} not reachable: {exc!r}. "
+                    "Mock mode (local GGUF is intentionally NOT used when "
+                    "DSPY_API_BASE is configured)."
+                )
+                warnings.warn(cls._load_error, RuntimeWarning, stacklevel=2)
+                return None
+            return client
 
         try:
             from llama_cpp import Llama  # type: ignore
@@ -266,11 +356,17 @@ class _ModelRegistry:
     @classmethod
     def status(cls) -> Dict[str, Any]:
         """Return a small dict describing model state for diagnostics."""
+        backend = "none"
+        if isinstance(cls._llm, _VLLMChatClient):
+            backend = "vllm"
+        elif cls._llm is not None:
+            backend = "llama_cpp"
         return {
             "mock_mode": cls._mock,
             "loaded": cls._llm is not None,
+            "backend": backend,
             "load_error": cls._load_error,
-            "n_gpu_layers": cls._detect_gpu_layers() if not cls._mock else None,
+            "vllm_api_base": os.environ.get("DSPY_API_BASE") or None,
             "model_path": str(
                 Path(
                     os.environ.get("QWEN3_GGUF_PATH", str(DEFAULT_MODEL_PATH))

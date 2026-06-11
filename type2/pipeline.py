@@ -1,21 +1,18 @@
-"""FastAPI prediction endpoint for the IJCNN EduQA competition.
+"""Type 2 physics pipeline — pure capability module (no HTTP server).
 
-Serves both Type 1 (logic-based) and Type 2 (physics calculation) pipelines
-through a single ``POST /predict`` endpoint.  The request type is detected by
-:func:`router.detect_query_type` and dispatched accordingly.
+The only HTTP endpoint in this project is the root-level ``api.py``
+(``E:\\LLM-vllm\\api.py``), which imports this module as ``type2.pipeline``
+and calls :func:`_load_models`, :func:`_run_type2` and
+:func:`_submission_result` directly.
 
 Type 2 pipeline flow per request:
   Stage 0 → Stage 1 (formula retrieval, beam_n paths)
     → for each path: Stage 2+3 (SolveTrace) → Stage 4 (diagnose) → Stage 5 (repair if FAIL)
     → pick best passing trace → Stage 6 (build_response)
 
-Startup loads:
-  - FormulaRetriever (warm formula library)
-  - SolveTrace, DiagnosticReasonerModule, RepairSolveTrace (if DSPy available)
-  - Type1Solver (if DSPy available)
-
-Health endpoint:
-  GET /health  → {"status": "ok", "dspy": bool, "sympy": bool}
+The logic was moved verbatim from the retired ``type2/api.py`` (minus the
+FastAPI endpoints and the Type 1 routing, which now live at the root) so
+that answers are unchanged.
 """
 
 from __future__ import annotations
@@ -24,35 +21,18 @@ import json
 import logging
 import re
 import time
-from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
-# FastAPI (soft dependency)
-# ---------------------------------------------------------------------------
-
-try:
-    from fastapi import Body, FastAPI, HTTPException
-    from fastapi.responses import JSONResponse
-    _FASTAPI_AVAILABLE = True
-except ImportError:
-    _FASTAPI_AVAILABLE = False
-    Body = None  # type: ignore[assignment,misc]
-    FastAPI = None  # type: ignore[assignment,misc]
-
-# ---------------------------------------------------------------------------
 # Pipeline imports
 # ---------------------------------------------------------------------------
 
 from config import SolverConfig
-from router import detect_query_type
 from parser.main import parse_problem as _parse_stage0
 from parser.llm_fallback import get_model_status as _get_stage0_llm_status
-
-import type1.pipeline as _type1_pipeline
 
 from parser.schemas import ProblemParseObject
 from type2.stage1 import FormulaRetriever
@@ -101,7 +81,6 @@ except ImportError:
 _retriever: Optional[FormulaRetriever] = None
 _solve_trace = None          # SolveTrace instance (DSPy-guarded)
 _repair_module = None        # RepairSolveTrace instance (DSPy-guarded)
-_type1_solver = None         # Type1Solver instance (DSPy-guarded)
 _config: SolverConfig = SolverConfig()
 _stage0_cache: Optional[Dict[str, Dict[str, Dict[str, Any]]]] = None
 _stage0_cache_path: Optional[str] = None
@@ -118,7 +97,9 @@ def _resolve_stage0_cache_path(cfg: SolverConfig) -> Path:
     path = Path(cfg.stage0_cache_results_path)
     if path.is_absolute():
         return path
-    return Path(__file__).resolve().parent / path
+    # Relative paths are anchored at the type2 repo root (this file lives
+    # one level down, in type2/type2/), matching the retired type2/api.py.
+    return Path(__file__).resolve().parents[1] / path
 
 
 def _load_stage0_cache(cfg: SolverConfig) -> Dict[str, Dict[str, Dict[str, Any]]]:
@@ -179,17 +160,27 @@ def _payload_bool(payload: Dict[str, Any], key: str, default: bool) -> bool:
     return bool(raw)
 
 
+_NUMERIC_TOKEN = r"[+-]?\d+(?:[.,]\d+)?(?:[eE][+-]?\d+)?"
+
 _ANSWER_UNIT_RE = re.compile(
-    r"^\s*([+-]?\d+(?:[.,]\d+)?(?:[eE][+-]?\d+)?)(?:\s*([^\d\s,;].*?))?\s*$"
+    rf"^\s*({_NUMERIC_TOKEN})(?:\s*([^\d\s,;].*?))?\s*$"
 )
 
+# Multi-subquestion pair format emitted by Stage 2 measurement templates,
+# e.g. "0.8; 0.533333 cm; %" → values "0.8; 0.533333", units "cm; %".
+_PAIR_ANSWER_RE = re.compile(
+    rf"^\s*({_NUMERIC_TOKEN}(?:\s*;\s*{_NUMERIC_TOKEN})+)(?:\s+(\S.*?))?\s*$"
+)
 
-def _ascii_unit(unit: Any) -> str:
-    """Normalize display units to the ASCII convention requested by EXACT."""
-    text = str(unit or "").strip()
-    if not text:
-        return ""
-    replacements = {
+_NUMERIC_ONLY_RE = re.compile(
+    rf"^\s*{_NUMERIC_TOKEN}(?:\s*;\s*{_NUMERIC_TOKEN})*\s*$"
+)
+
+_PROSE_NUM_UNIT_RE = re.compile(
+    rf"({_NUMERIC_TOKEN})\s*([^\s\d;,+=\-][^\s;,]*)?"
+)
+
+_ASCII_REPLACEMENTS: Dict[str, str] = {
         "Ω": "ohm",
         "Ω": "ohm",
         "μ": "u",
@@ -200,11 +191,67 @@ def _ascii_unit(unit: Any) -> str:
         "⁻": "-",
         "°": "deg",
     }
-    for src, dst in replacements.items():
+
+
+def _ascii_text(text: Any) -> str:
+    """Transliterate known symbols and drop any remaining non-ASCII characters."""
+    result = str(text or "")
+    for src, dst in _ASCII_REPLACEMENTS.items():
+        result = result.replace(src, dst)
+    result = result.encode("ascii", "ignore").decode("ascii")
+    return re.sub(r"\s+", " ", result).strip()
+
+
+def _ascii_unit(unit: Any) -> str:
+    """Normalize display units to the ASCII convention requested by EXACT."""
+    text = str(unit or "").strip()
+    if not text:
+        return ""
+    for src, dst in _ASCII_REPLACEMENTS.items():
         text = text.replace(src, dst)
     text = text.replace("Ohm", "ohm").replace("ohms", "ohm")
     text = text.strip(" .,:;")
-    return re.sub(r"\s+", "", text)
+    text = re.sub(r"\s+", "", text)
+    # Electric field: N/C and V/m are identical; the dataset convention is V/m.
+    if text == "N/C":
+        return "V/m"
+    return text
+
+
+def _parse_pair_answer(text: str) -> Optional[tuple[str, str]]:
+    """Parse a multi-subquestion answer "v1; v2 u1; u2" into values and units."""
+    match = _PAIR_ANSWER_RE.match(str(text or ""))
+    if not match:
+        return None
+    values = [v.strip().replace(",", ".") for v in match.group(1).split(";")]
+    raw_units = match.group(2) or ""
+    units = [_ascii_unit(u) for u in raw_units.split(";")] if raw_units.strip() else []
+    return "; ".join(values), "; ".join(units)
+
+
+def _extract_prose_numbers(text: str) -> Optional[tuple[str, str]]:
+    """Pull numeric values (with trailing units) out of a prose answer.
+
+    Last-resort fallback so the answer field never carries full sentences.
+    Only applies to text that looks like natural language (several words),
+    never to symbolic expressions such as "-2*sqrt(2)*q".
+    """
+    text = str(text or "").strip()
+    if len(text.split()) < 4 or not re.search(r"\d", text):
+        return None
+    values: List[str] = []
+    units: List[str] = []
+    for num, unit in _PROSE_NUM_UNIT_RE.findall(text):
+        unit = _ascii_unit(unit)
+        # Discard prose words mistaken for units (real units are short or compound).
+        if len(unit) > 5 and "/" not in unit and "^" not in unit:
+            unit = ""
+        values.append(num.replace(",", "."))
+        units.append(unit)
+    if not values:
+        return None
+    unit_field = "; ".join(units) if any(units) else ""
+    return "; ".join(values), unit_field
 
 
 def _split_answer_unit(answer: Any) -> tuple[str, str]:
@@ -212,12 +259,33 @@ def _split_answer_unit(answer: Any) -> tuple[str, str]:
     text = str(answer or "").strip()
     if not text:
         return "", ""
+    pair = _parse_pair_answer(text)
+    if pair is not None:
+        return pair
     match = _ANSWER_UNIT_RE.match(text)
     if not match:
         return text, ""
     value = match.group(1).replace(",", ".")
     unit = _ascii_unit(match.group(2) or "")
     return value, unit
+
+
+def _rescue_numeric_answer(result: Dict[str, Any], raw_answer: str) -> Optional[tuple[str, str]]:
+    """Recover a numeric multi-part answer when the final answer is prose.
+
+    Stage 2 measurement templates emit the canonical "v1; v2 u1; u2" pair
+    format as a step intermediate answer, but an LLM conclusion step may
+    overwrite the final answer with a sentence.  Prefer the pair-format step
+    (deterministic and matches the gold "v1; v2" convention); fall back to
+    extracting numbers straight from the prose.
+    """
+    for step in reversed(result.get("steps") or []):
+        if not isinstance(step, dict):
+            continue
+        pair = _parse_pair_answer(str(step.get("intermediate_answer") or "").strip())
+        if pair is not None:
+            return pair
+    return _extract_prose_numbers(raw_answer)
 
 
 def _reasoning_steps(result: Dict[str, Any], query_type: str) -> List[str]:
@@ -294,6 +362,11 @@ def _submission_result(
 
     if query_type == "type2":
         answer, unit = _split_answer_unit(raw_answer)
+        if not _NUMERIC_ONLY_RE.match(answer):
+            rescued = _rescue_numeric_answer(result, raw_answer)
+            if rescued is not None:
+                answer, unit = rescued
+        answer = _ascii_text(answer)
     else:
         answer = _choice_answer(raw_answer, payload.get("options"))
         unit = ""
@@ -357,8 +430,10 @@ def _get_stage0_parse(
     return parse
 
 
-def _load_models(cfg: SolverConfig, load_type1: bool = True) -> None:
-    global _retriever, _solve_trace, _repair_module, _type1_solver, _dspy_lm_configured, _type2_solver_mode
+def _load_models(cfg: SolverConfig, load_type1: bool = False) -> None:
+    """Load the Type 2 models. ``load_type1`` is accepted for backwards
+    compatibility but ignored — Type 1 lives in type1/IJCNN-Qiwei now."""
+    global _retriever, _solve_trace, _repair_module, _dspy_lm_configured, _type2_solver_mode
 
     if _retriever is None:
         logger.info("Loading FormulaRetriever...")
@@ -398,17 +473,6 @@ def _load_models(cfg: SolverConfig, load_type1: bool = True) -> None:
             )
     else:
         logger.warning("DSPy not available; using deterministic SymPy Type 2 solver.")
-
-    # Type 1 solver
-    if load_type1:
-        try:
-            from type1.dspy_modules import Type1Solver
-            _type1_solver = Type1Solver()
-            logger.info("Type1Solver loaded.")
-        except Exception as exc:
-            logger.warning("Type1Solver not available: %s", exc)
-    else:
-        _type1_solver = None
 
 
 # ---------------------------------------------------------------------------
@@ -588,94 +652,3 @@ def _run_type2(
         response["stage0_cache_key"] = parse_obj.metadata.get("stage0_cache_key")
     return response
 
-
-# ---------------------------------------------------------------------------
-# FastAPI app
-# ---------------------------------------------------------------------------
-
-if _FASTAPI_AVAILABLE:
-
-    @asynccontextmanager
-    async def _lifespan(app: FastAPI):
-        global _config
-        _load_models(_config)
-        yield
-
-    app = FastAPI(
-        title="IJCNN EduQA Solver",
-        description="Type 1 (logic) and Type 2 (physics) solver for the IJCNN competition.",
-        version="1.0.0",
-        lifespan=_lifespan,
-    )
-
-    @app.get("/health")
-    async def health() -> Dict[str, Any]:
-        return {
-            "status": "ok",
-            "dspy": _DSPY_AVAILABLE,
-            "dspy_lm_configured": _dspy_lm_configured,
-            "dspy_model": _config.dspy_model,
-            "dspy_api_base": _config.dspy_api_base,
-            "sympy": _SYMPY_AVAILABLE,
-            "type2_solver_mode": _type2_solver_mode,
-            "retriever_loaded": _retriever is not None,
-            "stage0_use_llm_fallback": _config.stage0_use_llm_fallback,
-            "stage0_cache_enabled": _config.stage0_cache_enabled,
-            "stage0_cache_results_path": str(_resolve_stage0_cache_path(_config)),
-            "stage0_llm_fallback": _get_stage0_llm_status(),
-        }
-
-    @app.post("/predict")
-    async def predict(payload: Dict[str, Any] = Body(...)) -> JSONResponse:
-        t_start = time.monotonic()
-        query_type = detect_query_type(payload)
-
-        try:
-            if query_type == "type1":
-                result = _type1_pipeline.run(
-                    payload=payload,
-                    config=_config,
-                    solver=_type1_solver,
-                )
-            else:
-                result = _run_type2(payload, _config, t_start)
-        except Exception as exc:
-            logger.exception("Pipeline error for %s: %s", query_type, exc)
-            raise HTTPException(status_code=500, detail=str(exc))
-
-        result["query_type"] = query_type
-        result["latency_seconds"] = round(time.monotonic() - t_start, 3)
-        return JSONResponse(content=[_submission_result(payload, result, query_type)])
-
-    @app.post("/predict/type1")
-    async def predict_type1(payload: Dict[str, Any] = Body(...)) -> JSONResponse:
-        t_start = time.monotonic()
-        try:
-            result = _type1_pipeline.run(
-                payload=payload,
-                config=_config,
-                solver=_type1_solver,
-            )
-        except Exception as exc:
-            logger.exception("Type 1 pipeline error: %s", exc)
-            raise HTTPException(status_code=500, detail=str(exc))
-        result["query_type"] = "type1"
-        result["latency_seconds"] = round(time.monotonic() - t_start, 3)
-        return JSONResponse(content=result)
-
-    @app.post("/predict/type2")
-    async def predict_type2(payload: Dict[str, Any] = Body(...)) -> JSONResponse:
-        t_start = time.monotonic()
-        try:
-            result = _run_type2(payload, _config, t_start)
-        except Exception as exc:
-            logger.exception("Type 2 pipeline error: %s", exc)
-            raise HTTPException(status_code=500, detail=str(exc))
-        result["query_type"] = "type2"
-        result["latency_seconds"] = round(time.monotonic() - t_start, 3)
-        return JSONResponse(content=result)
-
-else:
-    # FastAPI not installed — expose a no-op placeholder so imports don't crash
-    logger.warning("FastAPI not installed; API server will not be available.")
-    app = None  # type: ignore[assignment]

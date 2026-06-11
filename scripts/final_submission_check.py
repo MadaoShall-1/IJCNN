@@ -17,9 +17,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 SYNTAX_COMMANDS = [
-    ["python", "-m", "py_compile", ".\\api.py"],
+    ["python", "-m", "py_compile", ".\\type2\\pipeline.py"],
     ["python", "-m", "py_compile", ".\\router.py"],
-    ["python", "-m", "py_compile", ".\\type1\\parser.py"],
     ["python", "-m", "py_compile", ".\\type2\\stage2.py"],
     ["python", "-m", "py_compile", ".\\type2\\schemas.py"],
     ["python", "-m", "py_compile", ".\\scripts\\run_api_on_dataset.py"],
@@ -29,9 +28,8 @@ SYNTAX_COMMANDS = [
 
 POWERSHELL_COMMANDS = r"""
 # 1. Syntax checks
-python -m py_compile .\api.py
+python -m py_compile .\type2\pipeline.py
 python -m py_compile .\router.py
-python -m py_compile .\type1\parser.py
 python -m py_compile .\type2\stage2.py
 python -m py_compile .\type2\schemas.py
 python -m py_compile .\scripts\run_api_on_dataset.py

@@ -17,8 +17,9 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-import api  # noqa: E402
-import type1.pipeline as type1_pipeline  # noqa: E402
+# The type2 repo no longer ships an HTTP server; the pipeline capability
+# module exposes the same functions the old type2/api.py had.
+import type2.pipeline as api  # noqa: E402
 from config import SolverConfig  # noqa: E402
 from router import detect_query_type  # noqa: E402
 
@@ -139,7 +140,13 @@ def _run_one_payload(
     t_start: float,
 ) -> Dict[str, Any]:
     if query_type == "type1":
-        return type1_pipeline.run(payload=payload, config=cfg, solver=api._type1_solver)
+        # Type 1 now lives in type1/IJCNN-Qiwei and is served by the root
+        # api.py. This harness only evaluates the Type 2 pipeline; run it
+        # with --query-type type2 (as in the README commands).
+        raise RuntimeError(
+            "type1 rows are not supported by this harness anymore; "
+            "use --query-type type2 or evaluate Type 1 via the root /predict."
+        )
     return api._run_type2(payload, cfg, t_start)
 
 

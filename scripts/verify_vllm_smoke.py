@@ -29,7 +29,7 @@ os.environ.setdefault("DSPY_MODEL", "openai/qwen3-8b")
 os.environ.setdefault("DSPY_API_BASE", "http://localhost:8000/v1")
 os.environ.setdefault("DSPY_API_KEY", "EMPTY")
 
-import api  # noqa: E402
+import type2.pipeline as api  # noqa: E402
 from config import SolverConfig  # noqa: E402
 
 
