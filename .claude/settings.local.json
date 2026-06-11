@@ -1,17 +1,36 @@
 {
   "permissions": {
     "allow": [
-      "Bash(Get-ChildItem -Path \"E:\\\\LLM-vllm\" -Recurse -File)",
-      "Bash(Select-Object -ExpandProperty FullName)",
-      "Bash(Sort-Object)",
-      "Bash(python -m pytest tests/test_dispatcher.py -v --tb=short)",
-      "Bash(python -m pytest tests/test_predict_api.py -v --tb=short)",
+      "Bash(python *)",
+      "Bash(python3 *)",
+      "Bash(pip *)",
+      "Bash(curl *)",
+      "Bash(docker *)",
+      "Bash(git status*)",
+      "Bash(git log*)",
+      "Bash(git diff*)",
+      "Bash(git ls-files*)",
       "Bash(git checkout *)",
-      "Bash(python -m pytest tests/ -v --tb=short)",
-      "Bash(python run_type2_sample.py)",
-      "Bash(python scripts/run_stage0_on_dataset.py --dataset Dataset/Physics_Problems_Text_Only.csv --output-dir outputs/stage0_with_llm_v2 --use-llm-fallback)",
-      "Bash(python -c ' *)",
-      "Bash(python -c \"import dis, marshal, sys; f=open\\(r'E:/LLM-vllm/type2/type2/__pycache__/special_cases.cpython-312.pyc','rb'\\); f.read\\(16\\); code=marshal.load\\(f\\); print\\([c for c in code.co_consts if isinstance\\(c,str\\)][:10]\\)\")"
+      "Bash(until *)",
+      "PowerShell(python *)",
+      "PowerShell(pip *)",
+      "PowerShell(docker *)",
+      "PowerShell(git *)",
+      "PowerShell(Get-Content *)",
+      "PowerShell(Get-ChildItem *)",
+      "PowerShell(Get-Item *)",
+      "PowerShell(Get-NetTCPConnection *)",
+      "PowerShell(Get-CimInstance *)",
+      "PowerShell(Select-String *)",
+      "PowerShell(Test-Path *)",
+      "PowerShell(Copy-Item *)",
+      "PowerShell(Invoke-WebRequest *)",
+      "PowerShell(Invoke-RestMethod *)",
+      "PowerShell(Set-Location *)",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "PowerShell($env:Path = [Environment]::GetEnvironmentVariable\\(\"Path\",\"Machine\"\\) + \";\" + [Environment]::GetEnvironmentVariable\\(\"Path\",\"User\"\\); cloudflared tunnel login)",
+      "Bash(sleep 5; head -5 \"/c/Users/Madao/AppData/Local/Temp/claude/E--LLM-vllm/12caadee-0948-468b-b260-612141c48c6a/tasks/b80wg83om.output\")"
     ]
   }
 }

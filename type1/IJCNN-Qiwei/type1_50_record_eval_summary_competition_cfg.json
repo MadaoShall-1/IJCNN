@@ -1,0 +1,8 @@
+{
+  "records_requested": 50,
+  "questions_evaluated": 93,
+  "correct": 75,
+  "accuracy": 0.806452,
+  "request_failures": 0,
+  "output": "type1_50_record_eval_results_competition_cfg.jsonl"
+}

@@ -1,0 +1,8 @@
+{
+  "records_requested": 50,
+  "questions_evaluated": 93,
+  "correct": 73,
+  "accuracy": 0.784946,
+  "request_failures": 0,
+  "output": "type1_93q_gated.jsonl"
+}

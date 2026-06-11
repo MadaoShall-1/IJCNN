@@ -1,0 +1,2 @@
+prediction_url=https://predict.exact2026tsupernb.xyz/predict
+vllm_models_url=https://vllm.exact2026tsupernb.xyz/v1/models

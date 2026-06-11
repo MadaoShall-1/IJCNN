@@ -1,0 +1,8 @@
+{
+  "records_requested": 50,
+  "questions_evaluated": 93,
+  "correct": 65,
+  "accuracy": 0.698925,
+  "request_failures": 0,
+  "output": "type1_50_record_eval_results_retained_readme_labels.jsonl"
+}

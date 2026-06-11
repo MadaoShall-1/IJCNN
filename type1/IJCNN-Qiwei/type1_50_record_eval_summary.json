@@ -1,0 +1,8 @@
+{
+  "records_requested": 50,
+  "questions_evaluated": 93,
+  "correct": 29,
+  "accuracy": 0.311828,
+  "request_failures": 0,
+  "output": "type1_50_record_eval_results.jsonl"
+}

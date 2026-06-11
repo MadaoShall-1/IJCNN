@@ -1,13 +1,15 @@
 canonical_latex,meaning,your_notation
-+ ,addition,
-- ,subtraction,
 \times,multiplication,*
 \cdot,dot multiplication,*
 \div,division,/
+/,fraction slash,
+\frac{a}{b},fraction,a/b
++,addition,
+-,subtraction / minus,
 \pm,plus-minus,
 \mp,minus-plus,
 =,equals,
-\approx,approximately equals,
+\approx,approximately equal,
 \neq,not equal,
 <,less than,
 >,greater than,
@@ -15,11 +17,59 @@ canonical_latex,meaning,your_notation
 \geq,greater than or equal,>=
 \propto,proportional to,
 \infty,infinity,inf
-a^b,power,
+a^b,power / superscript,
 a_b,subscript,
 \sqrt{},square root,sqrt()
-\frac{a}{b},fraction,a/b
-\Omega,ohm,ohm
-\mu,micro prefix,u
-\degree,degree,degree
-%,percent,%
+\sqrt[n]{},nth root,
+\times 10^{n},scientific notation,*10^n
+\alpha,alpha,
+\beta,beta,
+\gamma,gamma,
+\delta,delta (lowercase),
+\Delta,Delta (change in),
+\epsilon,epsilon / permittivity,
+\varepsilon,var-epsilon,
+\theta,theta,
+\lambda,lambda / linear charge density,
+\mu,mu / micro prefix / permeability,u
+\pi,pi,
+\rho,rho / resistivity / volume charge density,
+\sigma,sigma / conductivity / surface charge density,
+\tau,tau / time constant,
+\phi,phi / potential / flux,
+\varphi,var-phi,
+\Phi,Phi / flux,
+\omega,omega / angular frequency,
+\Omega,Omega / ohm,ohm
+\int,integral,
+\sum,summation,
+\partial,partial derivative,
+\nabla,nabla / del,
+\vec{},vector,
+\hat{},unit vector,
+\degree,degree,deg
+\%,percent,
+\angle,angle,
+V,volt,
+A,ampere,
+ohm,ohm (unit),
+W,watt,
+J,joule,
+C,coulomb,
+F,farad,
+H,henry,
+T,tesla,
+Wb,weber,
+N,newton,
+V/m,volt per meter (electric field),
+N/C,newton per coulomb,
+Hz,hertz,
+s,second,
+m,meter,
+eV,electron volt,
+p,pico (prefix),
+n,nano (prefix),
+u,micro (prefix; ASCII for mu),
+k,kilo (prefix),
+M,mega (prefix),
+G,giga (prefix)
