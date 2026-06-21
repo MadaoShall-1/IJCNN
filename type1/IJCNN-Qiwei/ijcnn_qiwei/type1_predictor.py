@@ -218,25 +218,29 @@ class Type1Predictor:
                 # live it cost 2 points on the official distribution (73/93
                 # vs 75/93), roughly doubled latency on gated questions, and
                 # showed no live gain on out-of-distribution phrasings.
+                # Round1 gating below covers a newer OOD failure mode where
+                # invalid MCQ labels were coerced to option A.
+                fallback_reason = self._retained_fallback_reason(query, result)
+                if fallback_reason:
+                    return self._fallback_type1(
+                        query,
+                        fallback_reason=fallback_reason,
+                        retained_result=result,
+                    )
                 return self._validate_type1(query, result)
             except Exception as exc:
                 self._type1_retained_error = f"{type(exc).__name__}: {exc}"
         if self.vllm.enabled:
-            try:
-                parsed = self._call_type1_vllm(query)
-                return self._validate_type1(query, parsed)
-            except Exception as exc:
-                fallback = self._heuristic_type1(query)
-                fallback["reasoning"]["steps"].insert(0, f"vLLM fallback reason: {type(exc).__name__}")
-                if self._type1_retained_error:
-                    fallback["reasoning"]["steps"].insert(0, f"retained model fallback reason: {self._type1_retained_error}")
-                return fallback
+            return self._fallback_type1(query, fallback_reason="no_retained_path")
         fallback = self._heuristic_type1(query)
         if self._type1_retained_error:
             fallback["reasoning"]["steps"].insert(0, f"retained model fallback reason: {self._type1_retained_error}")
         return fallback
 
     def _call_type1_vllm(self, query: ExactQuery) -> dict[str, Any]:
+        if query.options:
+            return self._call_type1_vllm_entailment(query)
+
         system = (
             "You are the EXACT 2026 Type 1 logic solver. Return only valid JSON. "
             "If options is non-empty, answer must be exactly one option string. "
@@ -260,6 +264,149 @@ class Type1Predictor:
         )
         return self.vllm.chat_json(system, user, max_tokens=700)
 
+    def _call_type1_vllm_entailment(self, query: ExactQuery) -> dict[str, Any]:
+        labels = self._option_labels(query.options)
+        option_items = [
+            {
+                "label": labels[idx],
+                "value": option,
+                "text": self._option_text(query.query, labels[idx], option),
+            }
+            for idx, option in enumerate(query.options)
+        ]
+        ynu_options = {"Yes", "No", "Uncertain"}
+        if set(query.options) >= ynu_options:
+            task = (
+                "Decide whether the queried conclusion follows from the premises. "
+                "For questions asking whether the premises prove, establish, "
+                "guarantee, or satisfy a requirement, answer Yes only if the "
+                "full requested conclusion is entailed; answer No when any "
+                "required condition is missing or contradicted. Use Uncertain "
+                "only for a direct factual query whose truth is not determined "
+                "by the premises, especially when a premise says no premise "
+                "states that fact."
+            )
+            required = {
+                "verdict": "entailed | not_proven_or_contradicted | unknown_fact",
+                "answer": "exactly one of the provided option values",
+                "premises_used": "list[int]",
+                "reasoning": {"type": "fol", "steps": ["short proof steps"]},
+            }
+        else:
+            task = (
+                "Evaluate every multiple-choice option separately. Pick the one "
+                "option whose statement is entailed by the premises. Do not choose "
+                "an option merely because it is mentioned; it must be derivable."
+            )
+            required = {
+                "option_verdicts": {
+                    item["label"]: "entailed | contradicted | not_established"
+                    for item in option_items
+                },
+                "answer": "exactly one of the provided option values",
+                "premises_used": "list[int]",
+                "reasoning": {"type": "fol", "steps": ["short proof steps"]},
+            }
+
+        system = (
+            "You are the EXACT 2026 Type 1 proof checker. Return only valid JSON. "
+            "Use 0-based premise indices. Keep premises_used minimal but complete. "
+            "The answer must exactly match one provided option value."
+        )
+        user = json.dumps(
+            {
+                "task": task,
+                "query_id": query.query_id,
+                "query": query.query,
+                "premises": [
+                    {"index": idx, "text": premise}
+                    for idx, premise in enumerate(query.premises)
+                ],
+                "options": option_items,
+                "required_json": required,
+            },
+            ensure_ascii=False,
+        ) + " /no_think"
+        return self.vllm.chat_json(system, user, max_tokens=900)
+
+    def _fallback_type1(
+        self,
+        query: ExactQuery,
+        *,
+        fallback_reason: str,
+        retained_result: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        if self.vllm.enabled:
+            try:
+                parsed = self._call_type1_vllm(query)
+                result = self._validate_type1(query, parsed)
+                result["reasoning"]["steps"].insert(0, f"fallback reason: {fallback_reason}")
+                if retained_result is not None:
+                    retained_answer = TextTools.clean(retained_result.get("answer"))
+                    result["reasoning"]["steps"].insert(1, f"retained answer bypassed: {retained_answer}")
+                return result
+            except Exception as exc:
+                fallback = self._heuristic_type1(query)
+                fallback["reasoning"]["steps"].insert(0, f"vLLM fallback reason: {type(exc).__name__}")
+                fallback["reasoning"]["steps"].insert(0, f"retained fallback reason: {fallback_reason}")
+                if self._type1_retained_error:
+                    fallback["reasoning"]["steps"].insert(0, f"retained model error: {self._type1_retained_error}")
+                return fallback
+
+        fallback = self._heuristic_type1(query)
+        fallback["reasoning"]["steps"].insert(0, f"retained fallback reason: {fallback_reason}")
+        return fallback
+
+    def _retained_fallback_reason(self, query: ExactQuery, result: dict[str, Any]) -> str:
+        if os.getenv("TYPE1_RETAINED_GATING", "1") == "0":
+            return ""
+        if not query.options:
+            return ""
+
+        answer = TextTools.clean(result.get("answer"))
+        probabilities = result.get("candidate_probabilities")
+        if not isinstance(probabilities, dict):
+            probabilities = {}
+        ranked = sorted(
+            (
+                (TextTools.clean(label), float(prob))
+                for label, prob in probabilities.items()
+                if isinstance(prob, (int, float))
+            ),
+            key=lambda item: item[1],
+            reverse=True,
+        )
+        top_label = ranked[0][0] if ranked else answer
+        top_prob = ranked[0][1] if ranked else float(result.get("model_top_probability") or 0.0)
+        second_prob = ranked[1][1] if len(ranked) > 1 else 0.0
+        margin = top_prob - second_prob
+
+        normalized_options = {self._normalize_option_token(option) for option in query.options}
+        normalized_answer = self._normalize_option_token(answer)
+        normalized_top = self._normalize_option_token(top_label)
+        ynu_options = {"yes", "no", "uncertain"}
+        is_ynu = ynu_options <= normalized_options
+        is_abcd = normalized_options <= {"a", "b", "c", "d"} and len(normalized_options) >= 2
+
+        if normalized_answer not in normalized_options:
+            return f"retained_answer_not_in_options:{answer or '<blank>'}"
+        if is_abcd and normalized_top == "uncertain":
+            return "retained_top_uncertain_for_mcq"
+        if is_abcd and normalized_answer == "a" and top_prob < float(os.getenv("TYPE1_MCQ_A_CONFIDENCE_FLOOR", "0.70")):
+            return f"weak_mcq_a_bias:{top_prob:.3f}"
+        if is_abcd and top_prob < float(os.getenv("TYPE1_MCQ_CONFIDENCE_FLOOR", "0.40")):
+            return f"low_mcq_confidence:{top_prob:.3f}"
+        if is_abcd and margin < float(os.getenv("TYPE1_MCQ_MARGIN_FLOOR", "0.04")):
+            return f"low_mcq_margin:{margin:.3f}"
+        if (
+            is_ynu
+            and os.getenv("TYPE1_YNU_PROOF_FALLBACK", "1") != "0"
+        ):
+            return "ynu_entailment_proof_fallback"
+        if is_ynu and top_prob < float(os.getenv("TYPE1_YNU_CONFIDENCE_FLOOR", "0.58")):
+            return f"low_ynu_confidence:{top_prob:.3f}"
+        return ""
+
     def _get_type1_retained_predictor(self) -> Any:
         if os.getenv("TYPE1_USE_RETAINED_MODEL", "1") == "0":
             return None
@@ -278,10 +425,11 @@ class Type1Predictor:
     def _validate_type1(self, query: ExactQuery, parsed: dict[str, Any]) -> dict[str, Any]:
         answer = TextTools.clean(parsed.get("answer"))
         if query.options and answer not in query.options:
-            answer = self._closest_option(answer, query.options)
+            answer = self._coerce_option_answer(answer, query.options)
         premises_used = self._clean_premise_indices(parsed.get("premises_used"), len(query.premises))
         explanation = TextTools.clean(parsed.get("explanation")) or f"The selected answer is {answer}."
         reasoning = self._clean_reasoning(parsed.get("reasoning"), default_type="fol")
+        answer = self._adjust_ynu_answer(query, parsed, answer, reasoning)
         return {
             "query_id": query.query_id,
             "answer": answer,
@@ -373,6 +521,81 @@ class Type1Predictor:
             if re.search(rf"\b{re.escape(option.lower())}\b", normalized):
                 return option
         return options[0] if options else answer
+
+    def _coerce_option_answer(self, answer: str, options: list[str]) -> str:
+        labels = self._option_labels(options)
+        normalized = self._normalize_option_token(answer)
+        for idx, label in enumerate(labels):
+            if normalized == label.lower() and idx < len(options):
+                return options[idx]
+        return self._closest_option(answer, options)
+
+    def _adjust_ynu_answer(
+        self,
+        query: ExactQuery,
+        parsed: dict[str, Any],
+        answer: str,
+        reasoning: dict[str, Any],
+    ) -> str:
+        normalized_options = {option.lower(): option for option in query.options}
+        if not {"yes", "no", "uncertain"} <= set(normalized_options):
+            return answer
+
+        verdict = TextTools.clean(parsed.get("verdict")).lower()
+        if verdict in {"entailed", "yes"}:
+            adjusted = normalized_options["yes"]
+        elif verdict in {"not_proven_or_contradicted", "contradicted", "not_established", "no"}:
+            adjusted = normalized_options["no"]
+        elif verdict in {"unknown_fact", "unknown", "uncertain"}:
+            adjusted = normalized_options["uncertain"]
+        else:
+            adjusted = answer
+
+        text = " ".join(str(step) for step in reasoning.get("steps") or []).lower()
+        query_text = query.query.lower()
+        no_premise_marker = "no premise states" in text
+        missing_marker = bool(
+            re.search(
+                r"\b(no information about|do not have information|does not establish|"
+                r"not established|not determined|missing|required condition|"
+                r"but there is no|but we do not have)\b",
+                text,
+            )
+        )
+        proof_question = bool(
+            re.search(
+                r"\b(prove|establish|guarantee|satisfy every requirement|"
+                r"does .* follow|do the premises)\b",
+                query_text,
+            )
+        )
+
+        if no_premise_marker and not proof_question:
+            return normalized_options["uncertain"]
+        if missing_marker and proof_question:
+            return normalized_options["no"]
+        if no_premise_marker:
+            return normalized_options["uncertain"]
+        return adjusted
+
+    def _normalize_option_token(self, value: str) -> str:
+        text = TextTools.clean(value).lower()
+        match = re.match(r"^(?:option\s+)?([a-d])(?:[\s.)]|$)", text)
+        if match:
+            return match.group(1)
+        return text
+
+    def _option_labels(self, options: list[str]) -> list[str]:
+        if all(self._normalize_option_token(option) in {"a", "b", "c", "d"} for option in options):
+            return [self._normalize_option_token(option).upper() for option in options]
+        return [chr(ord("A") + idx) for idx in range(len(options))]
+
+    def _option_text(self, query_text: str, label: str, option: str) -> str:
+        pattern = rf"(?:^|\n)\s*{re.escape(label)}\.\s*(.*?)(?=\n\s*[A-D]\.\s*|\Z)"
+        match = re.search(pattern, query_text, flags=re.S)
+        if match:
+            return TextTools.clean(match.group(1))
+        return TextTools.clean(option)
 
     def _clean_premise_indices(self, value: Any, premise_count: int) -> list[int]:
         if not isinstance(value, list):
