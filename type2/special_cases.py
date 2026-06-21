@@ -292,6 +292,76 @@ def _make_text_trace(problem_id: str, answer: str, template_name: str, goal: str
     return _make_trace(problem_id, steps, {}, template_name)
 
 
+def _braking_distance_uniform_acceleration(
+    parse_obj: ProblemParseObject,
+    problem_id: str,
+) -> Optional[TraceObject]:
+    """Solve braking distance before the skeleton/LLM path can hang."""
+    q_text = parse_obj.problem_text
+    q_lower = q_text.lower()
+    target = str(parse_obj.unknown_quantity or "")
+    if target not in {"d", "s", "x"}:
+        return None
+    if "brak" not in q_lower or "to rest" not in q_lower:
+        return None
+
+    speed_match = re.search(
+        r"(?:moving|travelling|traveling)\s+at\s+"
+        r"(?P<value>[+-]?\d+(?:\.\d+)?)\s*m\s*/\s*s\b",
+        q_text,
+        flags=re.IGNORECASE,
+    )
+    accel_match = re.search(
+        r"acceleration\s*(?:is|=|of)?\s*"
+        r"(?P<value>[+-]?\d+(?:\.\d+)?)\s*m\s*/\s*s(?:\^?2|2|\?|Â²|Ã‚Â²|²)?",
+        q_text,
+        flags=re.IGNORECASE,
+    )
+    if not speed_match or not accel_match:
+        return None
+
+    v0 = float(speed_match.group("value"))
+    a = float(accel_match.group("value"))
+    if math.isclose(a, 0.0, abs_tol=1e-12):
+        return None
+    distance = (0.0 - v0 * v0) / (2.0 * a)
+    if distance < 0:
+        distance = abs(distance)
+
+    vso = init_vso(parse_obj)
+    vso["v_0"] = VSOEntry(value=v0, unit_symbol="m/s", unit_name="meter per second", defined_at="step_1", updated_at="step_1")
+    vso["v_final"] = VSOEntry(value=0.0, unit_symbol="m/s", unit_name="meter per second", defined_at="step_1", updated_at="step_1")
+    vso["a"] = VSOEntry(value=a, unit_symbol="m/s^2", unit_name="meter per second squared", defined_at="step_1", updated_at="step_1")
+    vso[target] = VSOEntry(value=distance, unit_symbol="m", unit_name="meter", defined_at="step_2", updated_at="step_2")
+
+    answer = f"{distance:g} m"
+    steps = [
+        {
+            "step_id": "step_1",
+            "goal": "Identify braking motion quantities: initial speed, final speed at rest, and constant acceleration.",
+            "intermediate_answer": f"v_0 = {v0:g} m/s, v_final = 0 m/s, a = {a:g} m/s^2",
+            "output_var": {"v_0": v0, "v_final": 0.0, "a": a},
+            "confidence": 1.0,
+        },
+        {
+            "step_id": "step_2",
+            "goal": "Compute braking distance from v_final^2 = v_0^2 + 2*a*d.",
+            "intermediate_answer": answer,
+            "output_var": {target: distance},
+            "confidence": 1.0,
+        },
+        {
+            "step_id": "step_3",
+            "goal": f"Report the final value of {target}.",
+            "type": "conclusion",
+            "intermediate_answer": answer,
+            "output_var": {target: distance},
+            "confidence": 0.95,
+        },
+    ]
+    return _make_trace(problem_id, steps, vso, "braking_distance_uniform_acceleration")
+
+
 # ---------------------------------------------------------------------------
 # Pattern 1: Midpoint equal same-sign charges → E = 0
 # ---------------------------------------------------------------------------
@@ -2740,6 +2810,7 @@ def _rlc_off_resonance_impedance(
 # ---------------------------------------------------------------------------
 
 _HANDLERS = [
+    _braking_distance_uniform_acceleration,
     _additional_numeric_templates,
     _textual_symbolic_answer_templates,
     _rlc_off_resonance_impedance,
